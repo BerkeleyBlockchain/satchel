@@ -18,18 +18,20 @@ interface CErc20 {
     function redeem(uint) external returns (uint);
 
     function redeemUnderlying(uint) external returns (uint);
+
+    function balanceOfUnderlying(address account) external returns (uint);
 }
 
 contract User {
     event MyLog(string, uint256);
 
-    address schoolContract;
+    address payable schoolContract;
     address owner;
     string name;
 
     uint public cTokenBalance;
 
-    constructor(address _schoolContract, string _name) {
+    constructor(address payable _schoolContract, string memory _name) public {
       name = _name;
       owner = msg.sender;
       schoolContract = _schoolContract;
@@ -78,7 +80,7 @@ contract User {
 
         // Ensure the user has enough supplied to compound to withdraw requested amount
         if (!checkHasEnough(amountWithoutInterest*(1 + interestRate), _cErc20Contract)) {
-          emit MyLog("There is not enough for the withdrawal.");
+        //   emit MyLog("There is not enough for the withdrawal.");
           return false;
         }
 
@@ -112,7 +114,7 @@ contract User {
       CErc20 cToken = CErc20(_cErc20Contract);
       uint exchangeRateMantissa = cToken.exchangeRateCurrent();
       uint currentcTokenBalance = cToken.balanceOfUnderlying(owner) / exchangeRateMantissa;
-      return (currentcTokenBalance - ctokenBalance) / ctokenBalance;
+      return (currentcTokenBalance - cTokenBalance) / cTokenBalance;
     }
 
     // This is needed to receive ETH when calling `redeemCEth`
