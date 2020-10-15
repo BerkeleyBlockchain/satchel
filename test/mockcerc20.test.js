@@ -20,10 +20,10 @@ contract("MockCERC20", (accounts) => {
   });
 
   describe("balanceOfUnderlying", () => {
-    it("is always 0", async () => {
+    it("is always 1", async () => {
       const balance = await contract.balanceOfUnderlying(zeroAddress);
 
-      expect(balance.toNumber()).to.be.equal(0);
+      expect(balance.toNumber()).to.be.equal(1);
     });
   });
 

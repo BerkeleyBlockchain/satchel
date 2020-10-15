@@ -7,7 +7,7 @@ contract MockCERC20 {
     }
 
     function balanceOfUnderlying(address _address) external pure returns (uint256) {
-      return 0;
+      return 1;
     }
 
     function exchangeRateCurrent() external pure returns (uint256) {

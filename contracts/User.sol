@@ -26,9 +26,9 @@ contract User {
     event MyLog(string, uint256);
     event InsufficientBalance(string);
 
-    address payable schoolContract;
-    address owner;
-    string name;
+    address payable public schoolContract;
+    address public owner;
+    string public name;
 
     uint public cTokenBalance;
 
@@ -105,17 +105,20 @@ contract User {
     }
 
     // Ensures the user has enough deposited to withdraw amount
-    function checkHasEnough(uint256 amount, address _cErc20Contract) private returns (bool) {
+    function checkHasEnough(uint256 amount, address _cErc20Contract) public returns (bool) {
       CErc20 cToken = CErc20(_cErc20Contract);
       return amount <= cToken.balanceOfUnderlying(owner);
     }
 
     // Calculate current average interest rate
-    function interestRate(address _cErc20Contract) private returns (uint) {
+    function interestRate(address _cErc20Contract) public returns (uint) {
       CErc20 cToken = CErc20(_cErc20Contract);
       uint exchangeRateMantissa = cToken.exchangeRateCurrent();
       uint currentcTokenBalance = cToken.balanceOfUnderlying(owner) / exchangeRateMantissa;
-      return (currentcTokenBalance - cTokenBalance) / cTokenBalance;
+      return exchangeRateMantissa;
+
+      // cTokenBalance is not defined
+      //return (currentcTokenBalance - cTokenBalance) / cTokenBalance;
     }
 
     // This is needed to receive ETH when calling `redeemCEth`
