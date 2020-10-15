@@ -27,21 +27,12 @@ contract User {
     address owner;
     string name;
 
-    // mapping: index -> (DAI, cToken, withdrawn)
-    mapping(uint => uint) public daiDeposit;
-    mapping(uint => uint) public cTokenDeposit;
-    mapping(uint => uint) public cTokenWithdrawn;
-    // currentIndex: next entry to withdraw from
-    uint currentIndex;
-    // lastIndex: next index to input a new entry
-    uint lastIndex;
+    uint public cTokenBalance;
 
     constructor(address _schoolContract, string _name) {
       name = _name;
       owner = msg.sender;
       schoolContract = _schoolContract;
-      currentIndex = 0;
-      lastIndex = 0;
     }
 
     // supplyErc20ToCompound
@@ -63,24 +54,13 @@ contract User {
         // Mint cTokens
         uint mintResult = cToken.mint(_numTokensToSupply);
 
+        // If deposit is successful, add number of supplied cTokens to running cToken balance
         if (mintResult == 0) {
-            daiDeposit[lastIndex] = _numTokensToSupply;
-            cTokenDeposit[lastIndex] = _numTokensToSupply / exchangeRateMantissa;
-            lastIndex += 1;
+            cTokenBalance += _numTokensToSupply / exchangeRateMantissa;
         }
         return mintResult;
     }
 
-    // redeemCErc20Tokens
-    // mapping: index -> (DAI, cToken, withdrawn)
-    // currentIndex: next entry to withdraw from
-    // lastIndex: next index to input a new entry
-    // iterate from currentIndex until amount withdrawn equals to desired amount
-    // update withdrawn from each entry
-    // interest = balanceOf(address owner) - sum(cToken)
-    // redeem(amount) OR redeemUnderlying(amount)
-    // transfer (interest / 2) * exchangeRateCurrent (in DAI) to school
-    // *** amount can only be in DAI
     function withdraw(
         uint256 amount,
         address _cErc20Contract
@@ -89,19 +69,30 @@ contract User {
         CErc20 cToken = CErc20(_cErc20Contract);
         uint exchangeRateMantissa = cToken.exchangeRateCurrent();
 
-        // `amount` is scaled up by 1e18 to avoid decimals
 
-        if (!checkHasEnough(amount, _cErc20Contract)) {
+        // Calculate the current interest rate
+        uint interestRate = interestRate(_cErc20Contract);
+
+        // Calculating requested amount without interest
+        uint256 amountWithoutInterest = amount/(1 + interestRate/2);
+
+        // Ensure the user has enough supplied to compound to withdraw requested amount
+        if (!checkHasEnough(amountWithoutInterest*(1 + interestRate), _cErc20Contract)) {
           emit MyLog("There is not enough for the withdrawal.");
           return false;
         }
 
-        uint256 redeemResult;
-        uint interestRate = interestRate(_cErc20Contract);
-        uint256 amountOfInterest = amount * interestRate;
-        uint256 amountWithoutInterest = amount - amountOfInterest;
+        // Redeem the amount with interest
+        uint256 redeemResult = cToken.redeemUnderlying(amountWithoutInterest*(1 + interestRate));
 
-        redeemResult = cToken.redeemUnderlying(amount);
+
+        if (redeemResult == 0) {
+            // If redeem is successful, decrement our cTokenBalance by the amount in cToken withdrawn
+            cTokenBalance -= amountWithoutInterest/exchangeRateMantissa;
+            // Transfer half of garnered interest to the school
+            schoolContract.transfer((amountWithoutInterest*interestRate)/2);
+
+        }
 
         // Error codes are listed here:
         // https://compound.finance/developers/ctokens#ctoken-error-codes
@@ -110,25 +101,18 @@ contract User {
         return true;
     }
 
-    function checkHasEnough(uint256 amount, , address _cErc20Contract) private returns (bool) {
+    // Ensures the user has enough deposited to withdraw amount
+    function checkHasEnough(uint256 amount, address _cErc20Contract) private returns (bool) {
       CErc20 cToken = CErc20(_cErc20Contract);
-      return amount <= currentUnderlyingBalance;
+      return amount <= cToken.balanceOfUnderlying(owner);
     }
 
-    function sumOfcTokenDepositLeft() private returns (uint) {
-      uint sum = 0;
-      for (int i = currentIndex; i < lastIndex; i++) {
-        sum += cTokenDeposit[i];
-      }
-      return sum;
-    }
-
+    // Calculate current average interest rate
     function interestRate(address _cErc20Contract) private returns (uint) {
       CErc20 cToken = CErc20(_cErc20Contract);
       uint exchangeRateMantissa = cToken.exchangeRateCurrent();
       uint currentcTokenBalance = cToken.balanceOfUnderlying(owner) / exchangeRateMantissa;
-      uint totalcTokenDepositLeft = sumOfcTokenDepositLeft();
-      return currentcTokenBalance - totalcTokenDepositLeft / totalcTokenDepositLeft;
+      return (currentcTokenBalance - ctokenBalance) / ctokenBalance;
     }
 
     // This is needed to receive ETH when calling `redeemCEth`
