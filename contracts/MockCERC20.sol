@@ -1,7 +1,7 @@
 pragma solidity ^0.5.12;
 
 // Mock as needed for unit testing
-contract CERC20 {  
+contract MockCERC20 {  
     function mint(uint256 _amount) external pure returns (uint256) {
       return _amount;
     }
