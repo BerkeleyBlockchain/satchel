@@ -15,6 +15,7 @@
   "author": "Compound Labs, Inc.",
   "license": "MIT",
   "dependencies": {
+    "dotenv": "^8.2.0",
     "ganache-cli": "^6.8.2",
     "solc": "0.5.12",
     "web3": "^1.2.5"
