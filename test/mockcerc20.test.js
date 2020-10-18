@@ -6,6 +6,8 @@ contract("MockCERC20", (accounts) => {
   let zeroAddress = "0x0000000000000000000000000000000000000000";
   let mintAmount = 0xff;
   let redeemAmount = 0xffff;
+  let setBal = 0xff;
+  let setExchange = 0xff;
 
   beforeEach(async () => {
     contract = await MockCERC20.deployed();
@@ -15,7 +17,7 @@ contract("MockCERC20", (accounts) => {
     it("always mints the amount", async () => {
       const minted = await contract.mint(mintAmount);
 
-      expect(minted.toNumber()).to.be.equal(mintAmount);
+      expect(minted.toNumber()).to.be.equal(0);
     });
   });
 
@@ -27,11 +29,29 @@ contract("MockCERC20", (accounts) => {
     });
   });
 
+  describe("updateBalance", () => {
+    it("sets balanceOfUnderlying", async () => {
+      const amount = await contract.setBalance(setBal);
+      const balance = await contract.balanceOfUnderlying(zeroAddress);
+
+      expect(balance.toNumber()).to.be.equal(setBal);
+    });
+  });
+
   describe("exchangeRateCurrent", () => {
     it("is always 1", async () => {
       const rate = await contract.exchangeRateCurrent();
 
       expect(rate.toNumber()).to.be.equal(1);
+    });
+  });
+
+  describe("setExchangeRate", () => {
+    it("sets exchangeRate", async () => {
+      const amount = await contract.setExchangeRate(setExchange);
+      const rate = await contract.exchangeRateCurrent();
+
+      expect(rate.toNumber()).to.be.equal(setExchange);
     });
   });
 
@@ -47,7 +67,7 @@ contract("MockCERC20", (accounts) => {
     it("always redeems the amount", async () => {
       const amount = await contract.redeem(redeemAmount);
 
-      expect(amount.toNumber()).to.be.equal(redeemAmount);
+      expect(amount.toNumber()).to.be.equal(0);
     });
   });
 
@@ -55,7 +75,7 @@ contract("MockCERC20", (accounts) => {
     it("always redeems the underlying amount", async () => {
       const amount = await contract.redeemUnderlying(redeemAmount);
 
-      expect(amount.toNumber()).to.be.equal(redeemAmount);
+      expect(amount.toNumber()).to.be.equal(0);
     });
   });
 });
