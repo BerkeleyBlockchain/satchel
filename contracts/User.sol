@@ -36,6 +36,7 @@ contract User {
       name = _name;
       owner = msg.sender;
       schoolContract = _schoolContract;
+      cTokenBalance = 0;
     }
 
     // supplyErc20ToCompound
@@ -77,23 +78,23 @@ contract User {
         uint interestRate = interestRate(_cErc20Contract);
 
         // Calculating requested amount without interest
-        uint256 amountWithoutInterest = amount/(1 + interestRate/2);
+        uint256 amountWithoutInterest = amount * 100/(100 + interestRate/2);
 
         // Ensure the user has enough supplied to compound to withdraw requested amount
-        if (!checkHasEnough(amountWithoutInterest*(1 + interestRate), _cErc20Contract)) {
+        if (!checkHasEnough((amountWithoutInterest*(100 + interestRate))/100, _cErc20Contract)) {
           emit InsufficientBalance("There is not enough for the withdrawal.");
           return false;
         }
 
         // Redeem the amount with interest
-        uint256 redeemResult = cToken.redeemUnderlying(amountWithoutInterest*(1 + interestRate));
+        uint256 redeemResult = cToken.redeemUnderlying((amountWithoutInterest *(100 + interestRate))/100);
 
 
         if (redeemResult == 0) {
             // If redeem is successful, decrement our cTokenBalance by the amount in cToken withdrawn
             cTokenBalance -= amountWithoutInterest/exchangeRateMantissa;
             // Transfer half of garnered interest to the school
-            schoolContract.transfer((amountWithoutInterest*interestRate)/2);
+            // schoolContract.transfer((amountWithoutInterest*interestRate)/200);
 
         }
 
@@ -112,13 +113,22 @@ contract User {
 
     // Calculate current average interest rate
     function interestRate(address _cErc20Contract) public returns (uint) {
+      if (cTokenBalance == 0) {
+          return 0;
+      }
+      
       CErc20 cToken = CErc20(_cErc20Contract);
       uint exchangeRateMantissa = cToken.exchangeRateCurrent();
       uint currentcTokenBalance = cToken.balanceOfUnderlying(owner) / exchangeRateMantissa;
-      return exchangeRateMantissa;
 
-      // cTokenBalance is not defined
-      //return (currentcTokenBalance - cTokenBalance) / cTokenBalance;
+      return 100 * (currentcTokenBalance - cTokenBalance) / cTokenBalance;
+    }
+
+
+    function getBalance(address _cErc20Contract) public returns (uint) {
+        CErc20 cToken = CErc20(_cErc20Contract);
+        uint exchangeRateMantissa = cToken.exchangeRateCurrent();
+        return (cTokenBalance + (cTokenBalance * interestRate(_cErc20Contract))/200) * exchangeRateMantissa;
     }
 
     // This is needed to receive ETH when calling `redeemCEth`
