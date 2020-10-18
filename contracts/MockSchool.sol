@@ -4,7 +4,7 @@ pragma solidity ^0.5.12;
 contract MockSchool {  
     uint256 balance = 0;
 
-    function transfer(uint256 _amount) external returns (bool) {
+    function fakeTransfer(uint256 _amount) external payable returns (bool) {
       balance += _amount;
       return true;
     }

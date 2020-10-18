@@ -1,15 +1,15 @@
 const User = artifacts.require("User");
 const MockERC20 = artifacts.require("MockERC20");
 const MockCERC20 = artifacts.require("MockCERC20");
-// const MockSchool = artifacts.require("MockSchool");
+const MockSchool = artifacts.require("MockSchool");
 const expect = require("chai").expect;
 
 contract("User", async (accounts) => {
   let contract;
   let mockERC20 = await MockERC20.deployed();
   let mockCERC20 = await MockCERC20.deployed();
-  // let mockSchool = await mockSchool.deployed();
-  let schoolAddress = "0x0000000000000000000000000000000000000001"; //mockSchool.address;
+  let mockSchool = await MockSchool.deployed();
+  let schoolAddress = mockSchool.address;
   let contractName = "Contract Name";
   let depositAmount = 0x01;
   let withdrawAmount = 0xff;
@@ -223,7 +223,6 @@ contract("User", async (accounts) => {
       );
 
       const curBalance = await contract.getBalance.call(mockCToken.address);
-      // expect(curBalance.toNumber()).to.be.equal(150);
 
       const success = await contract.withdraw.call(
         curBalance,
@@ -277,9 +276,73 @@ contract("User", async (accounts) => {
   });
   
 
-  //deposit 0
-  //deposit 0xff
-  //change balanceOfUnderlying to 2x deposit amount (interest rate/withdraw)
-  //Successful withdaw
+  describe("multiDepositWithdraw", () => {
+    it("end to end withdraw with double exchange rate", async () => {
+      let mockCToken = await MockCERC20.deployed();
+      const y = await mockCToken.setExchangeRate(1);
+
+      const amount = await contract.deposit.call(
+        mockERC20.address,
+        mockCToken.address,
+        100
+      );
+
+      const depositTx = await contract.deposit(
+        mockERC20.address,
+        mockCToken.address,
+        100
+      );
+
+      let cTokenBal = await contract.cTokenBalance();
+      expect(cTokenBal.toNumber()).to.be.equal(100);
+
+      const x = await mockCToken.setBalance(2 * 100);
+
+      let rate = await contract.interestRate.call(mockCToken.address);
+      expect(rate.toNumber()).to.be.equal(100);
+
+      let curBalance = await contract.getBalance.call(mockCToken.address);
+      expect(curBalance.toNumber()).to.be.equal(150);
+
+      const success = await contract.withdraw.call(
+        75,
+        mockCERC20.address
+      );
+
+      const tx = await contract.withdraw(75, mockCERC20.address);
+      expect(success).to.be.equal(true);
+
+      const x3 = await mockCToken.setBalance(100);
+
+      rate = await contract.interestRate.call(mockCToken.address);
+      expect(rate.toNumber()).to.be.equal(100);
+
+
+      cTokenBal = await contract.cTokenBalance();
+      expect(cTokenBal.toNumber()).to.be.equal(50);
+
+      curBalance = await contract.getBalance.call(mockCToken.address);
+      expect(curBalance.toNumber()).to.be.equal(75);
+
+      const amount2 = await contract.deposit.call(
+        mockERC20.address,
+        mockCToken.address,
+        150
+      );
+
+      const depositTx2 = await contract.deposit(
+        mockERC20.address,
+        mockCToken.address,
+        150
+      );
+
+      const x2 = await mockCToken.setBalance(300);
+
+      curBalance = await contract.getBalance.call(mockCToken.address);
+      expect(curBalance.toNumber()).to.be.equal(250);
+
+    });
+
+  });
 
 });

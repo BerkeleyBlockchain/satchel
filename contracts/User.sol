@@ -95,7 +95,6 @@ contract User {
             cTokenBalance -= amountWithoutInterest/exchangeRateMantissa;
             // Transfer half of garnered interest to the school
             // schoolContract.transfer((amountWithoutInterest*interestRate)/200);
-
         }
 
         // Error codes are listed here:

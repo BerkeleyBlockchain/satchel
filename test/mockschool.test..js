@@ -13,7 +13,7 @@ contract("MockSchool", (accounts) => {
 
   describe("transfer", () => {
     it("automatically approves all transfers", async () => {
-      const transfer = await contract.transfer(transferAmount);
+      const transfer = await contract.fakeTransfer(transferAmount);
 
       const balance = await contract.getBalance();
 
