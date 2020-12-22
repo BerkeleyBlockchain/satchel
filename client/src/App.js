@@ -4,7 +4,7 @@ import Dashboard from "./Dashboard";
 import Login from "./Login";
 import SchoolLogin from "./SchoolLogin";
 import SchoolDashboard from "./SchoolDashboard";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 
 class App extends Component {
   render() {
@@ -12,6 +12,9 @@ class App extends Component {
       <Router>
         <div>
           <Switch>
+            <Route exact path="/">
+                <Redirect to="/Login" />
+            </Route>
             <Route exact path = "/Login" component = {Login}/>
             <Route exact path = "/SchoolLogin" component = {SchoolLogin}/>
             <Route exact path = "/SchoolDashboard" component = {SchoolDashboard}/>
