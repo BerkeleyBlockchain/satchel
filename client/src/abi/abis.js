@@ -986,7 +986,7 @@ export const schoolJSON = {
 									"name": "this",
 									"nodeType": "Identifier",
 									"overloadedDeclarations": [],
-									"referencedDeclaration": 838,
+									"referencedDeclaration": 836,
 									"src": "442:4:1",
 									"typeDescriptions": {
 									  "typeIdentifier": "t_contract$_School_$162",
@@ -1419,7 +1419,7 @@ export const schoolJSON = {
 							  "name": "this",
 							  "nodeType": "Identifier",
 							  "overloadedDeclarations": [],
-							  "referencedDeclaration": 838,
+							  "referencedDeclaration": 836,
 							  "src": "753:4:1",
 							  "typeDescriptions": {
 								"typeIdentifier": "t_contract$_School_$162",
@@ -1735,7 +1735,7 @@ export const schoolJSON = {
 							  "name": "this",
 							  "nodeType": "Identifier",
 							  "overloadedDeclarations": [],
-							  "referencedDeclaration": 838,
+							  "referencedDeclaration": 836,
 							  "src": "974:4:1",
 							  "typeDescriptions": {
 								"typeIdentifier": "t_contract$_School_$162",
@@ -2040,7 +2040,7 @@ export const schoolJSON = {
 							  "name": "this",
 							  "nodeType": "Identifier",
 							  "overloadedDeclarations": [],
-							  "referencedDeclaration": 838,
+							  "referencedDeclaration": 836,
 							  "src": "1149:4:1",
 							  "typeDescriptions": {
 								"typeIdentifier": "t_contract$_School_$162",
@@ -2684,7 +2684,7 @@ export const schoolJSON = {
 									"name": "this",
 									"nodeType": "Identifier",
 									"overloadedDeclarations": [],
-									"referencedDeclaration": 838,
+									"referencedDeclaration": 836,
 									"src": "442:4:1",
 									"typeDescriptions": {
 									  "typeIdentifier": "t_contract$_School_$162",
@@ -3117,7 +3117,7 @@ export const schoolJSON = {
 							  "name": "this",
 							  "nodeType": "Identifier",
 							  "overloadedDeclarations": [],
-							  "referencedDeclaration": 838,
+							  "referencedDeclaration": 836,
 							  "src": "753:4:1",
 							  "typeDescriptions": {
 								"typeIdentifier": "t_contract$_School_$162",
@@ -3433,7 +3433,7 @@ export const schoolJSON = {
 							  "name": "this",
 							  "nodeType": "Identifier",
 							  "overloadedDeclarations": [],
-							  "referencedDeclaration": 838,
+							  "referencedDeclaration": 836,
 							  "src": "974:4:1",
 							  "typeDescriptions": {
 								"typeIdentifier": "t_contract$_School_$162",
@@ -3738,7 +3738,7 @@ export const schoolJSON = {
 							  "name": "this",
 							  "nodeType": "Identifier",
 							  "overloadedDeclarations": [],
-							  "referencedDeclaration": 838,
+							  "referencedDeclaration": 836,
 							  "src": "1149:4:1",
 							  "typeDescriptions": {
 								"typeIdentifier": "t_contract$_School_$162",
@@ -4011,16 +4011,10 @@ export const schoolJSON = {
 		"links": {},
 		"address": "0x8736d5567DAF02CDcdB9890716bC28f363b8807a",
 		"transactionHash": "0x17b63d4ffa9725bc61a2d02a1b49e0cbf8df586a03dbc9387b0e0a2e9e6ee720"
-	  },
-	  "3": {
-		"events": {},
-		"links": {},
-		"address": "0x326DEafB66E67520466F71e2a106B42AFB124e00",
-		"transactionHash": "0x72024bf35a56aa6bd37c69ebaa2ab946e428a846eeb850ea74126835401a6d7a"
 	  }
 	},
 	"schemaVersion": "3.3.1",
-	"updatedAt": "2020-12-10T19:09:28.763Z",
+	"updatedAt": "2020-12-03T23:45:06.049Z",
 	"networkType": "ethereum",
 	"devdoc": {
 	  "methods": {}
