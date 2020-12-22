@@ -55,7 +55,7 @@ We plan to add the following improvements:
 
 ## Setup
 
-App will be running at [http://localhost:3000](http://localhost:3000/) and use the Ganache testnet for testing purposes.
+App will be running at [http://localhost:3000/login](http://localhost:3000/login) and use the Ganache testnet for testing purposes.
 
 ### 1. Prerequisites
 Please ensure that you have the following installed on your computer:
