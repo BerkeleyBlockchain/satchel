@@ -57,7 +57,7 @@ We plan to add the following improvements:
 
 App will be running at [http://localhost:3000](http://localhost:3000/) and use the Ganache testnet for testing purposes.
 
-#### Prerequisites
+### 1. Prerequisites
 Please ensure that you have the following installed on your computer:
 
 -  Node JS
@@ -65,9 +65,9 @@ Please ensure that you have the following installed on your computer:
 -  Truffle
 -  Ganache
 
-### 1. Clone the repo
+### 2. Clone the repo
 
-### 2. Set up dependencies
+### 3. Set up dependencies
 ```
 cd client
 npm install
@@ -75,13 +75,13 @@ cd ../blockchain
 npm install
 ```
 
-### 3. Mint test-DAI
+### 4. Mint test-DAI
 
 ```
 ganache-cli -f https://mainnet.infura.io/v3/e7a8a5b48b5048649a342610dd4e0321 -m "clutch captain shoe salt awake harvest setup primary inmate ugly among become" -i 1 -u 0x9759A6Ac90977b93B58547b4A71c78317f391A28 
 ```
 
-### 4. Start the development server
+### 5. Start the development server
 
 ```
 sudo bash start.sh
