@@ -4,7 +4,7 @@
 1. [Description](#Description)
 2. [Features](#Features)
 3. [Setup](#Setup)
-4. [Demo & Prototype](#Demo & Prototype)
+4. [Demo](#Demo)
 5. [License](#License)
 
 ## Description
@@ -79,13 +79,13 @@ ganache-cli -f https://mainnet.infura.io/v3/e7a8a5b48b5048649a342610dd4e0321 -m 
 sudo bash start.sh
 ```                              
 
-## Demo & Prototype
+## Demo
 
-### Demo
+### Video Demo
 
 Insert here
 
-### Figma Prototype
+### Figma Prototype Demo
 
 Our [figma prototype](https://www.figma.com/proto/MQRABZHxaGFJSBRdOBX6xf/UNICEF?node-id=729%3A7067&scaling=min-zoom) showcases the envisioned functionality of Satchel after future features are included.
 
