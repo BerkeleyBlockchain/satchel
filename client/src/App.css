@@ -1,0 +1,308 @@
+.App {
+  text-align: center;
+  background-color: white;
+  height: 100vh;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 40vmin;
+  pointer-events: none;
+}
+
+.Welcome {
+  font-size: 25px;
+  margin-left: 10%;
+  margin-right: 10%;
+  text-align: left;
+  color: 000000, 100%;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+  margin-top: 10%;
+}
+
+
+.Community {
+  font-size: 30px;
+  margin-left: 10%;
+  margin-right: 10%;
+  text-align: left;
+  color: black;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+  margin-top: 0%;
+}
+
+.Initiative {
+  font-size: 20px;
+  margin-left: 10%;
+  margin-right: 10%;
+  text-align: left;
+  color: black;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+  margin-top: 5%;
+}
+
+.Balance {
+  background-color: #ECF3FF;
+  align-items: center;
+  color: 000000, 100%;
+  display: absolute;
+  margin-top: 10%;
+  margin-left: 10%;
+  margin-right: 10%;
+  border-radius: 10px;
+  text-align: center;
+  padding: 10px;
+  height: 50%;
+}
+
+.InterestRate {
+  background-color: #ECF3FF;
+  align-items: center;
+  color: 000000, 100%;
+  display: absolute;
+  margin-top: 10%;
+  margin-left: 10%;
+  margin-right: 10%;
+  border-radius: 10px;
+  padding: 10px;
+  height: 50%;
+}
+
+.Contributions {
+  background-color: #ECF3FF;
+  align-items: center;
+  color: black;
+  display: absolute;
+  margin-top: 5%;
+  margin-left: 10%;
+  margin-right: 10%;
+  border-radius: 10px;
+  padding: 10px;
+  height: 50%;
+}
+
+.ContributionsTitle {
+  font-size: 16px;
+  text-align: left;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+  margin-top: 5%;
+  margin-bottom: 2%;
+}
+
+.ContributionsAmount {
+  font-size: 25px;
+  text-align: left;
+  font-family: 'Roboto', sans-serif;
+  margin-bottom: 2%;
+}
+
+.School {
+  background-color: #ECF3FF;
+  align-items: center;
+  color: black;
+  display: absolute;
+  margin-top: 5%;
+  margin-left: 10%;
+  margin-right: 10%;
+  border-radius: 10px;
+  padding: 10px;
+  height: 50%;
+}
+
+.SchoolTitle {
+  font-size: 16px;
+  text-align: left;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+  margin-top: 5%;
+  margin-bottom: 2%;
+}
+
+.SchoolValue {
+  font-size: 25px;
+  text-align: left;
+  font-family: 'Roboto', sans-serif;
+  margin-bottom: 2%;
+}
+
+.InitiativeSection {
+  background-color: #ECF3FF;
+  align-items: center;
+  color: black;
+  display: absolute;
+  margin-top: 3%;
+  margin-left: 10%;
+  margin-right: 10%;
+  border-radius: 10px;
+  padding: 10px;
+  height: 50%;
+}
+
+.InitiativeTitle {
+  font-size: 14px;
+  text-align: left;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+  margin-bottom: 3%;
+  margin-top: 3%;
+}
+
+.InitiativeDescription {
+  font-size: 11px;
+  text-align: left;
+  font-family: 'Roboto', sans-serif;
+  margin-bottom: 3%;
+}
+
+.CommunityIcon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+
+.LoginItems {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  width: 90%;
+}
+
+.AmountField {
+  margin-top: 10%;
+  width: 80%;
+  font-family: 'Roboto', sans-serif;
+}
+
+.SchoolWithdrawField {
+  margin-top: 3%;
+  margin-left: 10%;
+  margin-right: 10%;
+  width: 80%;
+  font-family: 'Roboto', sans-serif;
+
+}
+
+.App-header {
+  margin-top: 50%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 50;
+  justify-content: space-around;
+  font-size: large;
+  color: #282c34;
+}
+
+.BalanceTitle {
+  font-size: 14px;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+  margin-top: 4%;
+}
+
+*:focus {
+  outline: none !important;
+}
+
+.InterestTitle {
+  font-size: 16px;
+  text-align: left;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+  margin-top: 5%;
+  margin-bottom: 5%;
+  color: 000000, 100%;
+}
+
+.BalanceAmount {
+  font-size: 35px;
+  text-align: center;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+  margin-top: 2%;
+  margin-bottom: 2%;
+}
+
+.InterestAmount {
+  font-size: 20px;
+  text-align: left;
+  font-family: 'Roboto', sans-serif;
+  margin-top: 2%;
+  margin-bottom: 5%;
+  color: 000000, 100%;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.LoginWelcome {
+  font-size: 28px;
+  margin-left: 10%;
+  margin-right: 10%;
+  margin-top: 3%;
+  text-align: center;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+  color: black;
+}
+
+.Slogan {
+  font-size: 15px;
+  margin-left: 10%;
+  margin-right: 10%;
+  margin-top: 2%;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+  color: black;
+}
+
+.SchoolLogin {
+  margin-top: 5%;
+}
+
+.NameField {
+  margin-left: 10%;
+  margin-right: 10%;
+}
+
+.Button {
+  width: 80%;
+  border-radius: 25px;
+}
+
+.InitiativeButton {
+  width: 80%;
+  margin-top: 3%;
+}
+
+.AmountButton {
+  width: 80%;
+  font-family: 'Roboto', sans-serif;
+}
+
+.Initiative {
+  margin-left: 10%;
+  margin-right: 10%;
+  margin-top: 10%;
+  margin-bottom: 5%;
+}
+
+.ColAlign {
+  margin-left: 9%;
+}
