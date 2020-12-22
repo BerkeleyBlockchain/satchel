@@ -9,7 +9,7 @@
 
 ## Description
 
-Satchel is a mobile-optimized web application that aims to bank underbanked communities that may lack access to stable financial climates, but have access to the internet. Satchel leverages a crowdfunding framework to combat hyperinflation and economic distrust by giving users banking functionality with the use of DAI, a cryptocurrency soft-pegged to the U.S. dollar. Satchel allows users to invest in both themselves and their local school, which operates as an economic hub for each community.
+Satchel is a mobile-optimized web application that aims to bank underbanked communities that may lack access to stable financial climates, but have access to the internet. Satchel leverages a crowdfunding framework to combat hyperinflation and economic distrust by giving users banking functionality with the use of DAI, a cryptocurrency soft-pegged to the U.S. dollar. Satchel allows users to invest in both themselves and their local school, which operates as an economic hub for each community. By arming communities with the tools they need to adopt socioeconomic mobility at the individual and communal level, Satchel can redefine financial autonomy on the global scale. 
 
 ### Technical Architecture
 - React.js and web3 for the frontend
