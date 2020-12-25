@@ -19,7 +19,7 @@ Satchel is a mobile-optimized web application that leverages a crowdfunding fram
 
 ### Visualization of Primary Flow
 
-![Architecture](Platform Flow.png)
+![Architecture](architecture.png)
 
 ##  Features
 
