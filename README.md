@@ -91,7 +91,7 @@ sudo bash start.sh
 
 ### Video Demo
 
-[![Satchel Demo](https://img.youtube.com/vi/cywQcc2nuWU/0.jpg)](https://www.youtube.com/watch?v=cywQcc2nuWU)
+[![Satchel Demo](https://img.youtube.com/vi/2gGPDbgQIrY/0.jpg)](https://youtu.be/2gGPDbgQIrY)
 
 ### Figma Prototype Demo
 
