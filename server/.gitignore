@@ -1,0 +1,18 @@
+# See https://help.github.com/ignore-files/ for more about ignoring files.
+
+
+# dependencies
+/node_modules
+/.openzeppelin
+
+# misc
+.env
+playground/config.js
+playground2/config.json
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+.openzeppelin/.session
+BerifySMServerBeta.pem
