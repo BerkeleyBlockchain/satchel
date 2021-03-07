@@ -19,156 +19,24 @@ import FastfoodOutlinedIcon from '@material-ui/icons/FastfoodOutlined';
 import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutlined';
 import LocationCityOutlinedIcon from '@material-ui/icons/LocationCityOutlined';
 import KitchenOutlinedIcon from '@material-ui/icons/KitchenOutlined';
-import {Redirect} from 'react-router-dom';
 
- // note, contract address must match the address provided by Truffle after migrations
-const web3 = new Web3(Web3.givenProvider);
-
-const privateKey = '0xb8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cbf329';
-
-// Add your Ethereum wallet to the Web3 object
-web3.eth.accounts.wallet.add(privateKey);
-const myWalletAddress = web3.eth.accounts.wallet[0].address;
-
-// Mainnet address of the underlying token contract. Example: Dai.
-const underlyingMainnetAddress = '0x6b175474e89094c44da98b954eedeac495271d0f';
-const underlying = new web3.eth.Contract(erc20Abi, underlyingMainnetAddress);
-
-// Mainnet contract address and ABI for the cToken, which can be found in the
-// mainnet tab on this page: https://compound.finance/docs
-const cTokenAddress = '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643';
-const cToken = new web3.eth.Contract(cTokenAbi, cTokenAddress);
-
-const fromMyWallet = {
-  from: myWalletAddress,
-  gasLimit: web3.utils.toHex(1000000),
-  gasPrice: web3.utils.toHex(20000000000) // use ethgasstation.info (mainnet only)
-};
-
-const underlyingDecimals = 18; // Number of decimals defined in this ERC20 token's contract
-
-var TruffleContract = require("truffle-contract");
-var School = TruffleContract(schoolJSON);
-School.setProvider(Web3.givenProvider);
-
-const theme = createMuiTheme({
-  palette: {
-      primary: {
-          main: '#146EFF'
-      },
-      secondary: {
-        main: '#146EFF'
+function Navbar(props) {
+    const [current, setcurrent] = useState('mail');
+    const history = useHistory();
+    const toHistory = () => history.push('/history');
+    const toTransactions = () => history.push('/status')
+    function handleclick(e) {
+        console.log('click', e);
+        setcurrent({ current: e.key });
     }
-    },
-});
-
-
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box p={3}>
-          <Typography component={'span'} variant={'body2'}>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.any.isRequired,
-  value: PropTypes.any.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
-
-class SchoolDashboard extends Component {
-  constructor(props) {
-    super(props);
-    var receivedProps = this.props.location.state;
-    this.state = {
-      activeTab: 0,
-      Balance: '',
-      Withdraw: '',
-      Name: receivedProps.Name
-    }
-    this.setBalance = this.setBalance.bind(this);
-    this.setWithdraw = this.setWithdraw.bind(this);
-    this.toggle = this.toggle.bind(this);
-
-    this.setBalance();
-  }
-
-  withdraw = async (e) => {
-    const self = this;
-    e.preventDefault();
-    const amount = web3.utils.toHex(this.state.Withdraw * Math.pow(10, underlyingDecimals));
-    School.deployed().then(async function(schoolInstance) {
-      let schoolBalance = await schoolInstance.getBalance(underlyingMainnetAddress);
-      console.log("school balance: " +  schoolBalance / 1e18);
-      console.log("withdrawing ... ");
-
-      await schoolInstance.withdrawBalance(schoolBalance, underlyingMainnetAddress, fromMyWallet);
-      self.setBalance();
-    }).catch(function(err) {
-      console.log(err.message);
-    });
-  }
-
-  setBalance = async (e) => {
-    const self = this;
-    School.deployed().then(async function(schoolInstance) {
-      let schoolBalance = await schoolInstance.getBalance(underlyingMainnetAddress);
-      console.log("schoolBalance: " + Number((schoolBalance / 1e18).toFixed(2)));
-      self.setState({Balance: Number((schoolBalance / 1e18).toFixed(6))});
-    }).catch(function(err) {
-      console.log("setBalance" + err.message);
-    });
-  }
-
-  setWithdraw = (event) => {
-    event.preventDefault();
-    const x = event.target.value;
-    this.setState({Withdraw: x});
-  };
-
-  toggle = (event, tab) => {
-    event.preventDefault();
-    if (this.state.activeTab !== tab) {
-      this.setState({activeTab: tab});
-    }
-  }
-
-  createProject = async (e) => {
-    console.log("hi\n");
-    this.props.history.push({pathname: "/CreateProject", state: {}});
-  }
-
-  logout = (event) => {
-    const self = this;
-    event.preventDefault();
-    self.props.history.push({pathname: "/Login", state: {}});
-  };
-
-  render() {
-    const { classes } = this.props;
+    {/*NavBar different for diff pages
+    props.page = "man" -> return navigation bar for manufacturer page
+    if you do not set props.page when you vall NavBar then you will get the default home
+    */}
     return (
-      <div className="App">
+        <div className="App">
         <div >
+
         <MuiThemeProvider theme={theme}>
             <AppBar position="static" style={{background: "#ECF3FF"}}>
                 <Tabs
@@ -289,8 +157,25 @@ class SchoolDashboard extends Component {
           </TabPanel>
         </div>
       </div>
-    );
-  }
-}
 
-export default SchoolDashboard;
+        // <Menu onClick={handleclick} selectedKeys={[current]} mode="horizontal" theme="dark">
+        //     <SubMenu key="SubMenu" icon={<MenuOutlined />} title="">
+        //         <Menu.ItemGroup title="Item 1">
+        //             <Menu.Item key="setting:1">Other Option 1</Menu.Item>
+        //             <Menu.Item key="setting:2">Other Option 2</Menu.Item>
+        //         </Menu.ItemGroup>
+        //         <Menu.ItemGroup title="Item 2">
+        //             <Menu.Item key="setting:3">Other Option 3</Menu.Item>
+        //             <Menu.Item key="setting:4">Other Option 4</Menu.Item>
+        //         </Menu.ItemGroup>
+        //     </SubMenu>
+        //     <Menu.Item onClick={toTransactions} key="transaction" icon={<TransactionOutlined />}>
+        //         Transactions
+        //     </Menu.Item>
+        //     <Menu.Item  onClick = {toHistory} key="clock" icon={<ClockCircleOutlined />}>
+        //         History
+        //     </Menu.Item>
+        // </Menu>
+    );
+}
+export default Navbar;
