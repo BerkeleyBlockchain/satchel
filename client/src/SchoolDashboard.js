@@ -157,8 +157,9 @@ class SchoolDashboard extends Component {
   }
 
   createProject = async (e) => {
-    console.log("hi\n");
-    this.props.history.push({pathname: "/CreateProject", state: this.state});
+    console.log(this.state.Name)
+    this.props.history.push({pathname: "/CreateProject", Balance: this.state.Balance, Withdraw: this.state.Withdraw, Name: this.state.Name, activeTab: this.state.activeTab});
+
   }
 
   logout = (event) => {

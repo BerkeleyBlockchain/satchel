@@ -109,17 +109,16 @@ function getStepContent(step) {
   }
 }
 
-export default function CreateProject() {
+
+
+export default function CreateProject(props) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
   const steps = getSteps();
   
-  //stuff for the server
-  const [projectName, setProjectName] = useState('');
-  const [projectDescription, setProjectDescription] = useState('');
-  const [targetFunding, setTargetFunding] = useState(0);
-  const [fundingBreakdown, setFundingBreakdown] = useState('');
+
+
 
 
   const isStepOptional = (step) => {
@@ -166,7 +165,7 @@ export default function CreateProject() {
 
   return (
     <div className={classes.root}>
-      <SchoolNavBar Balance={500} Withdraw={300} Name='Melissa' activeTab={1}/>
+      <SchoolNavBar Balance={props.location.Balance} Withdraw={props.location.Withdraw} Name={props.location.Name} activeTab={props.location.activeTab}/>
       <div className="CreateProjectPageTitle"> Create Project</div>
       <Stepper activeStep={activeStep}>
         {steps.map((label, index) => {
