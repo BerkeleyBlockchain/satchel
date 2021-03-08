@@ -19,8 +19,8 @@ import FastfoodOutlinedIcon from '@material-ui/icons/FastfoodOutlined';
 import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutlined';
 import LocationCityOutlinedIcon from '@material-ui/icons/LocationCityOutlined';
 import KitchenOutlinedIcon from '@material-ui/icons/KitchenOutlined';
-import NavBar from './NavBar.js'
 
+import {Redirect} from 'react-router-dom';
 
  // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
@@ -156,6 +156,11 @@ class SchoolDashboard extends Component {
     }
   }
 
+  createProject = async (e) => {
+    console.log("hi\n");
+    this.props.history.push({pathname: "/CreateProject", state: this.state});
+  }
+
   logout = (event) => {
     const self = this;
     event.preventDefault();
@@ -167,7 +172,6 @@ class SchoolDashboard extends Component {
     return (
       <div className="App">
         <div >
-
         <MuiThemeProvider theme={theme}>
             <AppBar position="static" style={{background: "#ECF3FF"}}>
                 <Tabs
@@ -213,7 +217,7 @@ class SchoolDashboard extends Component {
                   {"Projects"}
               </div>
               <br></br>
-               <Button style={{ backgroundColor:"#146EFF", fontWeight: "bold", color:"white", borderRadius: "10px", borderWidth:"0px"}} className="InitiativeButton">Create Project</Button>
+               <Button onClick={this.createProject} type="submit" style={{ backgroundColor:"#146EFF", fontWeight: "bold", color:"white", borderRadius: "10px", borderWidth:"0px"}} className="InitiativeButton">Create Project</Button>
                 <div className="InitiativeSection">
                 <Container>
                     <Row>

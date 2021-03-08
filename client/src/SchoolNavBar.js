@@ -24,7 +24,7 @@ const theme = createMuiTheme({
     },
 });
 
-export default function NavBar(props) {
+export default function SchoolNavBar(props) {
   const [value, setValue] = React.useState(props.activeTab);
 
   const history = useHistory();
@@ -35,7 +35,7 @@ export default function NavBar(props) {
         pathname: '/SchoolDashboard',
         state: {
           Name: props.Name,
-          Withdrawz: props.Withdraw,
+          Withdraw: props.Withdraw,
           Balance: props.Balance,
           activeTab: newValue,
         },

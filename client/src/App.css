@@ -21,6 +21,21 @@
   margin-top: 10%;
 }
 
+.CreateProjectPageTitle {
+  font-size: 25px;
+  margin-left: 10%;
+  margin-right: 10%;
+  text-align: left;
+  color: 000000, 100%;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+  margin-top: 10%;
+}
+
+.ProjectNextButton {
+  margin-bottom: 20px;
+  width: 90%;
+}
 
 .Community {
   font-size: 30px;
@@ -188,6 +203,16 @@
 
 }
 
+.ProjectNameField {
+  width: 90%;
+  font-family: 'Roboto', sans-serif;
+}
+
+.ProjectDescriptionField {
+  width: 90%;
+  font-family: 'Roboto', sans-serif;
+}
+
 .App-header {
   margin-top: 50%;
   display: flex;
@@ -204,6 +229,24 @@
   text-align: center;
   font-family: 'Roboto', sans-serif;
   margin-top: 4%;
+}
+
+.CreateProjectTitle {
+  font-size: 14px;
+  font-family: 'Roboto', sans-serif;
+  margin-top: 4%;
+  font-weight: bold;
+}
+
+.CongratulationsCreateProject {
+  font-size: 20px;
+  font-family: 'Roboto', sans-serif;
+  margin-bottom: 4%;
+  font-weight: bold;
+}
+
+.CreateProjectsFinished {
+  margin-bottom: 5%;
 }
 
 *:focus {
@@ -305,4 +348,10 @@
 
 .ColAlign {
   margin-left: 9%;
+}
+
+
+.Stepper {
+  margin-left: 10%;
+  margin-right: 10%;
 }

@@ -4,8 +4,8 @@ import Dashboard from "./Dashboard";
 import Login from "./Login";
 import SchoolLogin from "./SchoolLogin";
 import SchoolDashboard from "./SchoolDashboard";
+import CreateProject from "./CreateProject";
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
-import Test from "./Test";
 
 
 class App extends Component {
@@ -20,11 +20,12 @@ class App extends Component {
             <Route exact path = "/Login" component = {Login}/>
             <Route exact path = "/SchoolLogin" component = {SchoolLogin}/>
             <Route exact path = "/SchoolDashboard" component = {SchoolDashboard}/>
+            <Route exact path = "/CreateProject" component = {CreateProject}/>
+            {/* <Redirect to="/CreateProject/" /> */}
             <Route
               exact path="/Dashboard"
               render={(props) => <Dashboard {...props} />}
             />
-            <Route path="/Test"><Test/></Route>
           </Switch>
         </div>
       </Router>
