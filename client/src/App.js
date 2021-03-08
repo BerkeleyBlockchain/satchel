@@ -5,6 +5,8 @@ import Login from "./Login";
 import SchoolLogin from "./SchoolLogin";
 import SchoolDashboard from "./SchoolDashboard";
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
+import Test from "./Test";
+
 
 class App extends Component {
   render() {
@@ -22,6 +24,7 @@ class App extends Component {
               exact path="/Dashboard"
               render={(props) => <Dashboard {...props} />}
             />
+            <Route path="/Test"><Test/></Route>
           </Switch>
         </div>
       </Router>

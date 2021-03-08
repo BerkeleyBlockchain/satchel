@@ -32,7 +32,8 @@ class SchoolLogin extends Component {
     constructor(props) {
         super(props);
         this.state = {
-          Name: ''
+          Name: '',
+          activeTab: 0
         }
         this.setName = this.setName.bind(this);
         this.login = this.login.bind(this);
@@ -46,7 +47,7 @@ class SchoolLogin extends Component {
 
     login = async (e) => {
         e.preventDefault();
-        this.props.history.push({pathname: "/SchoolDashboard", state: {Name: this.state.Name}});
+        this.props.history.push({pathname: "/SchoolDashboard", state: {Name: this.state.Name, activeTab: this.state.activeTab}});
 
     }
 

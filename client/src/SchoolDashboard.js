@@ -19,6 +19,8 @@ import FastfoodOutlinedIcon from '@material-ui/icons/FastfoodOutlined';
 import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutlined';
 import LocationCityOutlinedIcon from '@material-ui/icons/LocationCityOutlined';
 import KitchenOutlinedIcon from '@material-ui/icons/KitchenOutlined';
+import NavBar from './NavBar.js'
+
 
  // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
@@ -100,17 +102,19 @@ class SchoolDashboard extends Component {
     super(props);
     var receivedProps = this.props.location.state;
     this.state = {
-      activeTab: 0,
       Balance: '',
       Withdraw: '',
-      Name: receivedProps.Name
+      Name: receivedProps.Name,
+      activeTab: receivedProps.activeTab,
+
     }
     this.setBalance = this.setBalance.bind(this);
     this.setWithdraw = this.setWithdraw.bind(this);
     this.toggle = this.toggle.bind(this);
-
     this.setBalance();
   }
+
+
 
   withdraw = async (e) => {
     const self = this;
