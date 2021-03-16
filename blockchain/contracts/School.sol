@@ -12,6 +12,10 @@ contract School {
       owner = msg.sender;
     }
 
+    function getName() public view returns (string memory) {
+        return name;
+    }
+
     function createUserContract(string memory _name) public {
         // instantiate a new user contract
         _users[msg.sender] = address(new User(address(this), _name));
