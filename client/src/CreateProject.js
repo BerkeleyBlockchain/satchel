@@ -171,7 +171,7 @@ export default function CreateProject(props) {
             "description": projectDes,
             "targetFunding": fundingAmt,
             "fundingBreakdown": fundingBreak,
-            "school": "UC berkeley",
+            "schoolAddress": "0x551192f78F5F1d30385415A59e008FFfc94Ab940",
         });
     };
 

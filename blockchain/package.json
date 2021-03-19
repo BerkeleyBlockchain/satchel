@@ -1,1 +1,10 @@
-{}
+{
+  "scripts": {
+    "test": "truffle test --network testing"
+  },
+  "devDependencies": {
+    "bn-chai": "^1.0.1",
+    "bn.js": "^5.2.0",
+    "chai": "^4.3.4"
+  }
+}
