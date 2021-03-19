@@ -6,9 +6,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
-import MenuBookOutlinedIcon from '@material-ui/icons/MenuBookOutlined';
 import SchoolNavBar from './SchoolNavBar.js'
 import axios from 'axios';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -162,6 +162,7 @@ export default function CreateProject(props) {
 
     if (activeStep == 2) {
       handleRequest();
+      handleFinish();
     }
   };
 
@@ -194,9 +195,17 @@ export default function CreateProject(props) {
       return newSkipped;
     });
   };
-
-  const handleReset = () => {
-    setActiveStep(0);
+  const history = useHistory();
+  const handleFinish = (event) => {
+      history.push({
+        pathname: '/SchoolDashboard',
+        state: {
+          Name: props.Name,
+          Withdraw: props.Withdraw,
+          Balance: props.Balance,
+          activeTab: 1,
+        },
+      });
   };
 
   return (
@@ -221,16 +230,6 @@ export default function CreateProject(props) {
         })}
       </Stepper>
       <div>
-        {activeStep === steps.length ? (
-          <div>
-            <Typography className={classes.instructions}>
-              All steps completed - you&apos;re finished
-            </Typography>
-            <Button onClick={handleReset} className={classes.button}>
-              Reset
-            </Button>
-          </div>
-        ) : (
           <div className="Stepper">
             {/*pass in more arguments to the getStepContent func(state functions)*/}
             <Typography> {getStepContent(activeStep, setProjectName, setProjectDes, setFundingAmt, setFundingBreak)} </Typography>
@@ -249,7 +248,6 @@ export default function CreateProject(props) {
               </Button>
             </div>
           </div>
-        )}
       </div>
     </div>
   );
