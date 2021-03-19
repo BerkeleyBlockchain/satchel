@@ -1,4 +1,4 @@
-pragma solidity ^0.7.0;
+pragma solidity ^0.5.0;
 
 import "./School.sol";
 
@@ -15,7 +15,7 @@ contract SchoolFactory {
         _;
     }
     
-    function newSchool(string calldata _schoolName) public {
+    function newSchool(string memory _schoolName) public {
         schoolArray.push(new School(_schoolName));
         uint256 id = schoolArray.length - 1;
         schoolToOwner[id] = msg.sender;
