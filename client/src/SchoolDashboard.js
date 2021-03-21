@@ -14,12 +14,9 @@ import { erc20Abi, cTokenAbi, schoolJSON } from './abi/abis';
 import './App.css';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
-import MenuBookOutlinedIcon from '@material-ui/icons/MenuBookOutlined';
-import FastfoodOutlinedIcon from '@material-ui/icons/FastfoodOutlined';
-import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutlined';
-import LocationCityOutlinedIcon from '@material-ui/icons/LocationCityOutlined';
-import KitchenOutlinedIcon from '@material-ui/icons/KitchenOutlined';
 import axios from 'axios';
+import { makeStyles } from '@material-ui/core/styles';
+import Panel from './Panel';
 
 import {Redirect} from 'react-router-dom';
 
@@ -63,7 +60,6 @@ const theme = createMuiTheme({
     }
     },
 });
-
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -231,22 +227,11 @@ class SchoolDashboard extends Component {
               <br></br>
                <Button onClick={this.createProject} type="submit" style={{ backgroundColor:"#146EFF", fontWeight: "bold", color:"white", borderRadius: "10px", borderWidth:"0px"}} className="InitiativeButton">Create Project</Button>
                {this.state.projects.length > 0? this.state.projects.map(project => (
-                  <div className="InitiativeSection">
-                  <Container>
-                      <Row>
-                        <Col xs="8">
-                          <div className = "InitiativeTitle">{project.name}</div>
-                          <div className = "InitiativeDescription">{project.description}</div>
-                        </Col>
-                        <Col xs="1" >
-                            <ArrowForwardIosOutlinedIcon style={{ color:"black", fontSize:"20px"}} className="CommunityIcon"/>
-                        </Col>
-                      </Row>
-                    </Container>
+                  <div className="PanelWidth">
+                    <Panel project={project}></Panel>
                   </div>
                 )): null
                }
-
           </TabPanel>
           <TabPanel value={this.state.activeTab} index={2}>
           <Button style={{ backgroundColor:"white", fontWeight: "bold", color:"#146EFF", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF"}} onClick={this.logout} className="LogoutButton">Logout</Button>

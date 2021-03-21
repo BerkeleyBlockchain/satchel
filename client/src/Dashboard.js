@@ -18,6 +18,7 @@ import MenuBookOutlinedIcon from '@material-ui/icons/MenuBookOutlined';
 import FastfoodOutlinedIcon from '@material-ui/icons/FastfoodOutlined';
 import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutlined';
 import axios from 'axios';
+import Panel from './Panel';
 
  // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
@@ -343,19 +344,9 @@ class Dashboard extends Component {
               <div className="Initiative">Explore School Initiatives</div>
 
               {this.state.projects.length > 0? this.state.projects.map(project => (
-                  <div className="InitiativeSection">
-                  <Container>
-                      <Row>
-                        <Col xs="8">
-                          <div className = "InitiativeTitle">{project.name}</div>
-                          <div className = "InitiativeDescription">{project.description}</div>
-                        </Col>
-                        <Col xs="1" >
-                            <ArrowForwardIosOutlinedIcon style={{ color:"black", fontSize:"20px"}} className="CommunityIcon"/>
-                        </Col>
-                      </Row>
-                    </Container>
-                  </div>
+                  <div className="PanelWidth">
+                  <Panel project={project}></Panel>
+                </div>
                 )): null
                }
           </TabPanel>
