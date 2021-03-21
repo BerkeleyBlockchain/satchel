@@ -174,11 +174,11 @@ class Dashboard extends Component {
     this.setState({Balance: Number((balance).toFixed(2))});
   }
 
-  setInterestRate = async (e) => {
-    let interestRate = await this.state.UserContract.methods.interestRate(cTokenAddress).call() / 1e16;
-    console.log(interestRate);
-    this.setState({InterestRate: Number((interestRate).toFixed(6))});
-  }
+  setInterestRate = async() => {
+    await axios.get('https://api.compound.finance/api/v2/ctoken?addresses=0x5d3a536e4d6dbd6114cc1ead35777bab948e3643')
+    .then(res=>this.setState(
+      {InterestRate: Number(((res.data.cToken[0].supply_rate.value)*100).toFixed(2))}));
+  };
 
   setName = async (e) => {
     let x = await this.state.UserContract.methods.getName().call();
@@ -293,12 +293,12 @@ class Dashboard extends Component {
                 <div className="InterestRate">
                   <Container>
                     <Row>
-                      <Col xs="6">
+                      <Col xs="8">
                         <div className="InterestTitle">
                           Interest Rate
                         </div>
                       </Col>
-                      <Col xs="6">
+                      <Col xs="4">
                         <div className="InterestAmount">
                         { this.state.InterestRate + "%"}
                         </div>
@@ -358,9 +358,6 @@ class Dashboard extends Component {
                   </div>
                 )): null
                }
-
-
-                {/* <Button style={{ backgroundColor:"white", fontWeight: "bold", color:"#146EFF", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF"}} className="InitiativeButton">Show More</Button> */}
           </TabPanel>
           <TabPanel value={this.state.activeTab} index={2}>
           <Button style={{ backgroundColor:"white", fontWeight: "bold", color:"#146EFF", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF"}} onClick={this.logout} className="LogoutButton">Logout</Button>
