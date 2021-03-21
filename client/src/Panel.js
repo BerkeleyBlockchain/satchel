@@ -19,7 +19,8 @@ const useStyles = makeStyles(theme => ({
     root: {
       width: '100%',
       borderRadius: '10px',
-      marginTop: '5%',
+      marginTop: '4%',
+      marginBottom: '4%',
       backgroundColor: '#ECF3FF',
     },
     heading: {
