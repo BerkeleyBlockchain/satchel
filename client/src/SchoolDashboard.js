@@ -19,6 +19,7 @@ import FastfoodOutlinedIcon from '@material-ui/icons/FastfoodOutlined';
 import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutlined';
 import LocationCityOutlinedIcon from '@material-ui/icons/LocationCityOutlined';
 import KitchenOutlinedIcon from '@material-ui/icons/KitchenOutlined';
+import axios from 'axios';
 
 import {Redirect} from 'react-router-dom';
 
@@ -106,15 +107,18 @@ class SchoolDashboard extends Component {
       Withdraw: '',
       Name: receivedProps.Name,
       activeTab: receivedProps.activeTab,
-
+      projects: []
     }
     this.setBalance = this.setBalance.bind(this);
     this.setWithdraw = this.setWithdraw.bind(this);
     this.toggle = this.toggle.bind(this);
     this.setBalance();
+    this.getProjects();
   }
 
-
+  componentDidMount() {
+    this.getProjects();
+  }
 
   withdraw = async (e) => {
     const self = this;
@@ -162,6 +166,12 @@ class SchoolDashboard extends Component {
 
   }
 
+  getProjects = async() => {
+    await axios.get('http://localhost:4000/api/project?schoolAddress=0xa0df350d2637096571F7A701CBc1C5fdE30dF76A')
+    .then(res=>this.setState(
+      {projects: res.data.projects}));
+  };
+
   logout = (event) => {
     const self = this;
     event.preventDefault();
@@ -169,6 +179,7 @@ class SchoolDashboard extends Component {
   };
 
   render() {
+    console.log(this.state.projects);
     const { classes } = this.props;
     return (
       <div className="App">
@@ -219,7 +230,24 @@ class SchoolDashboard extends Component {
               </div>
               <br></br>
                <Button onClick={this.createProject} type="submit" style={{ backgroundColor:"#146EFF", fontWeight: "bold", color:"white", borderRadius: "10px", borderWidth:"0px"}} className="InitiativeButton">Create Project</Button>
-                <div className="InitiativeSection">
+               {this.state.projects.length > 0? this.state.projects.map(project => (
+                  <div className="InitiativeSection">
+                  <Container>
+                      <Row>
+                        <Col xs="8">
+                          <div className = "InitiativeTitle">{project.name}</div>
+                          <div className = "InitiativeDescription">{project.description}</div>
+                        </Col>
+                        <Col xs="1" >
+                            <ArrowForwardIosOutlinedIcon style={{ color:"black", fontSize:"20px"}} className="CommunityIcon"/>
+                        </Col>
+                      </Row>
+                    </Container>
+                  </div>
+                )): null
+               }
+                
+                {/* <div className="InitiativeSection">
                 <Container>
                     <Row>
                       <Col xs="2" >
@@ -285,7 +313,7 @@ class SchoolDashboard extends Component {
                       </Col>
                     </Row>
                   </Container>
-                </div>
+                </div> */}
 
           </TabPanel>
           <TabPanel value={this.state.activeTab} index={2}>

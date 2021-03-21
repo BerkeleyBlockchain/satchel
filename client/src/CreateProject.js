@@ -152,10 +152,6 @@ export default function CreateProject(props) {
       newSkipped = new Set(newSkipped.values());
       newSkipped.delete(activeStep);
     }
-    // console.log(projectName);
-    // console.log(projectDes);
-    // console.log(fundingAmt);
-    // console.log(fundingBreak);
 
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     setSkipped(newSkipped);
@@ -167,14 +163,18 @@ export default function CreateProject(props) {
   };
 
   const handleRequest = async() => {
-    await axios.post('http://localhost:4000/api/project/createProject', {
+    try {
+      await axios.post('http://localhost:4000/api/project/createProject', {
             "name": projectName, 
             "description": projectDes,
             "targetFunding": fundingAmt,
             "fundingBreakdown": fundingBreak,
-            "schoolAddress": "0x551192f78F5F1d30385415A59e008FFfc94Ab940",
-        });
-    };
+            "schoolAddress": "0xa0df350d2637096571F7A701CBc1C5fdE30dF76A",
+        })
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
 
 
   const handleBack = () => {
