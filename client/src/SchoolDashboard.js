@@ -19,6 +19,7 @@ import FastfoodOutlinedIcon from '@material-ui/icons/FastfoodOutlined';
 import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutlined';
 import LocationCityOutlinedIcon from '@material-ui/icons/LocationCityOutlined';
 import KitchenOutlinedIcon from '@material-ui/icons/KitchenOutlined';
+import axios from 'axios';
 
 import {Redirect} from 'react-router-dom';
 
@@ -106,15 +107,18 @@ class SchoolDashboard extends Component {
       Withdraw: '',
       Name: receivedProps.Name,
       activeTab: receivedProps.activeTab,
-
+      projects: []
     }
     this.setBalance = this.setBalance.bind(this);
     this.setWithdraw = this.setWithdraw.bind(this);
     this.toggle = this.toggle.bind(this);
     this.setBalance();
+    this.getProjects();
   }
 
-
+  componentDidMount() {
+    this.getProjects();
+  }
 
   withdraw = async (e) => {
     const self = this;
@@ -162,6 +166,12 @@ class SchoolDashboard extends Component {
 
   }
 
+  getProjects = async() => {
+    await axios.get('http://localhost:4000/api/project?schoolAddress=0xa0df350d2637096571F7A701CBc1C5fdE30dF76A')
+    .then(res=>this.setState(
+      {projects: res.data.projects}));
+  };
+
   logout = (event) => {
     const self = this;
     event.preventDefault();
@@ -169,6 +179,7 @@ class SchoolDashboard extends Component {
   };
 
   render() {
+    console.log(this.state.projects);
     const { classes } = this.props;
     return (
       <div className="App">
@@ -219,73 +230,22 @@ class SchoolDashboard extends Component {
               </div>
               <br></br>
                <Button onClick={this.createProject} type="submit" style={{ backgroundColor:"#146EFF", fontWeight: "bold", color:"white", borderRadius: "10px", borderWidth:"0px"}} className="InitiativeButton">Create Project</Button>
-                <div className="InitiativeSection">
-                <Container>
-                    <Row>
-                      <Col xs="2" >
-                          <MenuBookOutlinedIcon style={{ color:"#146EFF", fontSize:"30px"}} className="CommunityIcon"/>
-                      </Col>
-                      <Col xs="8">
-                        <div className = "InitiativeTitle">{"School Textbooks"}</div>
-                        <div className = "InitiativeDescription">{"These will be some very good books."}</div>
-                      </Col>
-                      <Col xs="1" >
-                          <ArrowForwardIosOutlinedIcon style={{ color:"black", fontSize:"20px"}} className="CommunityIcon"/>
-                      </Col>
-                    </Row>
-                  </Container>
-                </div>
-
-                <div className="InitiativeSection">
-                <Container>
-                    <Row>
-                      <Col xs="2" >
-                          <FastfoodOutlinedIcon style={{ color:"#146EFF", fontSize:"30px"}} className="CommunityIcon"/>
-                      </Col>
-                      <Col xs="8">
-                        <div className = "InitiativeTitle">{"Lunch Options"}</div>
-                        <div className = "InitiativeDescription">{"Improving nutrition for students."}</div>
-                      </Col>
-                      <Col xs="1" >
-                          <ArrowForwardIosOutlinedIcon style={{ color:"black", fontSize:"20px"}} className="CommunityIcon"/>
-                      </Col>
-                    </Row>
-                  </Container>
-                </div>
-
-                <div className="InitiativeSection">
-                <Container>
-                    <Row>
-                      <Col xs="2" >
-                          <LocationCityOutlinedIcon style={{ color:"#146EFF", fontSize:"30px"}} className="CommunityIcon"/>
-                      </Col>
-                      <Col xs="8">
-                        <div className = "InitiativeTitle">{"Building Renovation"}</div>
-                        <div className = "InitiativeDescription">{"Removing old buildings and adding new ones."}</div>
-                      </Col>
-                      <Col xs="1" >
-                          <ArrowForwardIosOutlinedIcon style={{ color:"black", fontSize:"20px"}} className="CommunityIcon"/>
-                      </Col>
-                    </Row>
-                  </Container>
-                </div>
-
-                <div className="InitiativeSection">
-                <Container>
-                    <Row>
-                      <Col xs="2" >
-                          <KitchenOutlinedIcon style={{ color:"#146EFF", fontSize:"30px"}} className="CommunityIcon"/>
-                      </Col>
-                      <Col xs="8">
-                        <div className = "InitiativeTitle">{"Food Drive"}</div>
-                        <div className = "InitiativeDescription">{"Hosting a winter-season food drive."}</div>
-                      </Col>
-                      <Col xs="1" >
-                          <ArrowForwardIosOutlinedIcon style={{ color:"black", fontSize:"20px"}} className="CommunityIcon"/>
-                      </Col>
-                    </Row>
-                  </Container>
-                </div>
+               {this.state.projects.length > 0? this.state.projects.map(project => (
+                  <div className="InitiativeSection">
+                  <Container>
+                      <Row>
+                        <Col xs="8">
+                          <div className = "InitiativeTitle">{project.name}</div>
+                          <div className = "InitiativeDescription">{project.description}</div>
+                        </Col>
+                        <Col xs="1" >
+                            <ArrowForwardIosOutlinedIcon style={{ color:"black", fontSize:"20px"}} className="CommunityIcon"/>
+                        </Col>
+                      </Row>
+                    </Container>
+                  </div>
+                )): null
+               }
 
           </TabPanel>
           <TabPanel value={this.state.activeTab} index={2}>
