@@ -17,6 +17,7 @@ import SupervisedUserCircleOutlinedIcon from '@material-ui/icons/SupervisedUserC
 import MenuBookOutlinedIcon from '@material-ui/icons/MenuBookOutlined';
 import FastfoodOutlinedIcon from '@material-ui/icons/FastfoodOutlined';
 import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutlined';
+import axios from 'axios';
 
  // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
@@ -109,6 +110,7 @@ class Dashboard extends Component {
       Name: '',
       UserContractAddress: receivedProps.UserContractAddress,
       UserContract: '',
+      projects: []
     }
     this.setBalance = this.setBalance.bind(this);
     this.setDeposit = this.setDeposit.bind(this);
@@ -202,6 +204,16 @@ class Dashboard extends Component {
     }
     this.setContribution();
   }
+
+  componentDidMount() {
+    this.getProjects();
+  }
+
+  getProjects = async() => {
+    await axios.get('http://localhost:4000/api/project?schoolAddress=0xa0df350d2637096571F7A701CBc1C5fdE30dF76A')
+    .then(res=>this.setState(
+      {projects: res.data.projects}));
+  };
 
   logout = (event) => {
     const self = this;
@@ -329,41 +341,26 @@ class Dashboard extends Component {
                   </Container>
               </div>
               <div className="Initiative">Explore School Initiatives</div>
-                <div className="InitiativeSection">
-                <Container>
-                    <Row>
-                      <Col xs="2" >
-                          <MenuBookOutlinedIcon style={{ color:"#146EFF", fontSize:"30px"}} className="CommunityIcon"/>
-                      </Col>
-                      <Col xs="8">
-                        <div className = "InitiativeTitle">{"School Textbooks"}</div>
-                        <div className = "InitiativeDescription">{"These will be some very good books."}</div>
-                      </Col>
-                      <Col xs="1" >
-                          <ArrowForwardIosOutlinedIcon style={{ color:"black", fontSize:"20px"}} className="CommunityIcon"/>
-                      </Col>
-                    </Row>
-                  </Container>
-                </div>
 
-                <div className="InitiativeSection">
-                <Container>
-                    <Row>
-                      <Col xs="2" >
-                          <FastfoodOutlinedIcon style={{ color:"#146EFF", fontSize:"30px"}} className="CommunityIcon"/>
-                      </Col>
-                      <Col xs="8">
-                        <div className = "InitiativeTitle">{"Lunch Options"}</div>
-                        <div className = "InitiativeDescription">{"Improving nutrition for students."}</div>
-                      </Col>
-                      <Col xs="1" >
-                          <ArrowForwardIosOutlinedIcon style={{ color:"black", fontSize:"20px"}} className="CommunityIcon"/>
-                      </Col>
-                    </Row>
-                  </Container>
-                </div>
+              {this.state.projects.length > 0? this.state.projects.map(project => (
+                  <div className="InitiativeSection">
+                  <Container>
+                      <Row>
+                        <Col xs="8">
+                          <div className = "InitiativeTitle">{project.name}</div>
+                          <div className = "InitiativeDescription">{project.description}</div>
+                        </Col>
+                        <Col xs="1" >
+                            <ArrowForwardIosOutlinedIcon style={{ color:"black", fontSize:"20px"}} className="CommunityIcon"/>
+                        </Col>
+                      </Row>
+                    </Container>
+                  </div>
+                )): null
+               }
 
-                <Button style={{ backgroundColor:"white", fontWeight: "bold", color:"#146EFF", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF"}} className="InitiativeButton">Show More</Button>
+
+                {/* <Button style={{ backgroundColor:"white", fontWeight: "bold", color:"#146EFF", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF"}} className="InitiativeButton">Show More</Button> */}
           </TabPanel>
           <TabPanel value={this.state.activeTab} index={2}>
           <Button style={{ backgroundColor:"white", fontWeight: "bold", color:"#146EFF", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF"}} onClick={this.logout} className="LogoutButton">Logout</Button>
