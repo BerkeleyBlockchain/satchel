@@ -9,6 +9,19 @@ import StepLabel from '@material-ui/core/StepLabel';
 import SchoolNavBar from './SchoolNavBar.js'
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+
+
+const stheme = createMuiTheme({
+     palette: {
+      primary: {
+          main: '#146EFF'
+      },
+      secondary: {
+        main: '#146EFF'
+    }
+    },
+});
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -212,40 +225,57 @@ export default function CreateProject(props) {
     <div className={classes.root}>
       <SchoolNavBar Balance={props.location.Balance} Withdraw={props.location.Withdraw} Name={props.location.Name} activeTab={props.location.activeTab}/>
       <div className="CreateProjectPageTitle"> Create Project</div>
-      <Stepper activeStep={activeStep}>
-        {steps.map((label, index) => {
-          const stepProps = {};
-          const labelProps = {};
-          if (isStepOptional(index)) {
-            labelProps.optional = <Typography variant="caption"></Typography>;
-          }
-          if (isStepSkipped(index)) {
-            stepProps.completed = false;
-          }
-          return (
-            <Step key={label} {...stepProps}>
-              <StepLabel {...labelProps}>{label}</StepLabel>
-            </Step>
-          );
-        })}
-      </Stepper>
+      <MuiThemeProvider theme={stheme}>
+        <Stepper activeStep={activeStep}>
+          {steps.map((label, index) => {
+            const stepProps = {};
+            const labelProps = {};
+            if (isStepOptional(index)) {
+              labelProps.optional = <Typography variant="caption"></Typography>;
+            }
+            if (isStepSkipped(index)) {
+              stepProps.completed = false;
+            }
+            return (
+              <Step key={label} {...stepProps}>
+                <StepLabel {...labelProps}>{label}</StepLabel>
+              </Step>
+            );
+          })}
+        </Stepper>
+      </MuiThemeProvider>
       <div>
           <div className="Stepper">
             {/*pass in more arguments to the getStepContent func(state functions)*/}
             <Typography> {getStepContent(activeStep, setProjectName, setProjectDes, setFundingAmt, setFundingBreak)} </Typography>
             <div>
+            {activeStep !== steps.length - 1 ? 
               <Button disabled={activeStep === 0} onClick={handleBack} 
-                style={{ backgroundColor:"white", fontWeight: "bold", color:"#146EFF", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF"}}>
+                style={{ backgroundColor:"white", fontWeight: "bold", color:"#146EFF", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF", marginRight:"10%", width:"40%"}}>
                 Back
+              </Button>: ""}
+              
+              {activeStep === steps.length - 1 ? 
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleNext}
+                  style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF", width:"100%"}}
+                >
+                Return to Projects Page
               </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleNext}
-                style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF"}}
-              >
-                {activeStep === steps.length - 1 ? 'Return to Projects Page' : 'Next'}
-              </Button>
+                  :
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleNext}
+                  style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF", width:"40%"}}
+                >
+                Next
+                </Button>
+                }
+                
+
             </div>
           </div>
       </div>
