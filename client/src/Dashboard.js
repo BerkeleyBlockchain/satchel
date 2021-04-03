@@ -178,7 +178,7 @@ class Dashboard extends Component {
   setInterestRate = async() => {
     await axios.get('https://api.compound.finance/api/v2/ctoken?addresses=0x5d3a536e4d6dbd6114cc1ead35777bab948e3643')
     .then(res=>this.setState(
-      {InterestRate: Number(((res.data.cToken[0].supply_rate.value)*100).toFixed(2))}));
+      {InterestRate: Number(((res.data.cToken[0].supply_rate.value/2)*100).toFixed(2))}));
   };
 
   setName = async (e) => {
