@@ -9,6 +9,8 @@ import StepLabel from '@material-ui/core/StepLabel';
 import SchoolNavBar from './SchoolNavBar.js'
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,6 +24,17 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(1),
   },
 }));
+
+const stheme = createMuiTheme({
+  palette: {
+      primary: {
+          main: '#146EFF'
+      },
+      secondary: {
+        main: '#146EFF'
+    }
+    },
+});
 
 function getSteps() {
   return [' ', ' ', ' '];
@@ -212,6 +225,7 @@ export default function CreateProject(props) {
     <div className={classes.root}>
       <SchoolNavBar Balance={props.location.Balance} Withdraw={props.location.Withdraw} Name={props.location.Name} activeTab={props.location.activeTab}/>
       <div className="CreateProjectPageTitle"> Create Project</div>
+      <MuiThemeProvider theme={stheme}>
       <Stepper activeStep={activeStep}>
         {steps.map((label, index) => {
           const stepProps = {};
@@ -229,6 +243,8 @@ export default function CreateProject(props) {
           );
         })}
       </Stepper>
+      </MuiThemeProvider>
+
       <div>
           <div className="Stepper">
             {/*pass in more arguments to the getStepContent func(state functions)*/}

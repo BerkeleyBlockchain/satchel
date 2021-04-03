@@ -179,22 +179,7 @@ class SchoolDashboard extends Component {
     const { classes } = this.props;
     return (
       <div className="App">
-        <div >
-        <MuiThemeProvider theme={theme}>
-            <AppBar position="static" style={{background: "#ECF3FF"}}>
-                <Tabs
-                  TabIndicatorProps={{ style: { background: "#146EFF", height: "5px"} }}
-                  value={this.state.activeTab}
-                  onChange={this.toggle}
-                  variant="fullWidth"
-                  textColor="primary"
-                >
-                  <Tab icon={<SchoolOutlinedIcon />} label="School" {...a11yProps(0)} />
-                  <Tab icon={<FolderOutlinedIcon />} label="Projects" {...a11yProps(1)} />
-                  <Tab icon={<SettingsOutlinedIcon />} label="Settings" {...a11yProps(2)} />
-                </Tabs>
-            </AppBar>
-          </MuiThemeProvider>
+        <div>
 
           <TabPanel value={this.state.activeTab} index={0}>
               <div className="Welcome">
@@ -236,6 +221,24 @@ class SchoolDashboard extends Component {
           <TabPanel value={this.state.activeTab} index={2}>
           <Button style={{ backgroundColor:"white", fontWeight: "bold", color:"#146EFF", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF"}} onClick={this.logout} className="LogoutButton">Logout</Button>
           </TabPanel>
+        </div>
+
+        <div className="NavBar">
+        <MuiThemeProvider theme={theme}>
+            <AppBar position="relative" style={{background: "#ECF3FF"}}>
+                <Tabs
+                  TabIndicatorProps={{ style: { background: "#146EFF", height: "5px"} }}
+                  value={this.state.activeTab}
+                  onChange={this.toggle}
+                  variant="fullWidth"
+                  textColor="primary"
+                >
+                  <Tab icon={<SchoolOutlinedIcon />} label="School" {...a11yProps(0)} />
+                  <Tab icon={<FolderOutlinedIcon />} label="Projects" {...a11yProps(1)} />
+                  <Tab icon={<SettingsOutlinedIcon />} label="Settings" {...a11yProps(2)} />
+                </Tabs>
+            </AppBar>
+          </MuiThemeProvider>
         </div>
       </div>
     );

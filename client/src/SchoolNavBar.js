@@ -3,6 +3,7 @@ import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import './App.css';
 
 
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
@@ -44,7 +45,8 @@ export default function SchoolNavBar(props) {
 
   return (
     <MuiThemeProvider theme={theme}>
-    <Paper position="static" style={{background: "#ECF3FF"}}>
+    <div className="NavBar">
+    <Paper position="fixed" style={{background: "#ECF3FF"}}>
       <Tabs
         value={value}
         onChange={handleChange}
@@ -59,6 +61,7 @@ export default function SchoolNavBar(props) {
         <Tab icon={<SettingsOutlinedIcon/>} label="SETTINGS" />
       </Tabs>
     </Paper>
+    </div>
     </MuiThemeProvider>
   );
 }
