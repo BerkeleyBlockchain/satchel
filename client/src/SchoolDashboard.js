@@ -221,8 +221,9 @@ class SchoolDashboard extends Component {
           <TabPanel value={this.state.activeTab} index={2}>
           <Button style={{ backgroundColor:"white", fontWeight: "bold", color:"#146EFF", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF"}} onClick={this.logout} className="LogoutButton">Logout</Button>
           </TabPanel>
-        </div>
 
+          
+        </div>
         <div className="NavBar">
         <MuiThemeProvider theme={theme}>
             <AppBar position="relative" style={{background: "#ECF3FF"}}>

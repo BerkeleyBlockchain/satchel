@@ -12,6 +12,17 @@ import { useHistory } from 'react-router-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 
+const stheme = createMuiTheme({
+     palette: {
+      primary: {
+          main: '#146EFF'
+      },
+      secondary: {
+        main: '#146EFF'
+    }
+    },
+});
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
@@ -25,16 +36,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const stheme = createMuiTheme({
-  palette: {
-      primary: {
-          main: '#146EFF'
-      },
-      secondary: {
-        main: '#146EFF'
-    }
-    },
-});
 
 function getSteps() {
   return [' ', ' ', ' '];
@@ -250,18 +251,33 @@ export default function CreateProject(props) {
             {/*pass in more arguments to the getStepContent func(state functions)*/}
             <Typography> {getStepContent(activeStep, setProjectName, setProjectDes, setFundingAmt, setFundingBreak)} </Typography>
             <div>
+            {activeStep !== steps.length - 1 ? 
               <Button disabled={activeStep === 0} onClick={handleBack} 
-                style={{ backgroundColor:"white", fontWeight: "bold", color:"#146EFF", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF"}}>
+                style={{ backgroundColor:"white", fontWeight: "bold", color:"#146EFF", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF", marginRight:"10%", width:"40%"}}>
                 Back
+              </Button>: ""}
+              
+              {activeStep === steps.length - 1 ? 
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleNext}
+                  style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF", width:"100%"}}
+                >
+                Return to Projects Page
               </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleNext}
-                style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF"}}
-              >
-                {activeStep === steps.length - 1 ? 'Return to Projects Page' : 'Next'}
-              </Button>
+                  :
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleNext}
+                  style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF", width:"40%"}}
+                >
+                Next
+                </Button>
+                }
+                
+
             </div>
           </div>
       </div>
