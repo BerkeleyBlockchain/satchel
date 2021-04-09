@@ -56,12 +56,12 @@ web3.eth.accounts.wallet.add(privateKey);
 const myWalletAddress = web3.eth.accounts.wallet[0].address;
 
 // Mainnet address of the underlying token contract. Example: Dai.
-const underlyingMainnetAddress = "0x6b175474e89094c44da98b954eedeac495271d0f";
+const underlyingMainnetAddress = process.env.REACT_APP_TOKEN_ADDRESS;
 const underlying = new web3.eth.Contract(erc20Abi, underlyingMainnetAddress);
 
 // Mainnet contract address and ABI for the cToken, which can be found in the
 // mainnet tab on this page: https://compound.finance/docs
-const cTokenAddress = "0x5d3a536e4d6dbd6114cc1ead35777bab948e3643";
+const cTokenAddress = process.env.REACT_APP_CTOKEN_ADDRESS;
 const cToken = new web3.eth.Contract(cTokenAbi, cTokenAddress);
 
 const fromMyWallet = {

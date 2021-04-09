@@ -88,10 +88,6 @@ npm install
 ganache-cli -f https://mainnet.infura.io/v3/e7a8a5b48b5048649a342610dd4e0321 -m "clutch captain shoe salt awake harvest setup primary inmate ugly among become" -i 1 -u 0x9759A6Ac90977b93B58547b4A71c78317f391A28
 ```
 
-```
-ganache-cli -f https://mainnet.infura.io/v3/847f16fa482549f3b7027c913d9f0e3a -m "clutch captain shoe salt awake harvest setup primary inmate ugly among become" -i 1 -u 0x9759A6Ac90977b93B58547b4A71c78317f391A28
-```
-
 ### 5. Start the development server
 
 ```

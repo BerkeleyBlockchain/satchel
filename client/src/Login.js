@@ -26,23 +26,22 @@ import logo from "./logo.png";
 // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
 
-const privateKey =
-  "0xb8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cbf329";
+// const privateKey =
+//   "0xb8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cbf329";
 
-// Add your Ethereum wallet to the Web3 object
-web3.eth.accounts.wallet.add(privateKey);
-const myWalletAddress = web3.eth.accounts.wallet[0].address;
+// // Add your Ethereum wallet to the Web3 object
+// web3.eth.accounts.wallet.add(privateKey);
+// const myWalletAddress = web3.eth.accounts.wallet[0].address;
 
-const fromMyWallet = {
-  from: myWalletAddress,
-  gasLimit: web3.utils.toHex(1000000),
-  gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
-};
+// const fromMyWallet = {
+//   from: myWalletAddress,
+//   gasLimit: web3.utils.toHex(1000000),
+//   gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
+// };
 
-var TruffleContract = require("truffle-contract");
-var School = TruffleContract(schoolJSON);
-School.setProvider(Web3.givenProvider);
-
+// var TruffleContract = require("truffle-contract");
+// var School = TruffleContract(schoolJSON);
+// School.setProvider(Web3.givenProvider);
 class Login extends Component {
   constructor(props) {
     super(props);
@@ -114,7 +113,7 @@ class Login extends Component {
 
     let contractInstance = new web3.eth.Contract(
       contractAbi.abi,
-      "0x9b4e6a477EC865551ca4f5558420C908482F6073"
+      process.env.REACT_APP_CONTRACT_ADDRESS
     );
 
     const self = this;
@@ -125,7 +124,6 @@ class Login extends Component {
       let userContractAddress = await contractInstance.methods
         .getUserContract()
         .call({ from: accounts[0] });
-      console.log(userContractAddress);
       console.log("user addresss: " + userContractAddress);
       console.log("account[0]" + accounts[0]);
       if (userContractAddress == "0x0000000000000000000000000000000000000000") {
@@ -134,7 +132,7 @@ class Login extends Component {
         await contractInstance.methods
           .createUserContract(
             "Name", // Name the user just entered
-            "0x6D62dc40270e45769e825394ca2125D064146DeC" // Address of the school contract
+            "0x365809B0E78603576e19a44f0e8325EC527CFBdA" // Address of the school contract
           )
           .send({ from: accounts[0] });
         userContractAddress = await contractInstance.methods.getUserContract.call();
@@ -159,7 +157,7 @@ class Login extends Component {
 
     let contractInstance = new web3.eth.Contract(
       contractAbi.abi,
-      "0x9b4e6a477EC865551ca4f5558420C908482F6073"
+      process.env.REACT_APP_CONTRACT_ADDRESS
     );
 
     try {
