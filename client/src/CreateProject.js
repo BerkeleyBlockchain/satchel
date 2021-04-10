@@ -41,7 +41,27 @@ function getSteps() {
   return [' ', ' ', ' '];
 }
 
-function getStepContent(step, setProjectName, setProjectDes, setFundingAmt, setFundingBreak) {
+function getStepContent(step, setProjectName, setProjectDes, setFundingAmt, setFundingBreak, inputList, setInputList) {
+
+   // handle input change
+   const handleInputChange = (e, index) => {
+    const { name, value } = e.target;
+    const list = [...inputList];
+    list[index][name] = value;
+    setInputList(list);
+  };
+
+  // handle click event of the Remove button
+  const handleRemoveClick = index => {
+    const list = [...inputList];
+    list.splice(index, 1);
+    setInputList(list);
+  };
+
+  // handle click event of the Add button
+  const handleAddClick = () => {
+    setInputList([...inputList, { percent: "", category: "" }]);
+  };
 
   switch (step) {
     case 0:
@@ -110,7 +130,40 @@ function getStepContent(step, setProjectName, setProjectDes, setFundingAmt, setF
             </Form>
           </div>
           {/*Once user submits, store data in server */}
-          <Button style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"0px"}} className="ProjectNextButton" type="submit">+ Add Another Subsection</Button>
+          {inputList.map((x, i) => {
+      return (
+        <div>
+        <Container>
+        <Row>
+          <Col xs="4" >
+          <Input
+            name="percent"
+            placeholder="10%"
+            value={x.percent}
+            onChange={e => handleInputChange(e, i)}
+            style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px"}}
+          />
+          </Col>
+          <Col xs="8">
+          <Input
+            name="category"
+           placeholder="Enter Category Name"
+            value={x.category}
+            onChange={e => handleInputChange(e, i)}
+            style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px"}}
+          />
+          </Col>
+        </Row>
+        </Container>
+          <div className="btn-box">
+            {inputList.length !== 1 && 
+            <Button onClick={() => handleRemoveClick(i)} style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"0px"}} className="ProjectNextButton" type="submit">Remove</Button>}
+            {inputList.length - 1 === i &&  <Button onClick={handleAddClick} style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"0px"}} className="ProjectNextButton" type="submit">+ Add Another Subsection</Button>}
+          </div>
+        </div>
+      );
+    })}
+
       </div>
       );
     case 2:
@@ -146,11 +199,7 @@ export default function CreateProject(props) {
   const [projectDes, setProjectDes] = useState('');
   const [fundingAmt, setFundingAmt] = useState(0);
   const [fundingBreak, setFundingBreak] = useState('');
-
-  
-
-
-
+  const [inputList, setInputList] = useState([{ percent: "", category: "" }]);
 
   const isStepOptional = (step) => {
     return step === 1;
@@ -249,7 +298,7 @@ export default function CreateProject(props) {
       <div>
           <div className="Stepper">
             {/*pass in more arguments to the getStepContent func(state functions)*/}
-            <Typography> {getStepContent(activeStep, setProjectName, setProjectDes, setFundingAmt, setFundingBreak)} </Typography>
+            <Typography> {getStepContent(activeStep, setProjectName, setProjectDes, setFundingAmt, setFundingBreak, inputList, setInputList)} </Typography>
             <div>
             {activeStep !== steps.length - 1 ? 
               <Button disabled={activeStep === 0} onClick={handleBack} 
