@@ -17,6 +17,8 @@ import {
 } from "reactstrap";
 import Web3 from "web3";
 import { userAbi, erc20Abi, schoolAbi, schoolJSON } from "./abi/abis";
+import contractAbi from "./abi/UnicefSatchel.json";
+
 import "./App.css";
 import BusinessCenterOutlinedIcon from "@material-ui/icons/BusinessCenterOutlined";
 import logo from "./logo.png";
@@ -24,23 +26,22 @@ import logo from "./logo.png";
 // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
 
-const privateKey =
-  "0xb8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cbf329";
+// const privateKey =
+//   "0xb8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cbf329";
 
-// Add your Ethereum wallet to the Web3 object
-web3.eth.accounts.wallet.add(privateKey);
-const myWalletAddress = web3.eth.accounts.wallet[0].address;
+// // Add your Ethereum wallet to the Web3 object
+// web3.eth.accounts.wallet.add(privateKey);
+// const myWalletAddress = web3.eth.accounts.wallet[0].address;
 
-const fromMyWallet = {
-  from: myWalletAddress,
-  gasLimit: web3.utils.toHex(1000000),
-  gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
-};
+// const fromMyWallet = {
+//   from: myWalletAddress,
+//   gasLimit: web3.utils.toHex(1000000),
+//   gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
+// };
 
-var TruffleContract = require("truffle-contract");
-var School = TruffleContract(schoolJSON);
-School.setProvider(Web3.givenProvider);
-
+// var TruffleContract = require("truffle-contract");
+// var School = TruffleContract(schoolJSON);
+// School.setProvider(Web3.givenProvider);
 class Login extends Component {
   constructor(props) {
     super(props);
@@ -64,45 +65,114 @@ class Login extends Component {
     this.props.history.push({ pathname: "/SchoolLogin" });
   };
 
+  // login = async (e) => {
+  //   e.preventDefault();
+  //   var schoolInstance;
+  //   var userContractAddress = null;
+
+  //   const self = this;
+  //   web3.eth.getAccounts(function (error, accounts) {
+  //     if (error) {
+  //       console.log(error);
+  //     }
+  //     School.deployed()
+  //       .then(async function (instance) {
+  //         schoolInstance = instance;
+
+  //         userContractAddress = await schoolInstance.getUserContract.call();
+  //         console.log("user addresss: " + userContractAddress);
+  //         console.log("account[0]" + accounts[0]);
+  //         if (
+  //           userContractAddress == "0x0000000000000000000000000000000000000000"
+  //         ) {
+  //           await schoolInstance.createUserContract(self.state.Name, {
+  //             from: accounts[0],
+  //           });
+  //           console.log("inside await");
+  //           userContractAddress = await schoolInstance.getUserContract.call();
+  //           console.log("user address created: " + userContractAddress);
+  //         }
+  //       })
+  //       .then(async function (result) {
+  //         self.state.UserContractAddress = userContractAddress;
+  //         self.props.history.push({
+  //           pathname: "/Dashboard",
+  //           state: { UserContractAddress: self.state.UserContractAddress },
+  //         });
+  //       })
+  //       .catch(function (err) {
+  //         console.log(err.message);
+  //       });
+  //   });
+  // };
+
   login = async (e) => {
     e.preventDefault();
-    var schoolInstance;
-    var userContractAddress = null;
+    // var UserFactory = TruffleContract(userFactoryABI.abi);
+    // UserFactory.setProvider(Web3.givenProvider);
+
+    let contractInstance = new web3.eth.Contract(
+      contractAbi.abi,
+      process.env.REACT_APP_CONTRACT_ADDRESS
+    );
 
     const self = this;
-    web3.eth.getAccounts(function (error, accounts) {
-      if (error) {
-        console.log(error);
-      }
-      School.deployed()
-        .then(async function (instance) {
-          schoolInstance = instance;
 
-          userContractAddress = await schoolInstance.getUserContract.call();
-          console.log("user addresss: " + userContractAddress);
-          console.log("account[0]" + accounts[0]);
-          if (
-            userContractAddress == "0x0000000000000000000000000000000000000000"
-          ) {
-            await schoolInstance.createUserContract(self.state.Name, {
-              from: accounts[0],
-            });
-            console.log("inside await");
-            userContractAddress = await schoolInstance.getUserContract.call();
-            console.log("user address created: " + userContractAddress);
-          }
-        })
-        .then(async function (result) {
-          self.state.UserContractAddress = userContractAddress;
-          self.props.history.push({
-            pathname: "/Dashboard",
-            state: { UserContractAddress: self.state.UserContractAddress },
-          });
-        })
-        .catch(function (err) {
-          console.log(err.message);
-        });
-    });
+    try {
+      const accounts = await web3.eth.getAccounts();
+
+      let userContractAddress = await contractInstance.methods
+        .getUserContract()
+        .call({ from: accounts[0] });
+      console.log("user addresss: " + userContractAddress);
+      console.log("account[0]" + accounts[0]);
+      if (userContractAddress == "0x0000000000000000000000000000000000000000") {
+        console.log("New user detected");
+        // Move them somewhere ?
+        await contractInstance.methods
+          .createUserContract(
+            "Name", // Name the user just entered
+            "0x365809B0E78603576e19a44f0e8325EC527CFBdA" // Address of the school contract
+          )
+          .send({ from: accounts[0] });
+        userContractAddress = await contractInstance.methods.getUserContract.call();
+        console.log(userContractAddress);
+      } else {
+      }
+      self.state.UserContractAddress = userContractAddress;
+      self.props.history.push({
+        pathname: "/Dashboard",
+        state: { UserContractAddress: self.state.UserContractAddress },
+      });
+    } catch (err) {
+      console.log(err);
+      console.log(err.message);
+    }
+  };
+
+  deploySchool = async (e) => {
+    e.preventDefault();
+    // var UserFactory = TruffleContract(userFactoryABI.abi);
+    // UserFactory.setProvider(Web3.givenProvider);
+
+    let contractInstance = new web3.eth.Contract(
+      contractAbi.abi,
+      process.env.REACT_APP_CONTRACT_ADDRESS
+    );
+
+    try {
+      const accounts = await web3.eth.getAccounts();
+      const { events } = await contractInstance.methods
+        .newSchool("School Name")
+        .send({ from: accounts[0] });
+      const id = events.newSchoolEvent.returnValues.schoolId;
+      console.log(id);
+      const data = await contractInstance.methods.schoolArray(id).call();
+      console.log(data); // Gives address of school contract
+    } catch (err) {
+      console.log(err);
+      console.log(err.message);
+    }
   };
 
   render() {
@@ -153,6 +223,20 @@ class Login extends Component {
                 }}
               >
                 Log In
+              </Button>
+              <Button
+                className="Button"
+                onClick={this.deploySchool}
+                type="submit"
+                style={{
+                  backgroundColor: "#146EFF",
+                  color: "white",
+                  fontWeight: "bold",
+                  borderRadius: "10px",
+                  borderWidth: "0px",
+                }}
+              >
+                Dangerously Create New School
               </Button>
             </div>
           </Form>
