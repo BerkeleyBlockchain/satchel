@@ -9,6 +9,19 @@ import StepLabel from '@material-ui/core/StepLabel';
 import SchoolNavBar from './SchoolNavBar.js'
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+
+
+const stheme = createMuiTheme({
+     palette: {
+      primary: {
+          main: '#146EFF'
+      },
+      secondary: {
+        main: '#146EFF'
+    }
+    },
+});
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -27,7 +40,27 @@ function getSteps() {
   return [' ', ' ', ' '];
 }
 
-function getStepContent(step, setProjectName, setProjectDes, setFundingAmt, setFundingBreak) {
+function getStepContent(step, setProjectName, setProjectDes, setFundingAmt, setFundingBreak, inputList, setInputList) {
+
+   // handle input change
+   const handleInputChange = (e, index) => {
+    const { name, value } = e.target;
+    const list = [...inputList];
+    list[index][name] = value;
+    setInputList(list);
+  };
+
+  // handle click event of the Remove button
+  const handleRemoveClick = index => {
+    const list = [...inputList];
+    list.splice(index, 1);
+    setInputList(list);
+  };
+
+  // handle click event of the Add button
+  const handleAddClick = () => {
+    setInputList([...inputList, { percent: "", category: "" }]);
+  };
 
   switch (step) {
     case 0:
@@ -96,7 +129,40 @@ function getStepContent(step, setProjectName, setProjectDes, setFundingAmt, setF
             </Form>
           </div>
           {/*Once user submits, store data in server */}
-          <Button style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"0px"}} className="ProjectNextButton" type="submit">+ Add Another Subsection</Button>
+          {inputList.map((x, i) => {
+      return (
+        <div>
+        <Container>
+        <Row>
+          <Col xs="4" >
+          <Input
+            name="percent"
+            placeholder="10%"
+            value={x.percent}
+            onChange={e => handleInputChange(e, i)}
+            style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px"}}
+          />
+          </Col>
+          <Col xs="8">
+          <Input
+            name="category"
+           placeholder="Enter Category Name"
+            value={x.category}
+            onChange={e => handleInputChange(e, i)}
+            style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px"}}
+          />
+          </Col>
+        </Row>
+        </Container>
+          <div className="btn-box">
+            {inputList.length !== 1 && 
+            <Button onClick={() => handleRemoveClick(i)} style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"0px"}} className="ProjectNextButton" type="submit">Remove</Button>}
+            {inputList.length - 1 === i &&  <Button onClick={handleAddClick} style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"0px"}} className="ProjectNextButton" type="submit">+ Add Another Subsection</Button>}
+          </div>
+        </div>
+      );
+    })}
+
       </div>
       );
     case 2:
@@ -132,11 +198,7 @@ export default function CreateProject(props) {
   const [projectDes, setProjectDes] = useState('');
   const [fundingAmt, setFundingAmt] = useState(0);
   const [fundingBreak, setFundingBreak] = useState('');
-
-  
-
-
-
+  const [inputList, setInputList] = useState([{ percent: "", category: "" }]);
 
   const isStepOptional = (step) => {
     return step === 1;
@@ -212,40 +274,57 @@ export default function CreateProject(props) {
     <div className={classes.root}>
       <SchoolNavBar Balance={props.location.Balance} Withdraw={props.location.Withdraw} Name={props.location.Name} activeTab={props.location.activeTab}/>
       <div className="CreateProjectPageTitle"> Create Project</div>
-      <Stepper activeStep={activeStep}>
-        {steps.map((label, index) => {
-          const stepProps = {};
-          const labelProps = {};
-          if (isStepOptional(index)) {
-            labelProps.optional = <Typography variant="caption"></Typography>;
-          }
-          if (isStepSkipped(index)) {
-            stepProps.completed = false;
-          }
-          return (
-            <Step key={label} {...stepProps}>
-              <StepLabel {...labelProps}>{label}</StepLabel>
-            </Step>
-          );
-        })}
-      </Stepper>
+      <MuiThemeProvider theme={stheme}>
+        <Stepper activeStep={activeStep}>
+          {steps.map((label, index) => {
+            const stepProps = {};
+            const labelProps = {};
+            if (isStepOptional(index)) {
+              labelProps.optional = <Typography variant="caption"></Typography>;
+            }
+            if (isStepSkipped(index)) {
+              stepProps.completed = false;
+            }
+            return (
+              <Step key={label} {...stepProps}>
+                <StepLabel {...labelProps}>{label}</StepLabel>
+              </Step>
+            );
+          })}
+        </Stepper>
+      </MuiThemeProvider>
       <div>
           <div className="Stepper">
             {/*pass in more arguments to the getStepContent func(state functions)*/}
-            <Typography> {getStepContent(activeStep, setProjectName, setProjectDes, setFundingAmt, setFundingBreak)} </Typography>
+            <Typography> {getStepContent(activeStep, setProjectName, setProjectDes, setFundingAmt, setFundingBreak, inputList, setInputList)} </Typography>
             <div>
+            {activeStep !== steps.length - 1 ? 
               <Button disabled={activeStep === 0} onClick={handleBack} 
-                style={{ backgroundColor:"white", fontWeight: "bold", color:"#146EFF", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF"}}>
+                style={{ backgroundColor:"white", fontWeight: "bold", color:"#146EFF", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF", marginRight:"10%", width:"40%"}}>
                 Back
+              </Button>: ""}
+              
+              {activeStep === steps.length - 1 ? 
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleNext}
+                  style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF", width:"100%"}}
+                >
+                Return to Projects Page
               </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleNext}
-                style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF"}}
-              >
-                {activeStep === steps.length - 1 ? 'Return to Projects Page' : 'Next'}
-              </Button>
+                  :
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleNext}
+                  style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"3px", borderColor: "#146EFF", width:"40%"}}
+                >
+                Next
+                </Button>
+                }
+                
+
             </div>
           </div>
       </div>

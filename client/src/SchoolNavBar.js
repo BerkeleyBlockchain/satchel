@@ -10,7 +10,7 @@ import SchoolOutlinedIcon from '@material-ui/icons/SchoolOutlined';
 import FolderOutlinedIcon from '@material-ui/icons/FolderOutlined';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { useHistory } from 'react-router-dom';
-
+import './App.css';
 
 
 const theme = createMuiTheme({
@@ -44,7 +44,8 @@ export default function SchoolNavBar(props) {
 
   return (
     <MuiThemeProvider theme={theme}>
-    <Paper position="static" style={{background: "#ECF3FF"}}>
+    <div className="NavBar">
+    <Paper position="fixed" style={{background: "#ECF3FF"}}>
       <Tabs
         value={value}
         onChange={handleChange}
@@ -59,6 +60,7 @@ export default function SchoolNavBar(props) {
         <Tab icon={<SettingsOutlinedIcon/>} label="SETTINGS" />
       </Tabs>
     </Paper>
+    </div>
     </MuiThemeProvider>
   );
 }
