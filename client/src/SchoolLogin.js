@@ -6,6 +6,7 @@ import './App.css';
 import BusinessCenterOutlinedIcon from '@material-ui/icons/BusinessCenterOutlined';
 import logo from './logo.png';
 import contractAbi from "./abi/UnicefSatchel.json";
+import axios from "axios";
 
 // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
@@ -66,6 +67,12 @@ class SchoolLogin extends Component {
         console.log(id);
         const schoolAddress = await contractInstance.methods.schoolArray(id).call();
         console.log(schoolAddress); // Gives address of school contract
+
+        await axios.post("http://localhost:4000/api/school/createSchool", {
+          name: this.state.Name,
+          address: schoolAddress,
+        });
+
         this.props.history.push({pathname: "/SchoolDashboard", state: {Name: this.state.Name, activeTab: this.state.activeTab, schoolAddress: schoolAddress}});
 
       } catch (err) {
@@ -76,7 +83,7 @@ class SchoolLogin extends Component {
 
     login = async (e) => {
         e.preventDefault();
-        console.log("Trying to login")
+        console.log("Trying to login 2")
 
         let contractInstance = new web3.eth.Contract(
           contractAbi.abi,
@@ -103,7 +110,8 @@ class SchoolLogin extends Component {
           let id = ownedSchoolNames.indexOf(this.state.Name);
           let schoolAddress = await contractInstance.methods.schoolArray(id).call();
           console.log(schoolAddress);
-          this.props.history.push({pathname: "/SchoolDashboard", state: {Name: this.state.Name, activeTab: this.state.activeTab, schoolAddress: schoolAddress}});
+                  this.props.history.push({pathname: "/SchoolDashboard", state: {Name: this.state.Name, activeTab: this.state.activeTab, schoolAddress: schoolAddress}});
+
         } catch (e) {
           console.log(e)
         }

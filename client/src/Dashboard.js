@@ -138,6 +138,9 @@ class Dashboard extends Component {
       Name: "",
       UserContractAddress: receivedProps.UserContractAddress,
       UserContract: "",
+      SchoolContract: "",
+      SchoolName: "",
+      SchoolAddress: "",
       projects: [],
     };
     this.setBalance = this.setBalance.bind(this);
@@ -156,6 +159,7 @@ class Dashboard extends Component {
     this.setInterestRate();
     this.setContribution();
     this.setName();
+    this.setSchoolContract();
   }
 
   deposit = async (e) => {
@@ -257,7 +261,9 @@ class Dashboard extends Component {
   };
 
   setName = async (e) => {
-    let x = await this.state.UserContract.methods.getName().call();
+    console.log('Getting Name')
+    let x = await this.state.UserContract.methods.name().call();
+    console.log("Name is " + x);
     this.setState({ Name: x });
   };
 
@@ -281,6 +287,24 @@ class Dashboard extends Component {
     this.setContribution();
   };
 
+  setSchoolContract = async (e) => {
+    try {
+      console.log("Setting School");
+      let schoolAddress = await this.state.UserContract.methods.schoolContract().call();
+      console.log(schoolAddress);
+      const schoolContract = new web3.eth.Contract(
+        schoolAbi.abi,
+        schoolAddress
+      );
+      const name = await schoolContract.methods.getName().call();
+      console.log(name);
+      console.log(schoolAddress);
+      this.setState({ SchoolContract: schoolContract, SchoolName: name, SchoolAddres: schoolAddress })
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   componentDidMount() {
     this.getProjects();
   }
@@ -301,6 +325,7 @@ class Dashboard extends Component {
 
   render() {
     const { classes } = this.props;
+    console.log(this.state.UserContractAddress);
     return (
       <div className="App">
         <div>
@@ -477,7 +502,7 @@ class Dashboard extends Component {
                   </Col>
                   <Col xs="10">
                     <div className="SchoolTitle">{"Your School"}</div>
-                    <div className="SchoolValue">{"UC Berkeley"}</div>
+                    <div className="SchoolValue">{this.state.SchoolName}</div>
                   </Col>
                 </Row>
               </Container>

@@ -65,47 +65,6 @@ class Login extends Component {
     this.props.history.push({ pathname: "/SchoolLogin" });
   };
 
-  // login = async (e) => {
-  //   e.preventDefault();
-  //   var schoolInstance;
-  //   var userContractAddress = null;
-
-  //   const self = this;
-  //   web3.eth.getAccounts(function (error, accounts) {
-  //     if (error) {
-  //       console.log(error);
-  //     }
-  //     School.deployed()
-  //       .then(async function (instance) {
-  //         schoolInstance = instance;
-
-  //         userContractAddress = await schoolInstance.getUserContract.call();
-  //         console.log("user addresss: " + userContractAddress);
-  //         console.log("account[0]" + accounts[0]);
-  //         if (
-  //           userContractAddress == "0x0000000000000000000000000000000000000000"
-  //         ) {
-  //           await schoolInstance.createUserContract(self.state.Name, {
-  //             from: accounts[0],
-  //           });
-  //           console.log("inside await");
-  //           userContractAddress = await schoolInstance.getUserContract.call();
-  //           console.log("user address created: " + userContractAddress);
-  //         }
-  //       })
-  //       .then(async function (result) {
-  //         self.state.UserContractAddress = userContractAddress;
-  //         self.props.history.push({
-  //           pathname: "/Dashboard",
-  //           state: { UserContractAddress: self.state.UserContractAddress },
-  //         });
-  //       })
-  //       .catch(function (err) {
-  //         console.log(err.message);
-  //       });
-  //   });
-  // };
-
   login = async (e) => {
     e.preventDefault();
     // var UserFactory = TruffleContract(userFactoryABI.abi);
@@ -130,24 +89,20 @@ class Login extends Component {
         .call({ from: accounts[0] });
       console.log("user addresss: " + userContractAddress);
       console.log("account[0]" + accounts[0]);
-      if (userContractAddress == "0x0000000000000000000000000000000000000000") {
+      if (userContractAddress == "0x0000000000000000000000000000000000000000" ) {
         console.log("New user detected");
-        // Move them somewhere ?
-        await contractInstance.methods
-          .createUserContract(
-            "Name", // Name the user just entered
-            "0x365809B0E78603576e19a44f0e8325EC527CFBdA" // Address of the school contract
-          )
-          .send({ from: accounts[0] });
-        userContractAddress = await contractInstance.methods.getUserContract.call();
-        console.log(userContractAddress);
+        self.props.history.push({
+          pathname: "/SelectSchool",
+          state: { Name: self.state.Name }
+        });
       } else {
-      }
-      self.state.UserContractAddress = userContractAddress;
+        self.state.UserContractAddress = userContractAddress;
       self.props.history.push({
         pathname: "/Dashboard",
-        state: { UserContractAddress: self.state.UserContractAddress },
+        state: { UserContractAddress: self.state.UserContractAddress, Name: self.state.Name },
       });
+      }
+      
     } catch (err) {
       console.log(err);
       console.log(err.message);
@@ -170,7 +125,6 @@ class Login extends Component {
           <div className="Slogan">
             Invest in both yourself and your community.
           </div>
-
           <Form>
             <FormGroup className="NameField">
               <Label for="amount"></Label>

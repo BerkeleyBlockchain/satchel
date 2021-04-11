@@ -104,15 +104,15 @@ class SchoolDashboard extends Component {
       Name: receivedProps.Name,
       activeTab: receivedProps.activeTab,
       projects: [], 
-      schoolAddress: '',
-      schoolInstance: {}
+      schoolAddress: receivedProps.schoolAddress,
+      schoolInstance: ''
     }
     this.setBalance = this.setBalance.bind(this);
     this.setWithdraw = this.setWithdraw.bind(this);
     this.toggle = this.toggle.bind(this);
+    this.setSchoolInstance();
     this.setBalance();
     this.getProjects();
-    this.setSchoolInstance();
   }
 
   componentDidMount() {
@@ -122,7 +122,7 @@ class SchoolDashboard extends Component {
   setSchoolInstance = async (e) => {
     let schoolInstance = new web3.eth.Contract(
       schoolJSON.abi,
-      this.schoolAddress
+      this.state.schoolAddress
     );
     this.schoolInstance = schoolInstance;
   }
@@ -131,27 +131,33 @@ class SchoolDashboard extends Component {
     const self = this;
     e.preventDefault();
     const amount = web3.utils.toHex(this.state.Withdraw * Math.pow(10, underlyingDecimals));
-    School.deployed().then(async function(schoolInstance) {
-      let schoolBalance = await schoolInstance.getBalance(underlyingMainnetAddress);
+    try {
+      const accounts = await web3.eth.getAccounts();
+      let schoolBalance = await self.schoolInstance.methods.getBalance(underlyingMainnetAddress).call();
       console.log("school balance: " +  schoolBalance / 1e18);
       console.log("withdrawing ... ");
 
-      await schoolInstance.withdrawBalance(schoolBalance, underlyingMainnetAddress, fromMyWallet);
+      await self.schoolInstance.methods.withdrawBalance(schoolBalance, underlyingMainnetAddress).send({
+        from: accounts[0],
+        gasLimit: web3.utils.toHex(1000000),
+        gasPrice: web3.utils.toHex(20000000000),
+      });
+
       self.setBalance();
-    }).catch(function(err) {
+    } catch( err ) {
       console.log(err.message);
-    });
+    }
   }
 
   setBalance = async (e) => {
     const self = this;
-    School.deployed().then(async function(schoolInstance) {
-      let schoolBalance = await schoolInstance.getBalance(underlyingMainnetAddress);
+    try {
+      let schoolBalance = await self.schoolInstance.methods.getBalance(underlyingMainnetAddress).call();
       console.log("schoolBalance: " + Number((schoolBalance / 1e18).toFixed(2)));
       self.setState({Balance: Number((schoolBalance / 1e18).toFixed(6))});
-    }).catch(function(err) {
-      console.log("setBalance" + err.message);
-    });
+    } catch( err ) {
+      console.log("setBalance " + err.message);
+    };
   }
 
   setWithdraw = (event) => {

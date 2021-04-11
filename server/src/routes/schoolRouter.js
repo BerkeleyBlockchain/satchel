@@ -24,6 +24,18 @@ router.get('/', async (req, res) => {
     return res.status(200).json({ success: true, school });
 });
 
+router.get('/allSchools', async (req, res) => {
+    let schools = [];
+    try {
+        schools = await School.find();
+    } catch (e) {
+        console.log(e);
+        return res.status(500).send(e);
+    }
+
+    return res.status(200).json({ success: true, schools });
+});
+
 router.post('/createSchool', async (req, res) => {
     const { name, address } = req.body;
 
