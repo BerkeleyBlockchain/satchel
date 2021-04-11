@@ -119,8 +119,12 @@ class Login extends Component {
     const self = this;
 
     try {
-      const accounts = await web3.eth.getAccounts();
-
+      if (!window.ethereum) {
+        console.log('Metamask not installed')
+        return;
+      }
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      console.log(accounts)
       let userContractAddress = await contractInstance.methods
         .getUserContract()
         .call({ from: accounts[0] });
@@ -150,30 +154,7 @@ class Login extends Component {
     }
   };
 
-  deploySchool = async (e) => {
-    e.preventDefault();
-    // var UserFactory = TruffleContract(userFactoryABI.abi);
-    // UserFactory.setProvider(Web3.givenProvider);
 
-    let contractInstance = new web3.eth.Contract(
-      contractAbi.abi,
-      process.env.REACT_APP_CONTRACT_ADDRESS
-    );
-
-    try {
-      const accounts = await web3.eth.getAccounts();
-      const { events } = await contractInstance.methods
-        .newSchool("School Name")
-        .send({ from: accounts[0] });
-      const id = events.newSchoolEvent.returnValues.schoolId;
-      console.log(id);
-      const data = await contractInstance.methods.schoolArray(id).call();
-      console.log(data); // Gives address of school contract
-    } catch (err) {
-      console.log(err);
-      console.log(err.message);
-    }
-  };
 
   render() {
     return (
@@ -223,20 +204,6 @@ class Login extends Component {
                 }}
               >
                 Log In
-              </Button>
-              <Button
-                className="Button"
-                onClick={this.deploySchool}
-                type="submit"
-                style={{
-                  backgroundColor: "#146EFF",
-                  color: "white",
-                  fontWeight: "bold",
-                  borderRadius: "10px",
-                  borderWidth: "0px",
-                }}
-              >
-                Dangerously Create New School
               </Button>
             </div>
           </Form>

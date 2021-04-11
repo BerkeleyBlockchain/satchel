@@ -48,12 +48,12 @@ import Panel from "./Panel";
 // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
 
-const privateKey =
-  "0xb8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cbf329";
+// const privateKey =
+//   "0xb8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cbf329";
 
 // Add your Ethereum wallet to the Web3 object
-web3.eth.accounts.wallet.add(privateKey);
-const myWalletAddress = web3.eth.accounts.wallet[0].address;
+// web3.eth.accounts.wallet.add(privateKey);
+// const myWalletAddress = web3.eth.accounts.wallet[0].address;
 
 // Mainnet address of the underlying token contract. Example: Dai.
 const underlyingMainnetAddress = process.env.REACT_APP_TOKEN_ADDRESS;
@@ -64,11 +64,11 @@ const underlying = new web3.eth.Contract(erc20Abi, underlyingMainnetAddress);
 const cTokenAddress = process.env.REACT_APP_CTOKEN_ADDRESS;
 const cToken = new web3.eth.Contract(cTokenAbi, cTokenAddress);
 
-const fromMyWallet = {
-  from: myWalletAddress,
-  gasLimit: web3.utils.toHex(1000000),
-  gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
-};
+// const fromMyWallet = {
+//   from: "0x00000000000",
+//   gasLimit: web3.utils.toHex(1000000),
+//   gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
+// };
 
 const underlyingDecimals = 18; // Number of decimals defined in this ERC20 token's contract
 
@@ -159,6 +159,7 @@ class Dashboard extends Component {
   }
 
   deposit = async (e) => {
+    console.log(process.env.REACT_APP_CTOKEN_ADDRESS)
     console.log("handleGet\n");
     e.preventDefault();
     console.log(this.state.UserContractAddress);
@@ -202,16 +203,29 @@ class Dashboard extends Component {
 
   withdraw = async (e) => {
     e.preventDefault();
-    const amount = web3.utils.toHex(
-      this.state.Withdraw * Math.pow(10, underlyingDecimals)
-    );
-    console.log(`Redeeming ...`);
-    let redeemResult = await this.state.UserContract.methods
-      .withdraw(amount, underlyingMainnetAddress, cTokenAddress)
-      .send(fromMyWallet);
-    console.log(redeemResult.events.MyLog);
-    this.setBalance();
-    this.setInterestRate();
+    try {
+      const amount = web3.utils.toHex(
+        this.state.Withdraw * Math.pow(10, underlyingDecimals)
+      );
+
+      const accounts = await web3.eth.getAccounts();
+
+      console.log(`Redeeming ...`);
+      let redeemResult = await this.state.UserContract.methods
+        .withdraw(amount, underlyingMainnetAddress, cTokenAddress)
+        .send({
+          from: accounts[0],
+          gasLimit: web3.utils.toHex(1000000),
+          gasPrice: web3.utils.toHex(20000000000),
+        });
+
+      console.log(redeemResult.events.MyLog);
+      this.setBalance();
+      this.setInterestRate();
+    } catch (e) {
+      console.log(e)
+    }
+    
   };
 
   setContribution = async (e) => {
