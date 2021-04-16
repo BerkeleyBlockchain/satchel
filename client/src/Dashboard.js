@@ -163,7 +163,7 @@ class Dashboard extends Component {
   }
 
   deposit = async (e) => {
-    console.log(process.env.REACT_APP_CTOKEN_ADDRESS)
+    console.log(process.env.REACT_APP_CTOKEN_ADDRESS);
     console.log("handleGet\n");
     e.preventDefault();
     console.log(this.state.UserContractAddress);
@@ -227,9 +227,8 @@ class Dashboard extends Component {
       this.setBalance();
       this.setInterestRate();
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
-    
   };
 
   setContribution = async (e) => {
@@ -253,16 +252,23 @@ class Dashboard extends Component {
     this.setState({ Balance: Number(balance.toFixed(2)) });
   };
 
-
-  setInterestRate = async() => {
-    await axios.get('https://api.compound.finance/api/v2/ctoken?addresses=0x5d3a536e4d6dbd6114cc1ead35777bab948e3643')
-    .then(res=>this.setState(
-      {InterestRate: Number(((res.data.cToken[0].supply_rate.value/2)*100).toFixed(2))}));
+  setInterestRate = async () => {
+    await axios
+      .get(
+        "https://api.compound.finance/api/v2/ctoken?addresses=0x5d3a536e4d6dbd6114cc1ead35777bab948e3643"
+      )
+      .then((res) =>
+        this.setState({
+          InterestRate: Number(
+            ((res.data.cToken[0].supply_rate.value / 2) * 100).toFixed(2)
+          ),
+        })
+      );
   };
 
-  setName = async (e) => {
-    console.log('Getting Name')
-    let x = await this.state.UserContract.methods.name().call();
+  setName = async () => {
+    console.log("Getting Name");
+    let x = await this.state.UserContract.methods.getName().call();
     console.log("Name is " + x);
     this.setState({ Name: x });
   };
@@ -290,7 +296,9 @@ class Dashboard extends Component {
   setSchoolContract = async (e) => {
     try {
       console.log("Setting School");
-      let schoolAddress = await this.state.UserContract.methods.schoolContract().call();
+      let schoolAddress = await this.state.UserContract.methods
+        .schoolContract()
+        .call();
       console.log(schoolAddress);
       const schoolContract = new web3.eth.Contract(
         schoolAbi.abi,
@@ -299,11 +307,15 @@ class Dashboard extends Component {
       const name = await schoolContract.methods.getName().call();
       console.log(name);
       console.log(schoolAddress);
-      this.setState({ SchoolContract: schoolContract, SchoolName: name, SchoolAddres: schoolAddress })
+      this.setState({
+        SchoolContract: schoolContract,
+        SchoolName: name,
+        SchoolAddres: schoolAddress,
+      });
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
-  }
+  };
 
   componentDidMount() {
     this.getProjects();
