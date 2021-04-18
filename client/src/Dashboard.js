@@ -44,6 +44,8 @@ import FastfoodOutlinedIcon from "@material-ui/icons/FastfoodOutlined";
 import ArrowForwardIosOutlinedIcon from "@material-ui/icons/ArrowForwardIosOutlined";
 import axios from "axios";
 import Panel from "./Panel";
+import { css } from "@emotion/core";
+import ClipLoader from "react-spinners/ClipLoader";
 
 // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
@@ -86,6 +88,12 @@ const theme = createMuiTheme({
     },
   },
 });
+
+const override = css`
+  display: block;
+  margin: 0 auto;
+  border-color: red;
+`;
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -142,6 +150,8 @@ class Dashboard extends Component {
       SchoolName: "",
       SchoolAddress: "",
       projects: [],
+      withdrawLoading: false,
+      depositLoading: false,
     };
     this.setBalance = this.setBalance.bind(this);
     this.setDeposit = this.setDeposit.bind(this);
@@ -167,6 +177,7 @@ class Dashboard extends Component {
     console.log("handleGet\n");
     e.preventDefault();
     console.log(this.state.UserContractAddress);
+    this.setState({ depositLoading: true })
     const accounts = await web3.eth.getAccounts();
 
     try {
@@ -199,14 +210,16 @@ class Dashboard extends Component {
       console.log("supply result");
 
       this.setBalance();
-      this.setInterestRate();
+      // this.setInterestRate();
     } catch (e) {
       console.log(e);
     }
+    this.setState({ depositLoading: false })
   };
 
   withdraw = async (e) => {
     e.preventDefault();
+    this.setState({ withdrawLoading: true })
     try {
       const amount = web3.utils.toHex(
         this.state.Withdraw * Math.pow(10, underlyingDecimals)
@@ -225,10 +238,11 @@ class Dashboard extends Component {
 
       console.log(redeemResult.events.MyLog);
       this.setBalance();
-      this.setInterestRate();
+      // this.setInterestRate();
     } catch (e) {
       console.log(e);
     }
+    this.setState({ withdrawLoading: false })
   };
 
   setContribution = async (e) => {
@@ -250,6 +264,7 @@ class Dashboard extends Component {
       1e18;
     console.log(balance);
     this.setState({ Balance: Number(balance.toFixed(2)) });
+    this.setState({ withdrawLoading: false })
   };
 
   setInterestRate = async () => {
@@ -412,12 +427,17 @@ class Dashboard extends Component {
                             fontWeight: "bold",
                             borderRadius: "10px",
                             borderWidth: "0px",
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-around'
                           }}
                           className="AmountButton"
                           onClick={this.deposit}
                           type="submit"
                         >
                           Deposit
+                          <ClipLoader color={"#FFFFFF"} loading={this.state.depositLoading} size={20} />
                         </Button>
                       </Row>
                     </Form>
@@ -445,18 +465,23 @@ class Dashboard extends Component {
                       </Row>
                       <Row>
                         <Button
-                          style={{
+                           style={{
                             backgroundColor: "#146EFF",
                             color: "white",
                             fontWeight: "bold",
                             borderRadius: "10px",
                             borderWidth: "0px",
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-around'
                           }}
                           className="AmountButton"
                           onClick={this.withdraw}
                           type="submit"
                         >
                           Withdraw
+                          <ClipLoader color={"#FFFFFF"} loading={this.state.withdrawLoading} size={20} />
                         </Button>
                       </Row>
                     </Form>

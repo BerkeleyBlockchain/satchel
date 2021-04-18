@@ -7,6 +7,7 @@ import BusinessCenterOutlinedIcon from '@material-ui/icons/BusinessCenterOutline
 import logo from './logo.png';
 import contractAbi from "./abi/UnicefSatchel.json";
 import axios from "axios";
+import ClipLoader from "react-spinners/ClipLoader";
 
 // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
@@ -36,6 +37,8 @@ class SchoolLogin extends Component {
         this.state = {
           Name: '',
           activeTab: 0,
+          loginLoading: false,
+          createLoading: false
         }
         this.setName = this.setName.bind(this);
         this.login = this.login.bind(this);
@@ -56,6 +59,7 @@ class SchoolLogin extends Component {
         contractAbi.abi,
         process.env.REACT_APP_CONTRACT_ADDRESS
       );
+      this.setState({ createLoading: true })
   
       try {
         const accounts = await web3.eth.getAccounts();
@@ -79,11 +83,14 @@ class SchoolLogin extends Component {
         console.log(err);
         console.log(err.message);
       }
+      this.setState({ createLoading: false })
+
     };
 
     login = async (e) => {
         e.preventDefault();
-        console.log("Trying to login 2")
+        this.setState({ loginLoading: true })
+
 
         let contractInstance = new web3.eth.Contract(
           contractAbi.abi,
@@ -115,6 +122,8 @@ class SchoolLogin extends Component {
         } catch (e) {
           console.log(e)
         }
+        this.setState({ loginLoading: false })
+
     }
 
     render() {
@@ -137,8 +146,14 @@ class SchoolLogin extends Component {
                       <Input onChange={this.setName} type="text" name="text" id="amount" placeholder="Enter school name" style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "15px"}} />
                     </FormGroup>
 
-                    <div>
-                      <Button className="Button" onClick={this.login} type="submit" style={{ backgroundColor:"#146EFF", color:"white", fontWeight:"bold", borderRadius: "10px", borderWidth:"0px"}}>Log In</Button>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                      <>
+                      <Button className="Button" onClick={this.login} type="submit" style={{ backgroundColor:"#146EFF", color:"white", fontWeight:"bold", borderRadius: "10px", borderWidth:"0px", display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-around'}}>Log In <ClipLoader color={"#FFFFFF"} loading={this.state.loginLoading} size={20} />
+                        </Button>
+
                         <Button
                         className="Button"
                         onClick={this.deploySchool}
@@ -149,11 +164,17 @@ class SchoolLogin extends Component {
                           fontWeight: "bold",
                           borderRadius: "10px",
                           borderWidth: "0px",
-                          marginTop: "5%"
+                          marginTop: "5%",
+                          display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-around'
                         }}
                       >
                         Create New School
+                        <ClipLoader color={"#FFFFFF"} loading={this.state.createLoading} size={20} />
                       </Button>
+                      </>
                     </div>
                   </Form>
               </div>

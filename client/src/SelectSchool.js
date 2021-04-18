@@ -51,9 +51,9 @@ class SelectSchool extends Component {
     console.log(receivedProps);
     this.state = {
       schools: [],
-      Name: receivedProps.Name,
+      Name: "",
     };
-
+    this.setName = this.setName.bind(this);
     this.getSchools();
   }
 
@@ -61,6 +61,12 @@ class SelectSchool extends Component {
     await axios
       .get("http://localhost:4000/api/school/allSchools")
       .then((res) => this.setState({ schools: res.data.schools }));
+  };
+
+  setName = async (e) => {
+    e.preventDefault();
+    const x = e.target.value;
+    this.setState({ Name: x });
   };
 
   login = async (school) => {
@@ -129,6 +135,26 @@ class SelectSchool extends Component {
             In order to set up an account, you'll need to select a school that
             will receive your donations.
           </div>
+
+          <Form>
+          <FormGroup className="NameField">
+              <Label for="amount"></Label>
+              <Input
+                onChange={this.setName}
+                type="text"
+                name="text"
+                id="amount"
+                placeholder="Enter your name"
+                style={{
+                  backgroundColor: "#ECF3FF",
+                  color: "black",
+                  borderRadius: "10px",
+                  border: "white",
+                  fontSize: "15px",
+                }}
+              />
+            </FormGroup>
+          </Form>
 
           {this.state.schools.length > 0
             ? this.state.schools.map((school) => (

@@ -49,16 +49,16 @@ class Login extends Component {
       Name: "",
       UserContractAddress: "",
     };
-    this.setName = this.setName.bind(this);
+    // this.setName = this.setName.bind(this);
     this.login = this.login.bind(this);
     this.schoolLogin = this.schoolLogin.bind(this);
   }
 
-  setName = async (e) => {
-    e.preventDefault();
-    const x = e.target.value;
-    this.setState({ Name: x });
-  };
+  // setName = async (e) => {
+  //   e.preventDefault();
+  //   const x = e.target.value;
+  //   this.setState({ Name: x });
+  // };
 
   schoolLogin = async (e) => {
     e.preventDefault();
@@ -126,7 +126,7 @@ class Login extends Component {
             Invest in both yourself and your community.
           </div>
           <Form>
-            <FormGroup className="NameField">
+            {/* <FormGroup className="NameField">
               <Label for="amount"></Label>
               <Input
                 onChange={this.setName}
@@ -142,9 +142,9 @@ class Login extends Component {
                   fontSize: "15px",
                 }}
               />
-            </FormGroup>
+            </FormGroup> */}
 
-            <div>
+            <div style={{marginTop: "10px"}}>
               <Button
                 className="Button"
                 onClick={this.login}

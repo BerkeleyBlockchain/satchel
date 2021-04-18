@@ -17,6 +17,7 @@ import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import Panel from './Panel';
+import ClipLoader from "react-spinners/ClipLoader";
 
 import {Redirect} from 'react-router-dom';
 
@@ -105,7 +106,8 @@ class SchoolDashboard extends Component {
       activeTab: receivedProps.activeTab,
       projects: [], 
       schoolAddress: receivedProps.schoolAddress,
-      schoolInstance: ''
+      schoolInstance: '',
+      withdrawLoading: false,
     }
     this.setBalance = this.setBalance.bind(this);
     this.setWithdraw = this.setWithdraw.bind(this);
@@ -130,6 +132,7 @@ class SchoolDashboard extends Component {
   withdraw = async (e) => {
     const self = this;
     e.preventDefault();
+    this.setState({withdrawLoading: true});
     const amount = web3.utils.toHex(this.state.Withdraw * Math.pow(10, underlyingDecimals));
     try {
       const accounts = await web3.eth.getAccounts();
@@ -147,6 +150,7 @@ class SchoolDashboard extends Component {
     } catch( err ) {
       console.log(err.message);
     }
+    this.setState({ withdrawLoading: false })
   }
 
   setBalance = async (e) => {
@@ -216,7 +220,27 @@ class SchoolDashboard extends Component {
                       <Label for="amount"></Label>
                       <Input onChange={this.setWithdraw} type="number" name="text" id="amount" placeholder="Enter amount" style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px"}}/>
                     </FormGroup>
-                  <Button style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"0px"}} className="AmountButton" onClick={this.withdraw} type="submit">Withdraw</Button>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                  <Button 
+                    style={{
+                      backgroundColor: "#146EFF",
+                      color: "white",
+                      fontWeight: "bold",
+                      borderRadius: "10px",
+                      borderWidth: "0px",
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-around'
+                    }}
+                    className="AmountButton"
+                    onClick={this.withdraw}
+                    type="submit"
+                    >
+                    Withdraw
+                    <ClipLoader color={"#FFFFFF"} loading={this.state.withdrawLoading} size={20} />
+                  </Button>
+                  </div>
                 </Form>
               </div>
 
