@@ -314,6 +314,7 @@ class Dashboard extends Component {
       let schoolAddress = await this.state.UserContract.methods
         .schoolContract()
         .call();
+      console.log("School address is ", schoolAddress)
       console.log(schoolAddress);
       const schoolContract = new web3.eth.Contract(
         schoolAbi.abi,
@@ -325,21 +326,23 @@ class Dashboard extends Component {
       this.setState({
         SchoolContract: schoolContract,
         SchoolName: name,
-        SchoolAddres: schoolAddress,
+        SchoolAddress: schoolAddress,
       });
     } catch (e) {
       console.log(e);
     }
+    this.getProjects();
   };
 
-  componentDidMount() {
-    this.getProjects();
-  }
+  // componentDidMount() {
+  //   this.getProjects();
+  // }
 
   getProjects = async () => {
+    console.log("hi", this.state.SchoolAddress);
     await axios
       .get(
-        "http://localhost:4000/api/project?schoolAddress=0xa0df350d2637096571F7A701CBc1C5fdE30dF76A"
+        "http://localhost:4000/api/project?schoolAddress=" + this.state.SchoolAddress
       )
       .then((res) => this.setState({ projects: res.data.projects }));
   };
@@ -352,11 +355,11 @@ class Dashboard extends Component {
 
   render() {
     const { classes } = this.props;
-    console.log(this.state.UserContractAddress);
+    console.log("User Address: ", this.state.UserContractAddress);
     return (
       <div className="App">
         <div>
-          <MuiThemeProvider theme={theme}>
+          {/* <MuiThemeProvider theme={theme}>
             <AppBar position="static" style={{ background: "#ECF3FF" }}>
               <Tabs
                 TabIndicatorProps={{
@@ -384,7 +387,7 @@ class Dashboard extends Component {
                 />
               </Tabs>
             </AppBar>
-          </MuiThemeProvider>
+          </MuiThemeProvider> */}
 
           <TabPanel value={this.state.activeTab} index={0}>
             <div className="Welcome">
@@ -570,6 +573,24 @@ class Dashboard extends Component {
               Logout
             </Button>
           </TabPanel>
+
+          <div className="NavBar">
+        <MuiThemeProvider theme={theme}>
+            <AppBar position="relative" style={{background: "#ECF3FF"}}>
+                <Tabs
+                  TabIndicatorProps={{ style: { background: "#146EFF", height: "5px"} }}
+                  value={this.state.activeTab}
+                  onChange={this.toggle}
+                  variant="fullWidth"
+                  textColor="primary"
+                >
+                  <Tab icon={<AccountBalanceWalletOutlinedIcon />} label="School" {...a11yProps(0)} />
+                  <Tab icon={<DomainOutlinedIcon />} label="Projects" {...a11yProps(1)} />
+                  <Tab icon={<SettingsOutlinedIcon />} label="Settings" {...a11yProps(2)} />
+                </Tabs>
+            </AppBar>
+          </MuiThemeProvider>
+        </div>
         </div>
       </div>
     );

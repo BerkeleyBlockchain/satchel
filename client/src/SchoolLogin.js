@@ -111,6 +111,7 @@ class SchoolLogin extends Component {
           console.log(ownedSchoolNames);
           if (!ownedSchoolNames.includes(this.state.Name)){
             console.log("No school found");
+            this.setState({ loginLoading: false })
             return;
           }
 
