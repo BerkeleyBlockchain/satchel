@@ -226,13 +226,14 @@ export default function CreateProject(props) {
   };
 
   const handleRequest = async() => {
+    console.log(props.location.schoolAddress)
     try {
       await axios.post('http://localhost:4000/api/project/createProject', {
             "name": projectName, 
             "description": projectDes,
             "targetFunding": fundingAmt,
             "fundingBreakdown": fundingBreak,
-            "schoolAddress": "0xa0df350d2637096571F7A701CBc1C5fdE30dF76A",
+            "schoolAddress": props.location.schoolAddress,
         })
     } catch (error) {
       console.log(error.message);
@@ -266,6 +267,7 @@ export default function CreateProject(props) {
           Name: props.Name,
           Withdraw: props.Withdraw,
           Balance: props.Balance,
+          schoolAddress: props.location.schoolAddress,
           activeTab: 1,
         },
       });

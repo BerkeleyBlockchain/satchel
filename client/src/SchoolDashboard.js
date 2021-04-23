@@ -178,13 +178,13 @@ class SchoolDashboard extends Component {
   }
 
   createProject = async (e) => {
-    console.log(this.state.Name)
-    this.props.history.push({pathname: "/CreateProject", Balance: this.state.Balance, Withdraw: this.state.Withdraw, Name: this.state.Name, activeTab: this.state.activeTab});
+    console.log(this.state.schoolAdress)
+    this.props.history.push({pathname: "/CreateProject", Balance: this.state.Balance, Withdraw: this.state.Withdraw, Name: this.state.Name, activeTab: this.state.activeTab, schoolAddress: this.state.schoolAddress});
 
   }
 
-  getProjects = async() => {
-    await axios.get('http://localhost:4000/api/project?schoolAddress=0xa0df350d2637096571F7A701CBc1C5fdE30dF76A')
+  getProjects = async () => {
+    await axios.get('http://localhost:4000/api/project?schoolAddress=' + this.state.schoolAddress)
     .then(res=>this.setState(
       {projects: res.data.projects}));
   };
