@@ -120,16 +120,4 @@ contract("UnicefSatchel", (accounts) => {
       console.log(balance);
     });
   });
-
-  xcontext("Funding", async () => {
-    it("Schools should be able to retrieve balance", async () => {
-      await contractInstance.newSchool(schoolName, {
-        from: owner,
-      });
-
-      await contractInstance.getSchoolBalance(0, erc20Address);
-      let balance = await contractInstance.getSchoolBalance(0, erc20Address);
-      expect(balance).to.eq.BN(0);
-    });
-  });
 });

@@ -13,6 +13,7 @@
     "react-md": "^2.7.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.0.1",
+    "react-spinners": "^0.10.6",
     "reactstrap": "^8.7.1",
     "truffle-contract": "^4.0.31",
     "web3": "^1.2.5"

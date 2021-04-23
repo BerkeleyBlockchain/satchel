@@ -17,6 +17,7 @@ import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import Panel from './Panel';
+import ClipLoader from "react-spinners/ClipLoader";
 
 import {Redirect} from 'react-router-dom';
 
@@ -30,12 +31,12 @@ web3.eth.accounts.wallet.add(privateKey);
 const myWalletAddress = web3.eth.accounts.wallet[0].address;
 
 // Mainnet address of the underlying token contract. Example: Dai.
-const underlyingMainnetAddress = '0x6b175474e89094c44da98b954eedeac495271d0f';
+const underlyingMainnetAddress = process.env.REACT_APP_TOKEN_ADDRESS;
 const underlying = new web3.eth.Contract(erc20Abi, underlyingMainnetAddress);
 
 // Mainnet contract address and ABI for the cToken, which can be found in the
 // mainnet tab on this page: https://compound.finance/docs
-const cTokenAddress = '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643';
+const cTokenAddress = process.env.REACT_APP_CTOKEN_ADDRESS;
 const cToken = new web3.eth.Contract(cTokenAbi, cTokenAddress);
 
 const fromMyWallet = {
@@ -103,11 +104,15 @@ class SchoolDashboard extends Component {
       Withdraw: '',
       Name: receivedProps.Name,
       activeTab: receivedProps.activeTab,
-      projects: []
+      projects: [], 
+      schoolAddress: receivedProps.schoolAddress,
+      schoolInstance: '',
+      withdrawLoading: false,
     }
     this.setBalance = this.setBalance.bind(this);
     this.setWithdraw = this.setWithdraw.bind(this);
     this.toggle = this.toggle.bind(this);
+    this.setSchoolInstance();
     this.setBalance();
     this.getProjects();
   }
@@ -116,31 +121,47 @@ class SchoolDashboard extends Component {
     this.getProjects();
   }
 
+  setSchoolInstance = async (e) => {
+    let schoolInstance = new web3.eth.Contract(
+      schoolJSON.abi,
+      this.state.schoolAddress
+    );
+    this.schoolInstance = schoolInstance;
+  }
+
   withdraw = async (e) => {
     const self = this;
     e.preventDefault();
+    this.setState({withdrawLoading: true});
     const amount = web3.utils.toHex(this.state.Withdraw * Math.pow(10, underlyingDecimals));
-    School.deployed().then(async function(schoolInstance) {
-      let schoolBalance = await schoolInstance.getBalance(underlyingMainnetAddress);
+    try {
+      const accounts = await web3.eth.getAccounts();
+      let schoolBalance = await self.schoolInstance.methods.getBalance(underlyingMainnetAddress).call();
       console.log("school balance: " +  schoolBalance / 1e18);
       console.log("withdrawing ... ");
 
-      await schoolInstance.withdrawBalance(schoolBalance, underlyingMainnetAddress, fromMyWallet);
+      await self.schoolInstance.methods.withdrawBalance(schoolBalance, underlyingMainnetAddress).send({
+        from: accounts[0],
+        gasLimit: web3.utils.toHex(1000000),
+        gasPrice: web3.utils.toHex(20000000000),
+      });
+
       self.setBalance();
-    }).catch(function(err) {
+    } catch( err ) {
       console.log(err.message);
-    });
+    }
+    this.setState({ withdrawLoading: false })
   }
 
   setBalance = async (e) => {
     const self = this;
-    School.deployed().then(async function(schoolInstance) {
-      let schoolBalance = await schoolInstance.getBalance(underlyingMainnetAddress);
+    try {
+      let schoolBalance = await self.schoolInstance.methods.getBalance(underlyingMainnetAddress).call();
       console.log("schoolBalance: " + Number((schoolBalance / 1e18).toFixed(2)));
       self.setState({Balance: Number((schoolBalance / 1e18).toFixed(6))});
-    }).catch(function(err) {
-      console.log("setBalance" + err.message);
-    });
+    } catch( err ) {
+      console.log("setBalance " + err.message);
+    };
   }
 
   setWithdraw = (event) => {
@@ -200,7 +221,27 @@ class SchoolDashboard extends Component {
                       <Label for="amount"></Label>
                       <Input onChange={this.setWithdraw} type="number" name="text" id="amount" placeholder="Enter amount" style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px"}}/>
                     </FormGroup>
-                  <Button style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"0px"}} className="AmountButton" onClick={this.withdraw} type="submit">Withdraw</Button>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                  <Button 
+                    style={{
+                      backgroundColor: "#146EFF",
+                      color: "white",
+                      fontWeight: "bold",
+                      borderRadius: "10px",
+                      borderWidth: "0px",
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-around'
+                    }}
+                    className="AmountButton"
+                    onClick={this.withdraw}
+                    type="submit"
+                    >
+                    Withdraw
+                    <ClipLoader color={"#FFFFFF"} loading={this.state.withdrawLoading} size={20} />
+                  </Button>
+                  </div>
                 </Form>
               </div>
 

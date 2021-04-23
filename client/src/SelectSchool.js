@@ -22,6 +22,8 @@ import contractAbi from "./abi/UnicefSatchel.json";
 import "./App.css";
 import BusinessCenterOutlinedIcon from "@material-ui/icons/BusinessCenterOutlined";
 import logo from "./logo.png";
+import axios from "axios";
+import SchoolPanel from "./SchoolPanel.js";
 
 // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
@@ -42,34 +44,32 @@ const web3 = new Web3(Web3.givenProvider);
 // var TruffleContract = require("truffle-contract");
 // var School = TruffleContract(schoolJSON);
 // School.setProvider(Web3.givenProvider);
-class Login extends Component {
+class SelectSchool extends Component {
   constructor(props) {
     super(props);
+    let receivedProps = this.props.location.state;
+    console.log(receivedProps);
     this.state = {
+      schools: [],
       Name: "",
-      UserContractAddress: "",
     };
-    // this.setName = this.setName.bind(this);
-    this.login = this.login.bind(this);
-    this.schoolLogin = this.schoolLogin.bind(this);
+    this.setName = this.setName.bind(this);
+    this.getSchools();
   }
 
-  // setName = async (e) => {
-  //   e.preventDefault();
-  //   const x = e.target.value;
-  //   this.setState({ Name: x });
-  // };
-
-  schoolLogin = async (e) => {
-    e.preventDefault();
-    this.props.history.push({ pathname: "/SchoolLogin" });
+  getSchools = async () => {
+    await axios
+      .get("http://localhost:4000/api/school/allSchools")
+      .then((res) => this.setState({ schools: res.data.schools }));
   };
 
-  login = async (e) => {
+  setName = async (e) => {
     e.preventDefault();
-    // var UserFactory = TruffleContract(userFactoryABI.abi);
-    // UserFactory.setProvider(Web3.givenProvider);
+    const x = e.target.value;
+    this.setState({ Name: x });
+  };
 
+  login = async (school) => {
     let contractInstance = new web3.eth.Contract(
       contractAbi.abi,
       process.env.REACT_APP_CONTRACT_ADDRESS
@@ -79,36 +79,42 @@ class Login extends Component {
 
     try {
       if (!window.ethereum) {
-        console.log('Metamask not installed')
+        console.log("Metamask not installed");
         return;
       }
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      console.log(accounts);
       let userContractAddress = await contractInstance.methods
         .getUserContract()
         .call({ from: accounts[0] });
       console.log("user addresss: " + userContractAddress);
       console.log("account[0]" + accounts[0]);
-      if (userContractAddress == "0x0000000000000000000000000000000000000000" ) {
-        console.log("New user detected");
+      if (userContractAddress == "0x0000000000000000000000000000000000000000") {
+        await contractInstance.methods
+          .createUserContract(self.state.Name, school.address)
+          .send({ from: accounts[0] });
+
+        userContractAddress = await contractInstance.methods
+          .getUserContract()
+          .call({ from: accounts[0] });
+        console.log(userContractAddress);
+        self.state.UserContractAddress = userContractAddress;
         self.props.history.push({
-          pathname: "/SelectSchool",
-          state: { Name: self.state.Name }
+          pathname: "/Dashboard",
+          state: {
+            UserContractAddress: userContractAddress,
+            Name: self.state.Name,
+          },
         });
       } else {
-        self.state.UserContractAddress = userContractAddress;
-      self.props.history.push({
-        pathname: "/Dashboard",
-        state: { UserContractAddress: self.state.UserContractAddress, Name: self.state.Name },
-      });
+        console.log("You already have an account");
       }
-      
     } catch (err) {
       console.log(err);
-      console.log(err.message);
     }
   };
-
-
 
   render() {
     return (
@@ -122,10 +128,16 @@ class Login extends Component {
           <div className="LoginWelcome">{"Welcome to Satchel!"}</div>
 
           <div className="Slogan">
-            Invest in both yourself and your community.
+            Satchel donates a portion of interest earned on your savings to a
+            local school to help fund community projects.
           </div>
+          <div className="Slogan">
+            In order to set up an account, you'll need to select a school that
+            will receive your donations.
+          </div>
+
           <Form>
-            {/* <FormGroup className="NameField">
+          <FormGroup className="NameField">
               <Label for="amount"></Label>
               <Input
                 onChange={this.setName}
@@ -141,43 +153,21 @@ class Login extends Component {
                   fontSize: "15px",
                 }}
               />
-            </FormGroup> */}
-
-            <div style={{marginTop: "10px"}}>
-              <Button
-                className="Button"
-                onClick={this.login}
-                type="submit"
-                style={{
-                  backgroundColor: "#146EFF",
-                  color: "white",
-                  fontWeight: "bold",
-                  borderRadius: "10px",
-                  borderWidth: "0px",
-                }}
-              >
-                Log In
-              </Button>
-            </div>
+            </FormGroup>
           </Form>
-          <div className="SchoolLogin">
-            <Button
-              className="Button"
-              onClick={this.schoolLogin}
-              type="submit"
-              style={{
-                backgroundColor: "white",
-                color: "#146EFF",
-                borderWidth: "0px",
-              }}
-            >
-              I'm a school!
-            </Button>
-          </div>
+
+          {this.state.schools.length > 0
+            ? this.state.schools.map((school) => (
+                <div className="PanelWidth" onClick={() => this.login(school)}>
+                  <SchoolPanel school={school}></SchoolPanel>
+                </div>
+              ))
+            : null}
+          <div className="SchoolLogin"></div>
         </div>
       </div>
     );
   }
 }
 
-export default Login;
+export default SelectSchool;

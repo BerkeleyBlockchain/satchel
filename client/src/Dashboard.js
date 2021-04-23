@@ -44,16 +44,18 @@ import FastfoodOutlinedIcon from "@material-ui/icons/FastfoodOutlined";
 import ArrowForwardIosOutlinedIcon from "@material-ui/icons/ArrowForwardIosOutlined";
 import axios from "axios";
 import Panel from "./Panel";
+import { css } from "@emotion/core";
+import ClipLoader from "react-spinners/ClipLoader";
 
 // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
 
-const privateKey =
-  "0xb8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cbf329";
+// const privateKey =
+//   "0xb8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cbf329";
 
 // Add your Ethereum wallet to the Web3 object
-web3.eth.accounts.wallet.add(privateKey);
-const myWalletAddress = web3.eth.accounts.wallet[0].address;
+// web3.eth.accounts.wallet.add(privateKey);
+// const myWalletAddress = web3.eth.accounts.wallet[0].address;
 
 // Mainnet address of the underlying token contract. Example: Dai.
 const underlyingMainnetAddress = process.env.REACT_APP_TOKEN_ADDRESS;
@@ -64,11 +66,11 @@ const underlying = new web3.eth.Contract(erc20Abi, underlyingMainnetAddress);
 const cTokenAddress = process.env.REACT_APP_CTOKEN_ADDRESS;
 const cToken = new web3.eth.Contract(cTokenAbi, cTokenAddress);
 
-const fromMyWallet = {
-  from: myWalletAddress,
-  gasLimit: web3.utils.toHex(1000000),
-  gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
-};
+// const fromMyWallet = {
+//   from: "0x00000000000",
+//   gasLimit: web3.utils.toHex(1000000),
+//   gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
+// };
 
 const underlyingDecimals = 18; // Number of decimals defined in this ERC20 token's contract
 
@@ -86,6 +88,12 @@ const theme = createMuiTheme({
     },
   },
 });
+
+const override = css`
+  display: block;
+  margin: 0 auto;
+  border-color: red;
+`;
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -138,7 +146,12 @@ class Dashboard extends Component {
       Name: "",
       UserContractAddress: receivedProps.UserContractAddress,
       UserContract: "",
+      SchoolContract: "",
+      SchoolName: "",
+      SchoolAddress: "",
       projects: [],
+      withdrawLoading: false,
+      depositLoading: false,
     };
     this.setBalance = this.setBalance.bind(this);
     this.setDeposit = this.setDeposit.bind(this);
@@ -156,12 +169,15 @@ class Dashboard extends Component {
     this.setInterestRate();
     this.setContribution();
     this.setName();
+    this.setSchoolContract();
   }
 
   deposit = async (e) => {
+    console.log(process.env.REACT_APP_CTOKEN_ADDRESS);
     console.log("handleGet\n");
     e.preventDefault();
     console.log(this.state.UserContractAddress);
+    this.setState({ depositLoading: true })
     const accounts = await web3.eth.getAccounts();
 
     try {
@@ -194,24 +210,39 @@ class Dashboard extends Component {
       console.log("supply result");
 
       this.setBalance();
-      this.setInterestRate();
+      // this.setInterestRate();
     } catch (e) {
       console.log(e);
     }
+    this.setState({ depositLoading: false })
   };
 
   withdraw = async (e) => {
     e.preventDefault();
-    const amount = web3.utils.toHex(
-      this.state.Withdraw * Math.pow(10, underlyingDecimals)
-    );
-    console.log(`Redeeming ...`);
-    let redeemResult = await this.state.UserContract.methods
-      .withdraw(amount, underlyingMainnetAddress, cTokenAddress)
-      .send(fromMyWallet);
-    console.log(redeemResult.events.MyLog);
-    this.setBalance();
-    this.setInterestRate();
+    this.setState({ withdrawLoading: true })
+    try {
+      const amount = web3.utils.toHex(
+        this.state.Withdraw * Math.pow(10, underlyingDecimals)
+      );
+
+      const accounts = await web3.eth.getAccounts();
+
+      console.log(`Redeeming ...`);
+      let redeemResult = await this.state.UserContract.methods
+        .withdraw(amount, underlyingMainnetAddress, cTokenAddress)
+        .send({
+          from: accounts[0],
+          gasLimit: web3.utils.toHex(1000000),
+          gasPrice: web3.utils.toHex(20000000000),
+        });
+
+      console.log(redeemResult.events.MyLog);
+      this.setBalance();
+      // this.setInterestRate();
+    } catch (e) {
+      console.log(e);
+    }
+    this.setState({ withdrawLoading: false })
   };
 
   setContribution = async (e) => {
@@ -233,17 +264,27 @@ class Dashboard extends Component {
       1e18;
     console.log(balance);
     this.setState({ Balance: Number(balance.toFixed(2)) });
+    this.setState({ withdrawLoading: false })
   };
 
-
-  setInterestRate = async() => {
-    await axios.get('https://api.compound.finance/api/v2/ctoken?addresses=0x5d3a536e4d6dbd6114cc1ead35777bab948e3643')
-    .then(res=>this.setState(
-      {InterestRate: Number(((res.data.cToken[0].supply_rate.value/2)*100).toFixed(2))}));
+  setInterestRate = async () => {
+    await axios
+      .get(
+        "https://api.compound.finance/api/v2/ctoken?addresses=0x5d3a536e4d6dbd6114cc1ead35777bab948e3643"
+      )
+      .then((res) =>
+        this.setState({
+          InterestRate: Number(
+            ((res.data.cToken[0].supply_rate.value / 2) * 100).toFixed(2)
+          ),
+        })
+      );
   };
 
-  setName = async (e) => {
+  setName = async () => {
+    console.log("Getting Name");
     let x = await this.state.UserContract.methods.getName().call();
+    console.log("Name is " + x);
     this.setState({ Name: x });
   };
 
@@ -267,6 +308,30 @@ class Dashboard extends Component {
     this.setContribution();
   };
 
+  setSchoolContract = async (e) => {
+    try {
+      console.log("Setting School");
+      let schoolAddress = await this.state.UserContract.methods
+        .schoolContract()
+        .call();
+      console.log(schoolAddress);
+      const schoolContract = new web3.eth.Contract(
+        schoolAbi.abi,
+        schoolAddress
+      );
+      const name = await schoolContract.methods.getName().call();
+      console.log(name);
+      console.log(schoolAddress);
+      this.setState({
+        SchoolContract: schoolContract,
+        SchoolName: name,
+        SchoolAddres: schoolAddress,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   componentDidMount() {
     this.getProjects();
   }
@@ -287,6 +352,7 @@ class Dashboard extends Component {
 
   render() {
     const { classes } = this.props;
+    console.log(this.state.UserContractAddress);
     return (
       <div className="App">
         <div>
@@ -361,12 +427,17 @@ class Dashboard extends Component {
                             fontWeight: "bold",
                             borderRadius: "10px",
                             borderWidth: "0px",
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-around'
                           }}
                           className="AmountButton"
                           onClick={this.deposit}
                           type="submit"
                         >
                           Deposit
+                          <ClipLoader color={"#FFFFFF"} loading={this.state.depositLoading} size={20} />
                         </Button>
                       </Row>
                     </Form>
@@ -394,18 +465,23 @@ class Dashboard extends Component {
                       </Row>
                       <Row>
                         <Button
-                          style={{
+                           style={{
                             backgroundColor: "#146EFF",
                             color: "white",
                             fontWeight: "bold",
                             borderRadius: "10px",
                             borderWidth: "0px",
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-around'
                           }}
                           className="AmountButton"
                           onClick={this.withdraw}
                           type="submit"
                         >
                           Withdraw
+                          <ClipLoader color={"#FFFFFF"} loading={this.state.withdrawLoading} size={20} />
                         </Button>
                       </Row>
                     </Form>
@@ -463,7 +539,7 @@ class Dashboard extends Component {
                   </Col>
                   <Col xs="10">
                     <div className="SchoolTitle">{"Your School"}</div>
-                    <div className="SchoolValue">{"UC Berkeley"}</div>
+                    <div className="SchoolValue">{this.state.SchoolName}</div>
                   </Col>
                 </Row>
               </Container>

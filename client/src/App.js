@@ -5,6 +5,7 @@ import Login from "./Login";
 import SchoolLogin from "./SchoolLogin";
 import SchoolDashboard from "./SchoolDashboard";
 import CreateProject from "./CreateProject";
+import SelectSchool from "./SelectSchool";
 import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 
 
@@ -21,6 +22,7 @@ class App extends Component {
             <Route exact path = "/SchoolLogin" component = {SchoolLogin}/>
             <Route exact path = "/SchoolDashboard" component = {SchoolDashboard}/>
             <Route exact path = "/CreateProject" component = {CreateProject}/>
+            <Route exact path = "/SelectSchool" component = {SelectSchool}/>
             {/* <Redirect to="/CreateProject/" /> */}
             <Route
               exact path="/Dashboard"
