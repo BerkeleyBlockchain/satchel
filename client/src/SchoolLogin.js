@@ -63,9 +63,16 @@ class SchoolLogin extends Component {
   
       try {
         const accounts = await web3.eth.getAccounts();
+        const gasPrice = await web3.eth.getGasPrice();
+        const gasEstimate = await contractInstance.methods.newSchool(this.state.Name).estimateGas({ from: accounts[0] });
+
+        // contract.methods
+        //   .mySchool()
+        // .myMethod()
+        // .send({ from: account, gasPrice: gasPrice, gas: gasEstimate });
         const { events } = await contractInstance.methods
           .newSchool(this.state.Name)
-          .send({ from: accounts[0] });
+          .send({ from: accounts[0], gasPrice: gasPrice, gas: gasEstimate});
         const id = events.newSchoolEvent.returnValues.schoolId;
         console.log(this.state.Name + " created")
         console.log(id);
