@@ -358,7 +358,7 @@ class Dashboard extends Component {
     console.log("User Address: ", this.state.UserContractAddress);
     return (
       <div className="App">
-        <div>
+        <div className="screens">
           {/* <MuiThemeProvider theme={theme}>
             <AppBar position="static" style={{ background: "#ECF3FF" }}>
               <Tabs
