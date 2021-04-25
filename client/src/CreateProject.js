@@ -10,6 +10,7 @@ import SchoolNavBar from './SchoolNavBar.js'
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 
 
 const stheme = createMuiTheme({
@@ -119,46 +120,40 @@ function getStepContent(step, setProjectName, setProjectDes, setFundingAmt, setF
           <div className="CreateProjectTitle">
             Funding Breakdown
           </div>
-
-          <div>
-            <Form>
-                <FormGroup className="FundingBreak">
-                  <Label for="amount"></Label>
-                  {/*Include onChange function to collect userInput. Save collected info to state */}
-                  <Input value={fundingBreak} onChange={e => setFundingBreak(e.target.value)} type="string" name="text3" id="amount4" placeholder="Enter funding breakdown" style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px"}}/>
-                </FormGroup>
-            </Form>
-          </div>
-          {/*Once user submits, store data in server */}
+          {console.log(inputList)}
           {inputList.map((x, i) => {
       return (
         <div>
         <Container>
         <Row>
-          <Col xs="4" >
+          <Col xs="3" >
           <Input
             name="percent"
             placeholder="10%"
             value={x.percent}
             onChange={e => handleInputChange(e, i)}
-            style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px"}}
+            style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px", marginLeft: "-15px"}}
           />
           </Col>
-          <Col xs="8">
+          <Col xs="7">
           <Input
             name="category"
            placeholder="Enter Category Name"
             value={x.category}
             onChange={e => handleInputChange(e, i)}
-            style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px"}}
+            style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px", marginLeft: "-30px"}}
           />
+          </Col>
+          <Col xs = "1">
+          {inputList.length !== 1 && 
+            <Button onClick={() => handleRemoveClick(i)} style={{ backgroundColor:"white", borderWidth:"0px", marginLeft: "-30px"}}  type="submit">
+              <HighlightOffIcon style={{color: "#146EFF"}}/>
+              </Button>}
           </Col>
         </Row>
         </Container>
           <div className="btn-box">
-            {inputList.length !== 1 && 
-            <Button onClick={() => handleRemoveClick(i)} style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"0px"}} className="ProjectNextButton" type="submit">Remove</Button>}
-            {inputList.length - 1 === i &&  <Button onClick={handleAddClick} style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"0px"}} className="ProjectNextButton" type="submit">+ Add Another Subsection</Button>}
+            {inputList.length - 1 === i &&  <Button onClick={handleAddClick} style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"0px", marginTop: "5px"}} className="ProjectNextButton" type="submit">+ Add Another Subsection</Button>}
           </div>
         </div>
       );
@@ -173,7 +168,7 @@ function getStepContent(step, setProjectName, setProjectDes, setFundingAmt, setF
             Congratulations!
         </div>
 
-        <div className="CreateProjectsFinished"> The project <b>Buy Student Desks</b> is now created! You can view the details on the projects page.</div>
+        <div className="CreateProjectsFinished"> The project is now created! You can view the details on the projects page.</div>
 
         {/* <Button style={{ backgroundColor:"#146EFF", color: "white", fontWeight:"bold", borderRadius: "10px", borderWidth:"0px"}} className="AmountButton" type="submit">Return to Projects Page</Button> */}
       </div>
@@ -227,13 +222,18 @@ export default function CreateProject(props) {
 
   const handleRequest = async() => {
     console.log(props.location.schoolAddress)
-    console.log(projectName, projectDes, fundingAmt, fundingBreak);
+
+    let fundingBreakdown = {};
+    inputList.forEach(element => {fundingBreakdown[element.percent] = element.category});
+    console.log("funding breakdown is");
+    console.log(fundingBreakdown);
+
     try {
       await axios.post('http://localhost:4000/api/project/createProject', {
             "name": projectName, 
             "description": projectDes,
             "targetFunding": fundingAmt,
-            "fundingBreakdown": fundingBreak,
+            "fundingBreakdown": fundingBreakdown,
             "schoolAddress": props.location.schoolAddress,
         })
     } catch (error) {
@@ -265,7 +265,7 @@ export default function CreateProject(props) {
       history.push({
         pathname: '/SchoolDashboard',
         state: {
-          Name: props.Name,
+          Name: props.location.Name,
           Withdraw: props.Withdraw,
           Balance: props.Balance,
           schoolAddress: props.location.schoolAddress,
@@ -274,7 +274,10 @@ export default function CreateProject(props) {
       });
   };
 
+  console.log("Passed in state:")
+  console.log(props.location);
   return (
+    
     <div className={classes.root}>
       <SchoolNavBar Balance={props.location.Balance} Withdraw={props.location.Withdraw} Name={props.location.Name} activeTab={props.location.activeTab}/>
       <div className="CreateProjectPageTitle"> Create Project</div>

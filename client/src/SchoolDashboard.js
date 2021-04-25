@@ -127,6 +127,12 @@ class SchoolDashboard extends Component {
       this.state.schoolAddress
     );
     this.schoolInstance = schoolInstance;
+
+    // if (!this.state.Name){
+    //   let name = await schoolInstance.methods.getName().call();
+    //   console.log(name)
+    //   this.setState({ Name: name })
+    // }
   }
 
   withdraw = async (e) => {
@@ -200,7 +206,7 @@ class SchoolDashboard extends Component {
     const { classes } = this.props;
     return (
       <div className="App">
-        <div >
+        <div className="screens">
           <TabPanel value={this.state.activeTab} index={0}>
               <div className="Welcome">
                   {"Welcome back, " + this.state.Name + "!"}

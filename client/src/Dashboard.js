@@ -284,7 +284,7 @@ class Dashboard extends Component {
   setName = async () => {
     console.log("Getting Name");
     let x = await this.state.UserContract.methods.getName().call();
-    console.log("Name is " + x);
+    console.log("Name is " + x); 
     this.setState({ Name: x });
   };
 

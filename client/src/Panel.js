@@ -38,6 +38,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function Panel(props) {
     const classes = useStyles();
+    console.log(props.project.fundingBreakdown);
   return (
     <ExpansionPanel className={classes.root}>
         <ExpansionPanelSummary
@@ -50,7 +51,13 @@ export default function Panel(props) {
         <ExpansionPanelDetails className={classes.details}>
            <Typography className={classes.description}><b>Description: </b> {props.project.description}</Typography>           
            <Typography className={classes.description}> <b>Target Funding: </b> {props.project.targetFunding}</Typography>           
-           <Typography className={classes.description}><b>Funding Breakdown: </b> {props.project.fundingBreakdown}</Typography>
+           <Typography className={classes.description}><b>Funding Breakdown: </b> </Typography>
+
+          {typeof props.project.fundingBreakdown == "string" ? <Typography className={classes.description}><b> {props.project.fundingBreakdown} </b> </Typography> : 
+           Object.keys(props.project.fundingBreakdown[0]).map((key) => (
+            <Typography className={classes.description}><b>{key}%:</b> {props.project.fundingBreakdown[0][key]} </Typography>
+            ))
+           }
         </ExpansionPanelDetails>
     </ExpansionPanel>
   );

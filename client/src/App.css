@@ -2,7 +2,10 @@
   text-align: center;
   background-color: white;
   height: 100vh;
-  padding-bottom: 150px;
+}
+
+.screens {
+  padding-bottom: 100px;
 }
 
 .App-logo {
@@ -35,7 +38,7 @@
 
 .ProjectNextButton {
   margin-bottom: 20px;
-  width: 90%;
+  width: 100%;
 }
 
 .Community {
@@ -236,6 +239,7 @@
   font-family: "Roboto", sans-serif;
   margin-top: 4%;
   font-weight: bold;
+  margin-bottom: 2%;
 }
 
 .CongratulationsCreateProject {
@@ -361,14 +365,19 @@
 }
 
 .NavBar {
+  overflow: hidden;
   position: fixed;
   width: 100%;
   bottom: 0;
-  padding-top: 10%;
 }
 
 .CreateProject {
   overflow: auto;
   padding-bottom: 200px;
+}
 
+.center {
+  display: flex;
+  justify-content: "center";
+  align-items: "center";
 }
