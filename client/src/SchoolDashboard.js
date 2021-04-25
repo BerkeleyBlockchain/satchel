@@ -200,8 +200,7 @@ class SchoolDashboard extends Component {
     const { classes } = this.props;
     return (
       <div className="App">
-        <div>
-
+        <div >
           <TabPanel value={this.state.activeTab} index={0}>
               <div className="Welcome">
                   {"Welcome back, " + this.state.Name + "!"}

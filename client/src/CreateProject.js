@@ -41,7 +41,7 @@ function getSteps() {
   return [' ', ' ', ' '];
 }
 
-function getStepContent(step, setProjectName, setProjectDes, setFundingAmt, setFundingBreak, inputList, setInputList) {
+function getStepContent(step, setProjectName, setProjectDes, setFundingAmt, setFundingBreak, inputList, setInputList, projectName, projectDes, fundingAmt, fundingBreak) {
 
    // handle input change
    const handleInputChange = (e, index) => {
@@ -78,7 +78,7 @@ function getStepContent(step, setProjectName, setProjectDes, setFundingAmt, setF
                   <Label for="amount"></Label>
                   {/*Include onChange function to collect userInput. Save collected info to state */}
                   {/*pass in new funcs that call set funcs */}
-                  <Input onChange={e => setProjectName(e.target.value)} type="string" name="text" id="amount" placeholder="Enter project name" style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px"}}/>
+                  <Input value={projectName} defaultValue="" onChange={e => setProjectName(e.target.value)} type="string" name="text4" id="amount1" placeholder="Enter project name" style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px"}}/>
                   {/* {console.log(projectName)} */}
                 </FormGroup>
             </Form>
@@ -93,7 +93,7 @@ function getStepContent(step, setProjectName, setProjectDes, setFundingAmt, setF
                 <FormGroup className="ProjectDescriptionField">
                   <Label for="amount"></Label>
                   {/*Include onChange function to collect userInput. Save collected info to state */}
-                  <Input onChange={e => setProjectDes(e.target.value)} type="string" name="text" id="amount" placeholder="Enter project description" style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px"}}/>
+                  <Input value={projectDes} defaultValue="" onChange={e => setProjectDes(e.target.value)} type="string" name="text1" id="amount2" placeholder="Enter project description" style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px"}}/>
                 </FormGroup>
             </Form>
           </div>
@@ -108,10 +108,10 @@ function getStepContent(step, setProjectName, setProjectDes, setFundingAmt, setF
 
           <div>
             <Form>
-                <FormGroup className="ProjectNameField">
+                <FormGroup className="FundingAmt">
                   <Label for="amount"></Label>
                   {/*Include onChange function to collect userInput. Save collected info to state */}
-                  <Input onChange={e => setFundingAmt(e.target.value)}  type="string" name="text" id="amount" placeholder="Enter amount of funding needed" style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px"}}/>
+                  <Input value={fundingAmt} onChange={e => setFundingAmt(e.target.value)}  type="string" name="text2" id="amount3" placeholder="Enter amount of funding needed" style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px"}}/>
                 </FormGroup>
             </Form>
           </div>
@@ -122,10 +122,10 @@ function getStepContent(step, setProjectName, setProjectDes, setFundingAmt, setF
 
           <div>
             <Form>
-                <FormGroup className="ProjectDescriptionField">
+                <FormGroup className="FundingBreak">
                   <Label for="amount"></Label>
                   {/*Include onChange function to collect userInput. Save collected info to state */}
-                  <Input onChange={e => setFundingBreak(e.target.value)} type="string" name="text" id="amount" placeholder="Enter funding breakdown" style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px"}}/>
+                  <Input value={fundingBreak} onChange={e => setFundingBreak(e.target.value)} type="string" name="text3" id="amount4" placeholder="Enter funding breakdown" style={{ backgroundColor:"#ECF3FF", color:"black", borderRadius:"10px", border:"white", fontSize: "12px"}}/>
                 </FormGroup>
             </Form>
           </div>
@@ -227,6 +227,7 @@ export default function CreateProject(props) {
 
   const handleRequest = async() => {
     console.log(props.location.schoolAddress)
+    console.log(projectName, projectDes, fundingAmt, fundingBreak);
     try {
       await axios.post('http://localhost:4000/api/project/createProject', {
             "name": projectName, 
@@ -300,7 +301,7 @@ export default function CreateProject(props) {
       <div>
           <div className="Stepper">
             {/*pass in more arguments to the getStepContent func(state functions)*/}
-            <Typography> {getStepContent(activeStep, setProjectName, setProjectDes, setFundingAmt, setFundingBreak, inputList, setInputList)} </Typography>
+            <Typography> {getStepContent(activeStep, setProjectName, setProjectDes, setFundingAmt, setFundingBreak, inputList, setInputList, projectName, projectDes, fundingAmt, fundingBreak)} </Typography>
             <div>
             {activeStep !== steps.length - 1 ? 
               <Button disabled={activeStep === 0} onClick={handleBack} 
