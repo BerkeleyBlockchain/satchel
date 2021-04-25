@@ -127,6 +127,12 @@ class SchoolDashboard extends Component {
       this.state.schoolAddress
     );
     this.schoolInstance = schoolInstance;
+
+    // if (!this.state.Name){
+    //   let name = await schoolInstance.methods.getName().call();
+    //   console.log(name)
+    //   this.setState({ Name: name })
+    // }
   }
 
   withdraw = async (e) => {

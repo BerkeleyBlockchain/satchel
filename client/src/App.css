@@ -2,7 +2,7 @@
   text-align: center;
   background-color: white;
   height: 100vh;
-  padding-bottom: 100px;
+  padding-bottom: 150px;
 }
 
 .App-logo {
@@ -35,7 +35,7 @@
 
 .ProjectNextButton {
   margin-bottom: 20px;
-  width: 90%;
+  width: 100%;
 }
 
 .Community {
@@ -236,6 +236,7 @@
   font-family: "Roboto", sans-serif;
   margin-top: 4%;
   font-weight: bold;
+  margin-bottom: 2%;
 }
 
 .CongratulationsCreateProject {
@@ -365,4 +366,10 @@
   width: 100%;
   bottom: 0;
   padding-top: 10%;
+}
+
+.center {
+  display: flex;
+  justify-content: "center";
+  align-items: "center";
 }
