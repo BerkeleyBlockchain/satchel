@@ -1,27 +1,10 @@
 import React, { Component } from "react";
-import {
-  ButtonGroup,
-  Form,
-  FormGroup,
-  Label,
-  Input,
-  Table,
-  Card,
-  CardText,
-  CardTitle,
-  Button,
-  Navbar,
-  NavbarBrand,
-  Nav,
-  NavItem,
-} from "reactstrap";
+import { Form, Button } from "reactstrap";
 import Web3 from "web3";
-import { userAbi, erc20Abi, schoolAbi, schoolJSON } from "./abi/abis";
-import contractAbi from "./abi/UnicefSatchel.json";
+import contractAbi from "../abi/UnicefSatchel.json";
 
-import "./App.css";
-import BusinessCenterOutlinedIcon from "@material-ui/icons/BusinessCenterOutlined";
-import logo from "./logo.png";
+import "../App.css";
+import logo from "../logo.png";
 
 // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
@@ -79,36 +62,38 @@ class Login extends Component {
 
     try {
       if (!window.ethereum) {
-        console.log('Metamask not installed')
+        console.log("Metamask not installed");
         return;
       }
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
       let userContractAddress = await contractInstance.methods
         .getUserContract()
         .call({ from: accounts[0] });
       console.log("user addresss: " + userContractAddress);
       console.log("account[0]" + accounts[0]);
-      if (userContractAddress == "0x0000000000000000000000000000000000000000" ) {
+      if (userContractAddress == "0x0000000000000000000000000000000000000000") {
         console.log("New user detected");
         self.props.history.push({
           pathname: "/SelectSchool",
-          state: { Name: self.state.Name }
+          state: { Name: self.state.Name },
         });
       } else {
         self.state.UserContractAddress = userContractAddress;
-      self.props.history.push({
-        pathname: "/Dashboard",
-        state: { UserContractAddress: self.state.UserContractAddress, Name: self.state.Name },
-      });
+        self.props.history.push({
+          pathname: "/Dashboard",
+          state: {
+            UserContractAddress: self.state.UserContractAddress,
+            Name: self.state.Name,
+          },
+        });
       }
-      
     } catch (err) {
       console.log(err);
       console.log(err.message);
     }
   };
-
-
 
   render() {
     return (
@@ -143,7 +128,7 @@ class Login extends Component {
               />
             </FormGroup> */}
 
-            <div style={{marginTop: "10px"}}>
+            <div style={{ marginTop: "10px" }}>
               <Button
                 className="Button"
                 onClick={this.login}

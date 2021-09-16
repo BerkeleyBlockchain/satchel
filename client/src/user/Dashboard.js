@@ -30,10 +30,10 @@ import AppBar from "@material-ui/core/AppBar";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
 import Web3 from "web3";
-import { erc20Abi, cTokenAbi } from "./abi/abis";
-import userAbi from "./abi/User.json";
-import schoolAbi from "./abi/School.json";
-import "./App.css";
+import { erc20Abi, cTokenAbi } from "../abi/abis";
+import userAbi from "../abi/User.json";
+import schoolAbi from "../abi/School.json";
+import "../App.css";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 import AccountBalanceWalletOutlinedIcon from "@material-ui/icons/AccountBalanceWalletOutlined";
 import DomainOutlinedIcon from "@material-ui/icons/DomainOutlined";
@@ -43,7 +43,7 @@ import MenuBookOutlinedIcon from "@material-ui/icons/MenuBookOutlined";
 import FastfoodOutlinedIcon from "@material-ui/icons/FastfoodOutlined";
 import ArrowForwardIosOutlinedIcon from "@material-ui/icons/ArrowForwardIosOutlined";
 import axios from "axios";
-import Panel from "./Panel";
+import Panel from "../components/Panel";
 import { css } from "@emotion/core";
 import ClipLoader from "react-spinners/ClipLoader";
 
@@ -177,7 +177,7 @@ class Dashboard extends Component {
     console.log("handleGet\n");
     e.preventDefault();
     console.log(this.state.UserContractAddress);
-    this.setState({ depositLoading: true })
+    this.setState({ depositLoading: true });
     const accounts = await web3.eth.getAccounts();
 
     try {
@@ -214,12 +214,12 @@ class Dashboard extends Component {
     } catch (e) {
       console.log(e);
     }
-    this.setState({ depositLoading: false })
+    this.setState({ depositLoading: false });
   };
 
   withdraw = async (e) => {
     e.preventDefault();
-    this.setState({ withdrawLoading: true })
+    this.setState({ withdrawLoading: true });
     try {
       const amount = web3.utils.toHex(
         this.state.Withdraw * Math.pow(10, underlyingDecimals)
@@ -242,7 +242,7 @@ class Dashboard extends Component {
     } catch (e) {
       console.log(e);
     }
-    this.setState({ withdrawLoading: false })
+    this.setState({ withdrawLoading: false });
   };
 
   setContribution = async (e) => {
@@ -264,7 +264,7 @@ class Dashboard extends Component {
       1e18;
     console.log(balance);
     this.setState({ Balance: Number(balance.toFixed(2)) });
-    this.setState({ withdrawLoading: false })
+    this.setState({ withdrawLoading: false });
   };
 
   setInterestRate = async () => {
@@ -284,7 +284,7 @@ class Dashboard extends Component {
   setName = async () => {
     console.log("Getting Name");
     let x = await this.state.UserContract.methods.getName().call();
-    console.log("Name is " + x); 
+    console.log("Name is " + x);
     this.setState({ Name: x });
   };
 
@@ -314,7 +314,7 @@ class Dashboard extends Component {
       let schoolAddress = await this.state.UserContract.methods
         .schoolContract()
         .call();
-      console.log("School address is ", schoolAddress)
+      console.log("School address is ", schoolAddress);
       console.log(schoolAddress);
       const schoolContract = new web3.eth.Contract(
         schoolAbi.abi,
@@ -342,7 +342,8 @@ class Dashboard extends Component {
     console.log("hi", this.state.SchoolAddress);
     await axios
       .get(
-        "http://localhost:4000/api/project?schoolAddress=" + this.state.SchoolAddress
+        "http://localhost:4000/api/project?schoolAddress=" +
+          this.state.SchoolAddress
       )
       .then((res) => this.setState({ projects: res.data.projects }));
   };
@@ -430,17 +431,21 @@ class Dashboard extends Component {
                             fontWeight: "bold",
                             borderRadius: "10px",
                             borderWidth: "0px",
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'space-around'
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-around",
                           }}
                           className="AmountButton"
                           onClick={this.deposit}
                           type="submit"
                         >
                           Deposit
-                          <ClipLoader color={"#FFFFFF"} loading={this.state.depositLoading} size={20} />
+                          <ClipLoader
+                            color={"#FFFFFF"}
+                            loading={this.state.depositLoading}
+                            size={20}
+                          />
                         </Button>
                       </Row>
                     </Form>
@@ -468,23 +473,27 @@ class Dashboard extends Component {
                       </Row>
                       <Row>
                         <Button
-                           style={{
+                          style={{
                             backgroundColor: "#146EFF",
                             color: "white",
                             fontWeight: "bold",
                             borderRadius: "10px",
                             borderWidth: "0px",
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'space-around'
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-around",
                           }}
                           className="AmountButton"
                           onClick={this.withdraw}
                           type="submit"
                         >
                           Withdraw
-                          <ClipLoader color={"#FFFFFF"} loading={this.state.withdrawLoading} size={20} />
+                          <ClipLoader
+                            color={"#FFFFFF"}
+                            loading={this.state.withdrawLoading}
+                            size={20}
+                          />
                         </Button>
                       </Row>
                     </Form>
@@ -575,22 +584,36 @@ class Dashboard extends Component {
           </TabPanel>
 
           <div className="NavBar">
-        <MuiThemeProvider theme={theme}>
-            <AppBar position="relative" style={{background: "#ECF3FF"}}>
+            <MuiThemeProvider theme={theme}>
+              <AppBar position="relative" style={{ background: "#ECF3FF" }}>
                 <Tabs
-                  TabIndicatorProps={{ style: { background: "#146EFF", height: "5px"} }}
+                  TabIndicatorProps={{
+                    style: { background: "#146EFF", height: "5px" },
+                  }}
                   value={this.state.activeTab}
                   onChange={this.toggle}
                   variant="fullWidth"
                   textColor="primary"
                 >
-                  <Tab icon={<AccountBalanceWalletOutlinedIcon />} label="School" {...a11yProps(0)} />
-                  <Tab icon={<DomainOutlinedIcon />} label="Projects" {...a11yProps(1)} />
-                  <Tab icon={<SettingsOutlinedIcon />} label="Settings" {...a11yProps(2)} />
+                  <Tab
+                    icon={<AccountBalanceWalletOutlinedIcon />}
+                    label="School"
+                    {...a11yProps(0)}
+                  />
+                  <Tab
+                    icon={<DomainOutlinedIcon />}
+                    label="Projects"
+                    {...a11yProps(1)}
+                  />
+                  <Tab
+                    icon={<SettingsOutlinedIcon />}
+                    label="Settings"
+                    {...a11yProps(2)}
+                  />
                 </Tabs>
-            </AppBar>
-          </MuiThemeProvider>
-        </div>
+              </AppBar>
+            </MuiThemeProvider>
+          </div>
         </div>
       </div>
     );
