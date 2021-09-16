@@ -1,10 +1,11 @@
 import React, { Component } from "react";
 import { Form, Button } from "reactstrap";
 import Web3 from "web3";
-import contractAbi from "../abi/UnicefSatchel.json";
+import { connect } from "react-redux";
 
 import "../App.css";
 import logo from "../logo.png";
+import { handleUserLogin } from "../redux/actions/user_actions";
 
 // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
@@ -52,47 +53,7 @@ class Login extends Component {
     e.preventDefault();
     // var UserFactory = TruffleContract(userFactoryABI.abi);
     // UserFactory.setProvider(Web3.givenProvider);
-
-    let contractInstance = new web3.eth.Contract(
-      contractAbi.abi,
-      process.env.REACT_APP_CONTRACT_ADDRESS
-    );
-
-    const self = this;
-
-    try {
-      if (!window.ethereum) {
-        console.log("Metamask not installed");
-        return;
-      }
-      const accounts = await window.ethereum.request({
-        method: "eth_requestAccounts",
-      });
-      let userContractAddress = await contractInstance.methods
-        .getUserContract()
-        .call({ from: accounts[0] });
-      console.log("user addresss: " + userContractAddress);
-      console.log("account[0]" + accounts[0]);
-      if (userContractAddress == "0x0000000000000000000000000000000000000000") {
-        console.log("New user detected");
-        self.props.history.push({
-          pathname: "/SelectSchool",
-          state: { Name: self.state.Name },
-        });
-      } else {
-        self.state.UserContractAddress = userContractAddress;
-        self.props.history.push({
-          pathname: "/Dashboard",
-          state: {
-            UserContractAddress: self.state.UserContractAddress,
-            Name: self.state.Name,
-          },
-        });
-      }
-    } catch (err) {
-      console.log(err);
-      console.log(err.message);
-    }
+    this.props.handleUserLogin(this.state.Name, this.props.history);
   };
 
   render() {
@@ -165,4 +126,9 @@ class Login extends Component {
   }
 }
 
-export default Login;
+const mapStateToProps = (state) => {
+  const { address } = state.user;
+  return { address };
+};
+
+export default connect(mapStateToProps, { handleUserLogin })(Login);

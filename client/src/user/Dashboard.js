@@ -1,27 +1,16 @@
 import React, { Component } from "react";
+import axios from "axios";
+import Web3 from "web3";
+import { connect } from "react-redux";
 import {
-  CardBody,
-  CardSubtitle,
-  TabContent,
-  TabPane,
-  NavLink,
   Container,
   Row,
   Col,
-  ButtonGroup,
   Form,
   FormGroup,
   Label,
   Input,
-  Table,
-  Card,
-  CardText,
-  CardTitle,
   Button,
-  Navbar,
-  NavbarBrand,
-  Nav,
-  NavItem,
 } from "reactstrap";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
@@ -29,23 +18,19 @@ import PropTypes from "prop-types";
 import AppBar from "@material-ui/core/AppBar";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
-import Web3 from "web3";
-import { erc20Abi, cTokenAbi } from "../abi/abis";
-import userAbi from "../abi/User.json";
-import schoolAbi from "../abi/School.json";
-import "../App.css";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 import AccountBalanceWalletOutlinedIcon from "@material-ui/icons/AccountBalanceWalletOutlined";
 import DomainOutlinedIcon from "@material-ui/icons/DomainOutlined";
 import SettingsOutlinedIcon from "@material-ui/icons/SettingsOutlined";
 import SupervisedUserCircleOutlinedIcon from "@material-ui/icons/SupervisedUserCircleOutlined";
-import MenuBookOutlinedIcon from "@material-ui/icons/MenuBookOutlined";
-import FastfoodOutlinedIcon from "@material-ui/icons/FastfoodOutlined";
-import ArrowForwardIosOutlinedIcon from "@material-ui/icons/ArrowForwardIosOutlined";
-import axios from "axios";
-import Panel from "../components/Panel";
 import { css } from "@emotion/core";
 import ClipLoader from "react-spinners/ClipLoader";
+
+import "../App.css";
+import { erc20Abi, cTokenAbi } from "../abi/abis";
+import userAbi from "../abi/User.json";
+import schoolAbi from "../abi/School.json";
+import Panel from "../components/Panel";
 
 // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
@@ -131,9 +116,9 @@ function a11yProps(index) {
 }
 
 class Dashboard extends Component {
+  // TBH this should all go in component did mount..
   constructor(props) {
     super(props);
-    var receivedProps = this.props.location.state;
     this.state = {
       activeTab: 0,
       Balance: "",
@@ -144,8 +129,6 @@ class Dashboard extends Component {
       RoundedContribution: "",
       School: "",
       Name: "",
-      UserContractAddress: receivedProps.UserContractAddress,
-      UserContract: "",
       SchoolContract: "",
       SchoolName: "",
       SchoolAddress: "",
@@ -162,8 +145,12 @@ class Dashboard extends Component {
     this.setName = this.setName.bind(this);
     this.state.UserContract = new web3.eth.Contract(
       userAbi.abi,
-      this.state.UserContractAddress
+      this.props.contractAddress
     );
+
+    if (!this.props.contractAddress) {
+      this.props.history.push({ pathname: "Login" });
+    }
 
     this.setBalance();
     this.setInterestRate();
@@ -176,7 +163,7 @@ class Dashboard extends Component {
     console.log(process.env.REACT_APP_CTOKEN_ADDRESS);
     console.log("handleGet\n");
     e.preventDefault();
-    console.log(this.state.UserContractAddress);
+    console.log(this.props.userContract);
     this.setState({ depositLoading: true });
     const accounts = await web3.eth.getAccounts();
 
@@ -254,7 +241,7 @@ class Dashboard extends Component {
 
   setBalance = async (e) => {
     let cTokenBalance = await cToken.methods
-      .balanceOf(this.state.UserContractAddress)
+      .balanceOf(this.props.contractAddress)
       .call();
     cTokenBalance = cTokenBalance / 1e8;
     console.log(`MyContract's Token Balance:`, cTokenBalance);
@@ -356,7 +343,7 @@ class Dashboard extends Component {
 
   render() {
     const { classes } = this.props;
-    console.log("User Address: ", this.state.UserContractAddress);
+    console.log("User Address: ", this.props.contractAddress);
     return (
       <div className="App">
         <div className="screens">
@@ -620,4 +607,9 @@ class Dashboard extends Component {
   }
 }
 
-export default Dashboard;
+const mapStateToProps = (state) => {
+  const { address, contractAddress, name } = state.user;
+  return { address, contractAddress, name };
+};
+
+export default connect(mapStateToProps, {})(Dashboard);
