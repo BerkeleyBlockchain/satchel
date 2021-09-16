@@ -27,23 +27,6 @@ const web3 = new Web3(Web3.givenProvider);
 // var School = TruffleContract(schoolJSON);
 // School.setProvider(Web3.givenProvider);
 class Login extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      Name: "",
-      UserContractAddress: "",
-    };
-    // this.setName = this.setName.bind(this);
-    this.login = this.login.bind(this);
-    this.schoolLogin = this.schoolLogin.bind(this);
-  }
-
-  // setName = async (e) => {
-  //   e.preventDefault();
-  //   const x = e.target.value;
-  //   this.setState({ Name: x });
-  // };
-
   schoolLogin = async (e) => {
     e.preventDefault();
     this.props.history.push({ pathname: "/SchoolLogin" });
@@ -53,7 +36,7 @@ class Login extends Component {
     e.preventDefault();
     // var UserFactory = TruffleContract(userFactoryABI.abi);
     // UserFactory.setProvider(Web3.givenProvider);
-    this.props.handleUserLogin(this.state.Name, this.props.history);
+    this.props.handleUserLogin(this.props.history);
   };
 
   render() {

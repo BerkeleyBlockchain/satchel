@@ -31,7 +31,7 @@ import { erc20Abi, cTokenAbi } from "../abi/abis";
 import userAbi from "../abi/User.json";
 import schoolAbi from "../abi/School.json";
 import Panel from "../components/Panel";
-
+import { getName, getBalance } from "../redux/actions/user_actions";
 // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
 
@@ -136,27 +136,23 @@ class Dashboard extends Component {
       withdrawLoading: false,
       depositLoading: false,
     };
-    this.setBalance = this.setBalance.bind(this);
-    this.setDeposit = this.setDeposit.bind(this);
-    this.setWithdraw = this.setWithdraw.bind(this);
-    this.setInterestRate = this.setInterestRate.bind(this);
-    this.setContribution = this.setContribution.bind(this);
-    this.toggle = this.toggle.bind(this);
-    this.setName = this.setName.bind(this);
+
     this.state.UserContract = new web3.eth.Contract(
       userAbi.abi,
       this.props.contractAddress
     );
+  }
 
+  componentDidMount() {
     if (!this.props.contractAddress) {
       this.props.history.push({ pathname: "Login" });
+    } else {
+      this.props.getName(this.props.contractAddress);
+      this.props.getBalance(this.props.contractAddress);
+      this.setInterestRate();
+      this.setContribution();
+      this.setSchoolContract();
     }
-
-    this.setBalance();
-    this.setInterestRate();
-    this.setContribution();
-    this.setName();
-    this.setSchoolContract();
   }
 
   deposit = async (e) => {
@@ -240,18 +236,7 @@ class Dashboard extends Component {
   };
 
   setBalance = async (e) => {
-    let cTokenBalance = await cToken.methods
-      .balanceOf(this.props.contractAddress)
-      .call();
-    cTokenBalance = cTokenBalance / 1e8;
-    console.log(`MyContract's Token Balance:`, cTokenBalance);
-    let balance =
-      (await this.state.UserContract.methods.getBalance(cTokenAddress).call()) /
-      1e18 /
-      1e18;
-    console.log(balance);
-    this.setState({ Balance: Number(balance.toFixed(2)) });
-    this.setState({ withdrawLoading: false });
+    //
   };
 
   setInterestRate = async () => {
@@ -266,13 +251,6 @@ class Dashboard extends Component {
           ),
         })
       );
-  };
-
-  setName = async () => {
-    console.log("Getting Name");
-    let x = await this.state.UserContract.methods.getName().call();
-    console.log("Name is " + x);
-    this.setState({ Name: x });
   };
 
   setDeposit = (event) => {
@@ -342,7 +320,6 @@ class Dashboard extends Component {
   };
 
   render() {
-    const { classes } = this.props;
     console.log("User Address: ", this.props.contractAddress);
     return (
       <div className="App">
@@ -379,11 +356,11 @@ class Dashboard extends Component {
 
           <TabPanel value={this.state.activeTab} index={0}>
             <div className="Welcome">
-              {"Welcome back, " + this.state.Name + "!"}
+              {"Welcome back, " + this.props.name + "!"}
             </div>
             <div className="Balance">
               <div className="BalanceTitle">CURRENT BALANCE</div>
-              <div className="BalanceAmount">{this.state.Balance + " DAI"}</div>
+              <div className="BalanceAmount">{this.props.balance + " DAI"}</div>
             </div>
 
             <div className="ColAlign">
@@ -608,8 +585,8 @@ class Dashboard extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const { address, contractAddress, name } = state.user;
-  return { address, contractAddress, name };
+  const { address, contractAddress, name, balance } = state.user;
+  return { address, contractAddress, name, balance };
 };
 
-export default connect(mapStateToProps, {})(Dashboard);
+export default connect(mapStateToProps, { getName, getBalance })(Dashboard);
