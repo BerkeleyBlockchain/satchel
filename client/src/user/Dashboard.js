@@ -31,7 +31,12 @@ import { erc20Abi, cTokenAbi } from "../abi/abis";
 import userAbi from "../abi/User.json";
 import schoolAbi from "../abi/School.json";
 import Panel from "../components/Panel";
-import { getName, getBalance } from "../redux/actions/user_actions";
+import {
+  getName,
+  getBalance,
+  handleUserLogout,
+} from "../redux/actions/user_actions";
+import { getSchoolByUser } from "../redux/actions/school_actions";
 // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
 
@@ -151,7 +156,7 @@ class Dashboard extends Component {
       this.props.getBalance(this.props.contractAddress);
       this.setInterestRate();
       this.setContribution();
-      this.setSchoolContract();
+      this.props.getSchoolByUser(this.props.contractAddress);
     }
   }
 
@@ -273,45 +278,44 @@ class Dashboard extends Component {
     this.setContribution();
   };
 
-  setSchoolContract = async (e) => {
-    try {
-      console.log("Setting School");
-      let schoolAddress = await this.state.UserContract.methods
-        .schoolContract()
-        .call();
-      console.log("School address is ", schoolAddress);
-      console.log(schoolAddress);
-      const schoolContract = new web3.eth.Contract(
-        schoolAbi.abi,
-        schoolAddress
-      );
-      const name = await schoolContract.methods.getName().call();
-      console.log(name);
-      console.log(schoolAddress);
-      this.setState({
-        SchoolContract: schoolContract,
-        SchoolName: name,
-        SchoolAddress: schoolAddress,
-      });
-    } catch (e) {
-      console.log(e);
-    }
-    this.getProjects();
-  };
+  // setSchoolContract = async (e) => {
+  //   try {
+  //     console.log("Setting School");
+  //     let schoolAddress = await this.state.UserContract.methods
+  //       .schoolContract()
+  //       .call();
+  //     console.log("School address is ", schoolAddress);
+  //     console.log(schoolAddress);
+  //     const schoolContract = new web3.eth.Contract(
+  //       schoolAbi.abi,
+  //       schoolAddress
+  //     );
+  //     const name = await schoolContract.methods.getName().call();
+  //     console.log(name);
+  //     console.log(schoolAddress);
+  //     this.setState({
+  //       SchoolContract: schoolContract,
+  //       SchoolName: name,
+  //       SchoolAddress: schoolAddress,
+  //     });
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  //   this.getProjects();
+  // };
 
   // componentDidMount() {
   //   this.getProjects();
   // }
 
-  getProjects = async () => {
-    console.log("hi", this.state.SchoolAddress);
-    await axios
-      .get(
-        "http://localhost:4000/api/project?schoolAddress=" +
-          this.state.SchoolAddress
-      )
-      .then((res) => this.setState({ projects: res.data.projects }));
-  };
+  // getProjects = async () => {
+  //   await axios
+  //     .get(
+  //       "http://localhost:4000/api/project?schoolAddress=" +
+  //         this.state.SchoolAddress
+  //     )
+  //     .then((res) => this.setState({ projects: res.data.projects }));
+  // };
 
   logout = (event) => {
     const self = this;
@@ -515,15 +519,15 @@ class Dashboard extends Component {
                   </Col>
                   <Col xs="10">
                     <div className="SchoolTitle">{"Your School"}</div>
-                    <div className="SchoolValue">{this.state.SchoolName}</div>
+                    <div className="SchoolValue">{this.props.schoolName}</div>
                   </Col>
                 </Row>
               </Container>
             </div>
             <div className="Initiative">Explore School Initiatives</div>
 
-            {this.state.projects.length > 0
-              ? this.state.projects.map((project) => (
+            {this.props.projects.length > 0
+              ? this.props.projects.map((project) => (
                   <div className="PanelWidth">
                     <Panel project={project}></Panel>
                   </div>
@@ -540,7 +544,7 @@ class Dashboard extends Component {
                 borderWidth: "3px",
                 borderColor: "#146EFF",
               }}
-              onClick={this.logout}
+              onClick={() => this.props.handleUserLogout(this.props.history)}
               className="LogoutButton"
             >
               Logout
@@ -586,7 +590,21 @@ class Dashboard extends Component {
 
 const mapStateToProps = (state) => {
   const { address, contractAddress, name, balance } = state.user;
-  return { address, contractAddress, name, balance };
+  const { projects } = state.school;
+  return {
+    address,
+    contractAddress,
+    name,
+    balance,
+    projects,
+    schoolName: state.school.name,
+    schoolAddress: state.school.address,
+  };
 };
 
-export default connect(mapStateToProps, { getName, getBalance })(Dashboard);
+export default connect(mapStateToProps, {
+  getName,
+  getBalance,
+  getSchoolByUser,
+  handleUserLogout,
+})(Dashboard);

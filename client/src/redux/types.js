@@ -7,3 +7,6 @@ export const GET_BALANCE = "get-balance";
 export const GET_NAME = "get_name";
 
 export const LOGOUT_USER = "logout_user";
+
+export const GET_SCHOOL_INFO = "get_school_info";
+export const GET_SCHOOL_PROJECTS = "get_school_projects";

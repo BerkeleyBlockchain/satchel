@@ -5,7 +5,7 @@ import Login from "./user/Login";
 import SchoolLogin from "./school/SchoolLogin";
 import SchoolDashboard from "./school/SchoolDashboard";
 import CreateProject from "./school/CreateProject";
-import SelectSchool from "./school/SelectSchool";
+import SelectSchool from "./user/SelectSchool";
 
 import {
   BrowserRouter as Router,
