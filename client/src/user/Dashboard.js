@@ -35,6 +35,10 @@ import {
   getName,
   getBalance,
   handleUserLogout,
+  getContribution,
+  getInterestRate,
+  deposit,
+  withdraw,
 } from "../redux/actions/user_actions";
 import { getSchoolByUser } from "../redux/actions/school_actions";
 // note, contract address must match the address provided by Truffle after migrations
@@ -154,8 +158,8 @@ class Dashboard extends Component {
     } else {
       this.props.getName(this.props.contractAddress);
       this.props.getBalance(this.props.contractAddress);
-      this.setInterestRate();
-      this.setContribution();
+      this.props.getInterestRate(this.props.contractAddress);
+      this.props.getContribution(this.props.contractAddress);
       this.props.getSchoolByUser(this.props.contractAddress);
     }
   }
@@ -205,57 +209,10 @@ class Dashboard extends Component {
     this.setState({ depositLoading: false });
   };
 
-  withdraw = async (e) => {
-    e.preventDefault();
-    this.setState({ withdrawLoading: true });
-    try {
-      const amount = web3.utils.toHex(
-        this.state.Withdraw * Math.pow(10, underlyingDecimals)
-      );
-
-      const accounts = await web3.eth.getAccounts();
-
-      console.log(`Redeeming ...`);
-      let redeemResult = await this.state.UserContract.methods
-        .withdraw(amount, underlyingMainnetAddress, cTokenAddress)
-        .send({
-          from: accounts[0],
-          gasLimit: web3.utils.toHex(1000000),
-          gasPrice: web3.utils.toHex(20000000000),
-        });
-
-      console.log(redeemResult.events.MyLog);
-      this.setBalance();
-      // this.setInterestRate();
-    } catch (e) {
-      console.log(e);
-    }
-    this.setState({ withdrawLoading: false });
-  };
-
-  setContribution = async (e) => {
-    let x =
-      (await this.state.UserContract.methods.getContribution().call()) / 1e18;
-    this.setState({ Contribution: x });
-    this.setState({ RoundedContribution: Number(x.toFixed(6)) });
-  };
+  withdraw = async (e) => {};
 
   setBalance = async (e) => {
     //
-  };
-
-  setInterestRate = async () => {
-    await axios
-      .get(
-        "https://api.compound.finance/api/v2/ctoken?addresses=0x5d3a536e4d6dbd6114cc1ead35777bab948e3643"
-      )
-      .then((res) =>
-        this.setState({
-          InterestRate: Number(
-            ((res.data.cToken[0].supply_rate.value / 2) * 100).toFixed(2)
-          ),
-        })
-      );
   };
 
   setDeposit = (event) => {
@@ -275,52 +232,6 @@ class Dashboard extends Component {
     if (this.state.activeTab !== tab) {
       this.setState({ activeTab: tab });
     }
-    this.setContribution();
-  };
-
-  // setSchoolContract = async (e) => {
-  //   try {
-  //     console.log("Setting School");
-  //     let schoolAddress = await this.state.UserContract.methods
-  //       .schoolContract()
-  //       .call();
-  //     console.log("School address is ", schoolAddress);
-  //     console.log(schoolAddress);
-  //     const schoolContract = new web3.eth.Contract(
-  //       schoolAbi.abi,
-  //       schoolAddress
-  //     );
-  //     const name = await schoolContract.methods.getName().call();
-  //     console.log(name);
-  //     console.log(schoolAddress);
-  //     this.setState({
-  //       SchoolContract: schoolContract,
-  //       SchoolName: name,
-  //       SchoolAddress: schoolAddress,
-  //     });
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  //   this.getProjects();
-  // };
-
-  // componentDidMount() {
-  //   this.getProjects();
-  // }
-
-  // getProjects = async () => {
-  //   await axios
-  //     .get(
-  //       "http://localhost:4000/api/project?schoolAddress=" +
-  //         this.state.SchoolAddress
-  //     )
-  //     .then((res) => this.setState({ projects: res.data.projects }));
-  // };
-
-  logout = (event) => {
-    const self = this;
-    event.preventDefault();
-    self.props.history.push({ pathname: "/Login", state: {} });
   };
 
   render() {
@@ -405,13 +316,19 @@ class Dashboard extends Component {
                             justifyContent: "space-around",
                           }}
                           className="AmountButton"
-                          onClick={this.deposit}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            this.props.deposit(
+                              this.props.contractAddress,
+                              this.state.Deposit
+                            );
+                          }}
                           type="submit"
                         >
                           Deposit
                           <ClipLoader
                             color={"#FFFFFF"}
-                            loading={this.state.depositLoading}
+                            loading={this.props.depositLoading}
                             size={20}
                           />
                         </Button>
@@ -453,13 +370,19 @@ class Dashboard extends Component {
                             justifyContent: "space-around",
                           }}
                           className="AmountButton"
-                          onClick={this.withdraw}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            this.props.withdraw(
+                              this.props.contractAddress,
+                              this.state.Withdraw
+                            );
+                          }}
                           type="submit"
                         >
                           Withdraw
                           <ClipLoader
                             color={"#FFFFFF"}
-                            loading={this.state.withdrawLoading}
+                            loading={this.props.withdrawLoading}
                             size={20}
                           />
                         </Button>
@@ -478,7 +401,7 @@ class Dashboard extends Component {
                   </Col>
                   <Col xs="4">
                     <div className="InterestAmount">
-                      {this.state.InterestRate + "%"}
+                      {this.props.interestRate + "%"}
                     </div>
                   </Col>
                 </Row>
@@ -501,7 +424,7 @@ class Dashboard extends Component {
                       {"Your Contributions"}
                     </div>
                     <div className="ContributionsAmount">
-                      {this.state.RoundedContribution + " DAI"}
+                      {Number(this.props.contribution) + " DAI"}
                     </div>
                   </Col>
                 </Row>
@@ -589,7 +512,16 @@ class Dashboard extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const { address, contractAddress, name, balance } = state.user;
+  const {
+    address,
+    contractAddress,
+    name,
+    balance,
+    contribution,
+    interestRate,
+    depositLoading,
+    withdrawLoading,
+  } = state.user;
   const { projects } = state.school;
   return {
     address,
@@ -597,6 +529,10 @@ const mapStateToProps = (state) => {
     name,
     balance,
     projects,
+    contribution,
+    interestRate,
+    depositLoading,
+    withdrawLoading,
     schoolName: state.school.name,
     schoolAddress: state.school.address,
   };
@@ -607,4 +543,8 @@ export default connect(mapStateToProps, {
   getBalance,
   getSchoolByUser,
   handleUserLogout,
+  getContribution,
+  getInterestRate,
+  deposit,
+  withdraw,
 })(Dashboard);
