@@ -1,4 +1,4 @@
-pragma solidity ^0.5.12;
+pragma solidity ^0.6.12;
 
 interface Erc20 {
     function approve(address, uint256) external returns (bool);
@@ -201,5 +201,5 @@ contract User {
     }
 
     // This is needed to receive ETH when calling `redeemCEth`
-    function() external payable {}
+    fallback() external payable {}
 }

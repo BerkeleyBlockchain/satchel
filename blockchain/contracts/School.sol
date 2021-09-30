@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import "./User.sol";
 
@@ -39,5 +39,5 @@ contract School {
         return underlying.balanceOf(address(this));
     }
 
-    function() external payable {}
+    fallback() external payable {}
 }
