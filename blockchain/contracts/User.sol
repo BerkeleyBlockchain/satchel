@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.6.12;
 
 interface Erc20 {
@@ -6,10 +7,12 @@ interface Erc20 {
     function transfer(address, uint256) external returns (bool);
 
     function balanceOf(address) external view returns (uint256 balance);
+
+    function decimals() external view returns (uint8);
 }
 
 
-interface CErc20 {
+interface CErc20 is Erc20 {
     function mint(uint256) external returns (uint256);
 
     function balanceOfUnderlying(address) external returns (uint256);
@@ -201,5 +204,6 @@ contract User {
     }
 
     // This is needed to receive ETH when calling `redeemCEth`
+    receive() external payable {}
     fallback() external payable {}
 }

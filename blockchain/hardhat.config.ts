@@ -86,7 +86,7 @@ const config: HardhatUserConfig = {
     },
   },
   typechain: {
-    outDir: "typechain",
+    outDir: "../client",
     target: "ethers-v5",
   },
 };
