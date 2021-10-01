@@ -60,9 +60,9 @@ contract User is Exponential {
     }
         
 
-    constructor(address payable _schoolContract, string memory _name) public {
+    constructor(address payable _schoolContract, string memory _name, address payable _owner) public {
       name = _name;
-      owner = msg.sender;
+      owner = _owner;
       schoolContract = _schoolContract;
     }
 

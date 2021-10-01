@@ -1,3 +1,74 @@
+import hre from "hardhat";
+import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-ethers";
+import { Artifact } from "hardhat/types";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
+import { Signers } from "./types";
+import { School } from "../contract_types/School";
+import { UnicefSatchel } from '../contract_types/UnicefSatchel';
+import { getOverrideOptions } from "./utils";
+import chai, { expect } from "chai";
+import { solidity } from "ethereum-waffle";
+chai.use(solidity);
+const { deployContract } = hre.waffle;
+
+describe("Unit tests", function () {
+    let unicefSatchel: UnicefSatchel;
+    let admin: SignerWithAddress;
+    let owner: SignerWithAddress;
+    let deployer: SignerWithAddress;
+    let alice: SignerWithAddress;
+    let bob: SignerWithAddress;
+    const schoolName = "School Name";
+    const schoolName2 = "Second School Name";
+    const erc20Address = "0x5d3a536e4d6dbd6114cc1ead35777bab948e3643";
+    const userName = "User Name";
+    before(async function () {
+      this.signers = {} as Signers;
+      const signers: SignerWithAddress[] = await hre.ethers.getSigners();
+      admin = signers[0];
+      owner = signers[1];
+      deployer = signers[2];
+      alice = signers[3];
+      bob = signers[4];
+  
+      // deploy UnicefSatchel Contract
+      const UnicefSatchelArtifact: Artifact = await hre.artifacts.readArtifact("UnicefSatchel");
+      this.unicefSatchel = <UnicefSatchel><any>(
+        await deployContract(owner, UnicefSatchelArtifact, [], {gasPrice: 1_000_000_00})
+      );
+
+      unicefSatchel = this.unicefSatchel;
+  
+      // // Fund UnicefSatchel with 10 ETH
+      // await this.signers.admin.sendTransaction({
+      //     // @ts-ignore
+      //     to: this.unicefSatchel.address,
+      //     value: hre.ethers.utils.parseEther("10"),
+      //     ...getOverrideOptions()
+      // });
+    });
+
+    describe("Schools", () => {
+      it("Users should be able to create new schools", async () => {
+        await unicefSatchel.newSchool(schoolName, {
+          from: owner.address,
+        }); 
+        let eventFilter = unicefSatchel.filters.newSchoolEvent();
+        let events = await unicefSatchel.queryFilter(eventFilter, "latest");
+        expect(events[0].args.schoolName).to.equal(schoolName);
+        expect(events[0].args.schoolId).to.eq(0);
+  
+        await unicefSatchel.newSchool(schoolName2, {
+          from: owner.address,
+        });
+        events = await unicefSatchel.queryFilter(eventFilter, "latest");
+        expect(events[0].args.schoolName).to.equal(schoolName2);
+        expect(events[0].args.schoolId).to.eq(1);
+      });
+    });
+});
+
 // const UnicefSatchel = artifacts.require("UnicefSatchel");
 // const User = artifacts.require("User");
 // const chai = require("chai");
@@ -120,4 +191,4 @@
 //       console.log(balance);
 //     });
 //   });
-// });
+// })

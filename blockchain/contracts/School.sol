@@ -19,7 +19,7 @@ contract School {
 
     function createUserContract(string memory _name) public {
         // instantiate a new user contract
-        _users[msg.sender] = address(new User(address(this), _name));
+        _users[msg.sender] = address(new User(address(this), _name, msg.sender));
     }
 
     function getUserContract() public view returns (address) {

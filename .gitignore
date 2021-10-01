@@ -5,3 +5,4 @@ node_modules/
 cache/
 artifacts/
 client/contract_types
+blockchain/contract_types
