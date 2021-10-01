@@ -11,6 +11,12 @@ interface Erc20 {
     function balanceOf(address) external view returns (uint256 balance);
 
     function decimals() external view returns (uint8);
+
+    function transferFrom(
+        address,
+        address,
+        uint
+    ) external returns (bool);
 }
 
 
@@ -28,17 +34,26 @@ interface CErc20 is Erc20 {
     function redeemUnderlying(uint) external returns (uint);
 }
 
-contract User {
+contract User is Exponential {
     event MyLog(string, uint256);
+    // School addr, token addr, amount
+    event SendToSchool(address, address, uint256);
     event InsufficientBalance(string);
 
     address payable public schoolContract;
     address public owner;
     string public name;
 
+    //TODO - have a modifier to make sure only owner can call these withdraw/deposit functions
+
+    // Keep track of how much the user deposited in underlying token
+    // underlyingToken => amount deposited
+    mapping(address => uint256) underlyingAmountDeposited;
+
+    mapping(address => uint256) schoolContributions;
+
     uint256 public cTokenBalance;
     uint256 public avgExchangeRate;
-    uint256 public schoolContributions;
 
     constructor(address payable _schoolContract, string memory _name) public {
       name = _name;
@@ -80,38 +95,115 @@ contract User {
         return c;
     }
 
-
-
-    // supplyErc20ToCompound
+    /**
+     * Allow a user to deposit tokens into the COMP protocol
+     * NOTE: Users must call _erc20Contract.approve() before calling this function
+     * since we this contract will be using their tokens to deposit into compound
+     * @param _erc20Contract the ERC contract for the underlying token
+     * @param _cErc20Contract the ERC contract for the CToken
+     * @param _numTokensToSupply the number of underlying tokens to supply
+     * @return (uint) - 0 on success, else an int to represent the error
+     */
     function deposit(
         address _erc20Contract,
         address _cErc20Contract,
         uint256 _numTokensToSupply
     ) public returns (uint) {
+
+        //TODO: msg.sender vs tx.origin nuances
+        // I think the user needs to first give us their numTokensToSupply
+        // before we call underlying.approve and stuff. 
+
         // Create a reference to the underlying asset contract, like DAI.
         Erc20 underlying = Erc20(_erc20Contract);
 
         // Create a reference to the corresponding cToken contract, like cDAI
         CErc20 cToken = CErc20(_cErc20Contract);
-        uint exchangeRateMantissa = cToken.exchangeRateCurrent();
 
-        // Approve transfer on the ERC20 contract
+        // Assumes that user has already called underlying.approve()
+        // Transfer tokens from sender to this contract
+        require(underlying.transferFrom(msg.sender, address(this), _numTokensToSupply), "Failure: Could not transfer tokens from user to contract");
+
+        // Approve cToken contract to use our funds 
         underlying.approve(_cErc20Contract, _numTokensToSupply);
 
         // Mint cTokens
         uint mintResult = cToken.mint(_numTokensToSupply);
 
-        // If deposit is successful, add number of supplied cTokens to running cToken balance
+        // If mint is successful, then update the underlyingAmountDeposited for this token
         if (mintResult == 0) {
-            uint256 minted = div(mul(_numTokensToSupply, 1e18), exchangeRateMantissa);
-            uint256 cTokenBalanceOld = cTokenBalance;
-            cTokenBalance = add(cTokenBalance, minted);//+= _numTokensToSupply * 1e18 / exchangeRateMantissa;
-            avgExchangeRate = div(add(mul(avgExchangeRate, cTokenBalanceOld), mul(exchangeRateMantissa, minted)), cTokenBalance);
+            (MathError err0, uint result) = addUInt(underlyingAmountDeposited[underlying], _numTokensToSupply);
+            require(err0 == MathError.NO_ERROR, "error updating initial balance of user");
+            underlyingAmountDeposited[underlying] = result;
         }
 
         return mintResult;
     }
 
+    /**
+     * @param amount - the amount in underlying the user wishes to withdraw
+     * @param _erc20Contract the ERC contract for the underlying token
+     * @param _cErc20Contract the ERC contract for the CToken
+     * @return (uint) - 0 on success, else reverts
+     */
+    function withdraw(
+        uint256 amount, 
+        address _erc20Contract,
+        address _cErc20Contract
+    ) public returns (uint) {
+        // Create a reference to the corresponding cToken contract, like cDAI
+        Erc20 underlying = Erc20(_erc20Contract);
+        CErc20 cToken = CErc20(_cErc20Contract);
+        uint256 underlyingBalance = cToken.balanceOfUnderlying(msg.sender);
+
+        if (amount > underlyingBalance) {
+            emit InsufficientBalance("There is not enough for the withdrawal.");
+            revert("Failure: Attempting to withdraw more than you own.");
+        }
+
+        // First, let's redeem the cTokens for actual underlying
+        require(cToken.redeemUnderlying(amount) == 0, "Failed to redeem cTokens for underlying token");
+        
+        // Let's calculate the fraction of the user's total asset they are trying to withdraw
+        // e.g. if you have 100 dai and are trying to withdraw 50, then we would get 1/2 
+        // Solidity does not support floating point, so this does (amount / underlyingBalance) * 1e18
+        Exp memory fractionToWithdraw = getExp(amount, underlyingBalance);
+        // Let's calculate how much interest the user has earned
+        (MathError err0, uint256 interestEarned) = subUInt(underlyingBalance, underlyingAmountDeposited[underlying]);
+        if (err0 != MathError.NO_ERROR) {
+            revert("Arithmetic Failure when calculating interestEarned");
+        }
+        
+        // Now of the total amount to withdraw, we want to calculate how much of it was gained from interest
+        Exp memory interestToWithdraw = mulScalar(fractionToWithdraw, interestEarned);
+
+        // Now calculate half of the amount generated from interest
+        Exp memory halfWithdrawnInterest = divScalar(interestToWithdraw, 2);
+        // Convert Exponential back into native units of the underlying token
+        uint256 interestToSendToSchool = halfWithdrawnInterest.mantissa / expScale;
+
+        // Now the user will get the amount to withdraw, minus the interest that went to the school
+        (MathError err1, uint256 amountForUser) = subUInt(amount, interestToSendToSchool);
+        if (err1 != MathError.NO_ERROR) {
+            revert("Arithmetic Failure when calculating amount to send to user");
+        }
+
+        underlying.transfer(schoolContract, interestToSendToSchool);
+        emit SendToSchool(schoolAddress, underlying, interestToSendToSchool);
+        underlying.transfer(msg.sender, amountForUser);
+
+        // Bookkeeping: Now we need to identify the amount withdrawn that came from the initial deposit (not from interest)
+        (MathError err2, uint256 amountWithdrawnFromDeposit) = subUInt(amount, mulUInt(interestToSendToSchool, 2));
+        if (err2 != MathError.NO_ERROR) {
+            revert("Arithmetic Failure when calculating new value for amountWithdrawnFromDeposit");
+        }
+        underlyingAmountDeposited[underlying] = subUInt(underlyingAmountDeposited[underlying], amountWithdrawnFromDeposit);
+        schoolContributions[underlying] += interestToSendToSchool;
+
+        // Indicate success
+        return 0;
+
+    }
 
     function withdraw(
         uint256 amount,
