@@ -1,4 +1,5 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.6.0;
 
 import "./User.sol";
 
@@ -18,7 +19,7 @@ contract School {
 
     function createUserContract(string memory _name) public {
         // instantiate a new user contract
-        _users[msg.sender] = address(new User(address(this), _name));
+        _users[msg.sender] = address(new User(address(this), _name, msg.sender));
     }
 
     function getUserContract() public view returns (address) {
@@ -39,5 +40,6 @@ contract School {
         return underlying.balanceOf(address(this));
     }
 
-    function() external payable {}
+    receive() external payable {}
+    fallback() external payable {}
 }

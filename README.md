@@ -66,8 +66,9 @@ App will be running at [http://localhost:3000/](http://localhost:3000/) and use 
 Please ensure that you have the following installed on your computer:
 
 - Node JS
-- Node Package Manager (npm)
+- Node Package Manager (npm) or Yarn
 - Truffle
+- Hardhat
 
 ### 2. Clone the repo
 
@@ -90,8 +91,10 @@ Compound: https://app.compound.finance/
 ### 5. Fill out the smart-contract side .env
 
 ```
-INFURA=[YOUR INFURA API KEY]
-MNEMONIC=[YOUR METAMASK MNEMONIC]
+ARCHIVE_MAINNET_NODE_URL=
+MNEMONIC=
+ARCHIVE_GOERLI_NODE_URL=
+GOERLI_PRIVATE_KEY=
 ```
 
 ### 6. Deploy the smart contracts
