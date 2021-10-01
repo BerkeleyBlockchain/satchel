@@ -1,4 +1,4 @@
-import hre from "hardhat";
+import hre, { ethers } from "hardhat";
 import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-ethers";
 import { Artifact } from "hardhat/types";
@@ -6,6 +6,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-wit
 import { Signers } from "./types";
 import { School } from "../contract_types/School";
 import { UnicefSatchel } from '../contract_types/UnicefSatchel';
+import { User } from '../contract_types/User';
 import { getOverrideOptions } from "./utils";
 import chai, { expect } from "chai";
 import { solidity } from "ethereum-waffle";
@@ -23,7 +24,7 @@ describe("Unit tests", function () {
     const schoolName2 = "Second School Name";
     const erc20Address = "0x5d3a536e4d6dbd6114cc1ead35777bab948e3643";
     const userName = "User Name";
-    before(async function () {
+    beforeEach(async function () {
       this.signers = {} as Signers;
       const signers: SignerWithAddress[] = await hre.ethers.getSigners();
       admin = signers[0];
@@ -34,11 +35,9 @@ describe("Unit tests", function () {
   
       // deploy UnicefSatchel Contract
       const UnicefSatchelArtifact: Artifact = await hre.artifacts.readArtifact("UnicefSatchel");
-      this.unicefSatchel = <UnicefSatchel><any>(
+      unicefSatchel = <UnicefSatchel><any>(
         await deployContract(owner, UnicefSatchelArtifact, [], {gasPrice: 1_000_000_00})
       );
-
-      unicefSatchel = this.unicefSatchel;
   
       // // Fund UnicefSatchel with 10 ETH
       // await this.signers.admin.sendTransaction({
@@ -65,6 +64,88 @@ describe("Unit tests", function () {
         events = await unicefSatchel.queryFilter(eventFilter, "latest");
         expect(events[0].args.schoolName).to.equal(schoolName2);
         expect(events[0].args.schoolId).to.eq(1);
+      });
+
+      it("Users should be able to retrieve information about schools", async () => {
+        await unicefSatchel.newSchool(schoolName, {
+          from: owner.address,
+        });
+        let eventFilter = unicefSatchel.filters.newSchoolEvent();
+        let events = await unicefSatchel.queryFilter(eventFilter, "latest");
+        expect(events[0].args.schoolName).to.equal(schoolName);
+        expect(events[0].args.schoolId).to.eq(0);
+  
+        let name = await unicefSatchel.getSchoolName(0);
+        expect(name).to.equal(schoolName);
+      });
+
+      it("Users should be able to get all schools owned", async () => {
+        await unicefSatchel.newSchool(schoolName, {
+          from: owner.address,
+        });
+  
+        await unicefSatchel.newSchool(schoolName2, {
+          from: owner.address,
+        });
+  
+        let ownerOwned = await unicefSatchel.getSchoolByOwner(owner.address);
+        expect(ownerOwned[0]).to.eq(0);
+        expect(ownerOwned[1]).to.eq(1);
+        expect(ownerOwned.length).to.equal(2);
+      });
+
+      it("Schools should be able to check balance", async () => {
+        await unicefSatchel.newSchool(schoolName, {
+          from: owner.address,
+        });
+  
+        let balance = await unicefSatchel.getSchoolBalance(0, erc20Address);
+        expect(balance).to.eq(0);
+      });
+    });
+
+
+    describe("Users", () => {
+      it("Users should be able to create users", async () => {
+        await unicefSatchel.newSchool(schoolName, {
+          from: owner.address,
+        });
+
+        const schoolAddress = await unicefSatchel.schoolArray(0);
+
+        await unicefSatchel.createUserContract(userName, schoolAddress, {
+          from: owner.address,
+        });
+
+        const userAddress = await unicefSatchel.getUserContract({
+          from: owner.address,
+        });
+        let userInstance = await ethers.getContractAt("User", userAddress);
+
+        let name = await userInstance.name();
+        expect(name).to.equal(userName);
+
+        let address = await userInstance.schoolContract();
+        expect(address).to.equal(schoolAddress);
+      });
+
+      it("Users should be able to get their balance", async () => {
+        await unicefSatchel.newSchool(schoolName, {
+          from: owner.address,
+        });
+
+        const schoolAddress = await unicefSatchel.schoolArray(0);
+
+        await unicefSatchel.createUserContract(userName, schoolAddress, {
+          from: owner.address,
+        });
+
+        const userAddress = await unicefSatchel.getUserContract({
+          from: owner.address,
+        });
+        let userInstance = await ethers.getContractAt("User", userAddress);
+        let balance = await userInstance.getBalance(erc20Address);
+        console.log(balance);
       });
     });
 });

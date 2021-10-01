@@ -202,6 +202,11 @@ contract User is Exponential {
         return 0;
     }
 
+    function getBalance(address _erc20Contract) public view returns(uint256) {
+        Erc20 underlying = Erc20(_erc20Contract);
+        return underlying.balanceOf(msg.sender);
+    }
+
     // This is needed to receive ETH when calling `redeemCEth`
     receive() external payable {}
     fallback() external payable {}
