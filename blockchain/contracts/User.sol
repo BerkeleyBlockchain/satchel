@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.12;
 
+import "./floating_point/Exponential.sol";
+
 interface Erc20 {
     function approve(address, uint256) external returns (bool);
 
