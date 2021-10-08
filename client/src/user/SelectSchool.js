@@ -1,29 +1,13 @@
 import React, { Component } from "react";
-import {
-  ButtonGroup,
-  Form,
-  FormGroup,
-  Label,
-  Input,
-  Table,
-  Card,
-  CardText,
-  CardTitle,
-  Button,
-  Navbar,
-  NavbarBrand,
-  Nav,
-  NavItem,
-} from "reactstrap";
+import { Form, FormGroup, Label, Input } from "reactstrap";
 import Web3 from "web3";
-import { userAbi, erc20Abi, schoolAbi, schoolJSON } from "./abi/abis";
-import contractAbi from "./abi/UnicefSatchel.json";
+import { connect } from "react-redux";
 
-import "./App.css";
-import BusinessCenterOutlinedIcon from "@material-ui/icons/BusinessCenterOutlined";
-import logo from "./logo.png";
+import "../App.css";
+import logo from "../logo.png";
 import axios from "axios";
-import SchoolPanel from "./SchoolPanel.js";
+import SchoolPanel from "../components/SchoolPanel.js";
+import { handleUserSignup } from "../redux/actions/user_actions";
 
 // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
@@ -45,15 +29,12 @@ const web3 = new Web3(Web3.givenProvider);
 // var School = TruffleContract(schoolJSON);
 // School.setProvider(Web3.givenProvider);
 class SelectSchool extends Component {
-  constructor(props) {
-    super(props);
-    let receivedProps = this.props.location.state;
-    console.log(receivedProps);
-    this.state = {
-      schools: [],
-      Name: "",
-    };
-    this.setName = this.setName.bind(this);
+  state = {
+    schools: [],
+    name: "",
+  };
+
+  componentDidMount() {
     this.getSchools();
   }
 
@@ -61,59 +42,6 @@ class SelectSchool extends Component {
     await axios
       .get("http://localhost:4000/api/school/allSchools")
       .then((res) => this.setState({ schools: res.data.schools }));
-  };
-
-  setName = async (e) => {
-    e.preventDefault();
-    const x = e.target.value;
-    this.setState({ Name: x });
-  };
-
-  login = async (school) => {
-    let contractInstance = new web3.eth.Contract(
-      contractAbi.abi,
-      process.env.REACT_APP_CONTRACT_ADDRESS
-    );
-
-    const self = this;
-
-    try {
-      if (!window.ethereum) {
-        console.log("Metamask not installed");
-        return;
-      }
-      const accounts = await window.ethereum.request({
-        method: "eth_requestAccounts",
-      });
-      console.log(accounts);
-      let userContractAddress = await contractInstance.methods
-        .getUserContract()
-        .call({ from: accounts[0] });
-      console.log("user addresss: " + userContractAddress);
-      console.log("account[0]" + accounts[0]);
-      if (userContractAddress == "0x0000000000000000000000000000000000000000") {
-        await contractInstance.methods
-          .createUserContract(self.state.Name, school.address)
-          .send({ from: accounts[0] });
-
-        userContractAddress = await contractInstance.methods
-          .getUserContract()
-          .call({ from: accounts[0] });
-        console.log(userContractAddress);
-        self.state.UserContractAddress = userContractAddress;
-        self.props.history.push({
-          pathname: "/Dashboard",
-          state: {
-            UserContractAddress: userContractAddress,
-            Name: self.state.Name,
-          },
-        });
-      } else {
-        console.log("You already have an account");
-      }
-    } catch (err) {
-      console.log(err);
-    }
   };
 
   render() {
@@ -137,10 +65,10 @@ class SelectSchool extends Component {
           </div>
 
           <Form>
-          <FormGroup className="NameField">
+            <FormGroup className="NameField">
               <Label for="amount"></Label>
               <Input
-                onChange={this.setName}
+                onChange={(e) => this.setState({ name: e.target.value })}
                 type="text"
                 name="text"
                 id="amount"
@@ -158,7 +86,16 @@ class SelectSchool extends Component {
 
           {this.state.schools.length > 0
             ? this.state.schools.map((school) => (
-                <div className="PanelWidth" onClick={() => this.login(school)}>
+                <div
+                  className="PanelWidth"
+                  onClick={() =>
+                    this.props.handleUserSignup(
+                      school,
+                      this.state.name,
+                      this.props.history
+                    )
+                  }
+                >
                   <SchoolPanel school={school}></SchoolPanel>
                 </div>
               ))
@@ -170,4 +107,4 @@ class SelectSchool extends Component {
   }
 }
 
-export default SelectSchool;
+export default connect(null, { handleUserSignup })(SelectSchool);
