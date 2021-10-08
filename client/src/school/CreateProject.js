@@ -368,13 +368,6 @@ export default function CreateProject(props) {
   const handleFinish = (event) => {
     history.push({
       pathname: "/SchoolDashboard",
-      state: {
-        Name: props.location.Name,
-        Withdraw: props.Withdraw,
-        Balance: props.Balance,
-        schoolAddress: props.location.schoolAddress,
-        activeTab: 1,
-      },
     });
   };
 
