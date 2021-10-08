@@ -1,155 +1,23 @@
 import React, { Component } from "react";
 import { Form, FormGroup, Label, Input, Button } from "reactstrap";
-import Web3 from "web3";
-import { userAbi, erc20Abi, schoolAbi, schoolJSON } from "../abi/abis";
+import ClipLoader from "react-spinners/ClipLoader";
+import { connect } from "react-redux";
+
 import "../App.css";
 import logo from "../logo.png";
-import contractAbi from "../abi/UnicefSatchel.json";
-import axios from "axios";
-import ClipLoader from "react-spinners/ClipLoader";
-
-// note, contract address must match the address provided by Truffle after migrations
-const web3 = new Web3(Web3.givenProvider);
-
-// const privateKey = '0xb8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cbf329';
-const privateKey =
-  "0x63c532aa122a9ba3fdba7c57c10185c45db04b481a9ced93100d2fc6efea104e";
-// Add your Ethereum wallet to the Web3 object
-web3.eth.accounts.wallet.add(privateKey);
-const myWalletAddress = web3.eth.accounts.wallet[0].address;
-
-const fromMyWallet = {
-  from: myWalletAddress,
-  gasLimit: web3.utils.toHex(1000000),
-  gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
-};
-
-var TruffleContract = require("truffle-contract");
-var School = TruffleContract(schoolJSON);
-School.setProvider(Web3.givenProvider);
-
+import { loginSchool, deploySchool } from "../redux/actions/school_actions";
 class SchoolLogin extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      Name: "",
-      activeTab: 0,
-      loginLoading: false,
-      createLoading: false,
+      name: "",
     };
-    this.setName = this.setName.bind(this);
-    this.login = this.login.bind(this);
   }
 
   setName = async (e) => {
     e.preventDefault();
     const x = e.target.value;
-    this.setState({ Name: x });
-  };
-
-  deploySchool = async (e) => {
-    e.preventDefault();
-    // var UserFactory = TruffleContract(userFactoryABI.abi);
-    // UserFactory.setProvider(Web3.givenProvider);
-
-    let contractInstance = new web3.eth.Contract(
-      contractAbi.abi,
-      process.env.REACT_APP_CONTRACT_ADDRESS
-    );
-    this.setState({ createLoading: true });
-
-    try {
-      const accounts = await web3.eth.getAccounts();
-      const gasPrice = await web3.eth.getGasPrice();
-      const gasEstimate = await contractInstance.methods
-        .newSchool(this.state.Name)
-        .estimateGas({ from: accounts[0] });
-
-      // contract.methods
-      //   .mySchool()
-      // .myMethod()
-      // .send({ from: account, gasPrice: gasPrice, gas: gasEstimate });
-      const { events } = await contractInstance.methods
-        .newSchool(this.state.Name)
-        .send({ from: accounts[0], gasPrice: gasPrice, gas: gasEstimate });
-      const id = events.newSchoolEvent.returnValues.schoolId;
-      console.log(this.state.Name + " created");
-      console.log(id);
-      const schoolAddress = await contractInstance.methods
-        .schoolArray(id)
-        .call();
-      console.log(schoolAddress); // Gives address of school contract
-
-      await axios.post("http://localhost:4000/api/school/createSchool", {
-        name: this.state.Name,
-        address: schoolAddress,
-      });
-
-      this.props.history.push({
-        pathname: "/SchoolDashboard",
-        state: {
-          Name: this.state.Name,
-          activeTab: this.state.activeTab,
-          schoolAddress: schoolAddress,
-        },
-      });
-    } catch (err) {
-      console.log(err);
-      console.log(err.message);
-    }
-    this.setState({ createLoading: false });
-  };
-
-  login = async (e) => {
-    e.preventDefault();
-    this.setState({ loginLoading: true });
-
-    let contractInstance = new web3.eth.Contract(
-      contractAbi.abi,
-      process.env.REACT_APP_CONTRACT_ADDRESS
-    );
-
-    try {
-      if (!window.ethereum) {
-        console.log("Metamask not installed");
-        return;
-      }
-      const accounts = await window.ethereum.request({
-        method: "eth_requestAccounts",
-      });
-      const account = accounts[0];
-      console.log(accounts);
-      let ownedSchoolIds = await contractInstance.methods
-        .getSchoolByOwner(account)
-        .call();
-      console.log(ownedSchoolIds);
-      let ownedSchoolNames = await Promise.all(
-        ownedSchoolIds.map(
-          async (id) => await contractInstance.methods.getSchoolName(id).call()
-        )
-      );
-      console.log(ownedSchoolNames);
-      if (!ownedSchoolNames.includes(this.state.Name)) {
-        console.log("No school found");
-        this.setState({ loginLoading: false });
-        return;
-      }
-
-      let id = ownedSchoolNames.indexOf(this.state.Name);
-      let schoolAddress = await contractInstance.methods.schoolArray(id).call();
-      console.log(schoolAddress);
-      this.props.history.push({
-        pathname: "/SchoolDashboard",
-        state: {
-          Name: this.state.Name,
-          activeTab: this.state.activeTab,
-          schoolAddress: schoolAddress,
-        },
-      });
-    } catch (e) {
-      console.log(e);
-    }
-    this.setState({ loginLoading: false });
+    this.setState({ name: x });
   };
 
   render() {
@@ -197,7 +65,10 @@ class SchoolLogin extends Component {
               <>
                 <Button
                   className="Button"
-                  onClick={this.login}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    this.props.loginSchool(this.state.name, this.props.history);
+                  }}
                   type="submit"
                   style={{
                     backgroundColor: "#146EFF",
@@ -214,14 +85,20 @@ class SchoolLogin extends Component {
                   Log In{" "}
                   <ClipLoader
                     color={"#FFFFFF"}
-                    loading={this.state.loginLoading}
+                    loading={this.props.loginLoading}
                     size={20}
                   />
                 </Button>
 
                 <Button
                   className="Button"
-                  onClick={this.deploySchool}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    this.props.deploySchool(
+                      this.state.name,
+                      this.props.history
+                    );
+                  }}
                   type="submit"
                   style={{
                     backgroundColor: "#146EFF",
@@ -239,7 +116,7 @@ class SchoolLogin extends Component {
                   Create New School
                   <ClipLoader
                     color={"#FFFFFF"}
-                    loading={this.state.createLoading}
+                    loading={this.props.deployLoading}
                     size={20}
                   />
                 </Button>
@@ -252,4 +129,11 @@ class SchoolLogin extends Component {
   }
 }
 
-export default SchoolLogin;
+const mapStateToProps = (state) => {
+  const { loginLoading, deployLoading, error } = state.school;
+  return { loginLoading, deployLoading, error };
+};
+
+export default connect(mapStateToProps, { loginSchool, deploySchool })(
+  SchoolLogin
+);

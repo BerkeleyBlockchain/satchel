@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-import axios from "axios";
-import Web3 from "web3";
 import { connect } from "react-redux";
 import {
   Container,
@@ -27,9 +25,6 @@ import { css } from "@emotion/core";
 import ClipLoader from "react-spinners/ClipLoader";
 
 import "../App.css";
-import { erc20Abi, cTokenAbi } from "../abi/abis";
-import userAbi from "../abi/User.json";
-import schoolAbi from "../abi/School.json";
 import Panel from "../components/Panel";
 import {
   getName,
@@ -41,36 +36,6 @@ import {
   withdraw,
 } from "../redux/actions/user_actions";
 import { getSchoolByUser } from "../redux/actions/school_actions";
-// note, contract address must match the address provided by Truffle after migrations
-const web3 = new Web3(Web3.givenProvider);
-
-// const privateKey =
-//   "0xb8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cbf329";
-
-// Add your Ethereum wallet to the Web3 object
-// web3.eth.accounts.wallet.add(privateKey);
-// const myWalletAddress = web3.eth.accounts.wallet[0].address;
-
-// Mainnet address of the underlying token contract. Example: Dai.
-const underlyingMainnetAddress = process.env.REACT_APP_TOKEN_ADDRESS;
-const underlying = new web3.eth.Contract(erc20Abi, underlyingMainnetAddress);
-
-// Mainnet contract address and ABI for the cToken, which can be found in the
-// mainnet tab on this page: https://compound.finance/docs
-const cTokenAddress = process.env.REACT_APP_CTOKEN_ADDRESS;
-const cToken = new web3.eth.Contract(cTokenAbi, cTokenAddress);
-
-// const fromMyWallet = {
-//   from: "0x00000000000",
-//   gasLimit: web3.utils.toHex(1000000),
-//   gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
-// };
-
-const underlyingDecimals = 18; // Number of decimals defined in this ERC20 token's contract
-
-// var TruffleContract = require("truffle-contract");
-// var School = TruffleContract(schoolAbi.abi);
-// School.setProvider(Web3.givenProvider);
 
 const theme = createMuiTheme({
   palette: {
@@ -125,32 +90,23 @@ function a11yProps(index) {
 }
 
 class Dashboard extends Component {
-  // TBH this should all go in component did mount..
-  constructor(props) {
-    super(props);
-    this.state = {
-      activeTab: 0,
-      Balance: "",
-      Deposit: "",
-      Withdraw: "",
-      InterestRate: "",
-      Contribution: "",
-      RoundedContribution: "",
-      School: "",
-      Name: "",
-      SchoolContract: "",
-      SchoolName: "",
-      SchoolAddress: "",
-      projects: [],
-      withdrawLoading: false,
-      depositLoading: false,
-    };
-
-    this.state.UserContract = new web3.eth.Contract(
-      userAbi.abi,
-      this.props.contractAddress
-    );
-  }
+  state = {
+    activeTab: 0,
+    Balance: "",
+    Deposit: "",
+    Withdraw: "",
+    InterestRate: "",
+    Contribution: "",
+    RoundedContribution: "",
+    School: "",
+    Name: "",
+    SchoolContract: "",
+    SchoolName: "",
+    SchoolAddress: "",
+    projects: [],
+    withdrawLoading: false,
+    depositLoading: false,
+  };
 
   componentDidMount() {
     if (!this.props.contractAddress) {
@@ -163,57 +119,6 @@ class Dashboard extends Component {
       this.props.getSchoolByUser(this.props.contractAddress);
     }
   }
-
-  deposit = async (e) => {
-    console.log(process.env.REACT_APP_CTOKEN_ADDRESS);
-    console.log("handleGet\n");
-    e.preventDefault();
-    console.log(this.props.userContract);
-    this.setState({ depositLoading: true });
-    const accounts = await web3.eth.getAccounts();
-
-    try {
-      let transferResult = await underlying.methods
-        .transfer(
-          this.state.UserContractAddress,
-          web3.utils.toHex(
-            this.state.Deposit * Math.pow(10, underlyingDecimals)
-          ) // 10 tokens to send to MyContract
-        )
-        .send({
-          from: accounts[0],
-          gasLimit: web3.utils.toHex(1000000),
-          gasPrice: web3.utils.toHex(20000000000),
-        });
-      console.log("transfer result");
-      let supplyResult = await this.state.UserContract.methods
-        .deposit(
-          underlyingMainnetAddress,
-          cTokenAddress,
-          web3.utils.toHex(
-            this.state.Deposit * Math.pow(10, underlyingDecimals)
-          ) // 10 tokens to supply
-        )
-        .send({
-          from: accounts[0],
-          gasLimit: web3.utils.toHex(1000000),
-          gasPrice: web3.utils.toHex(20000000000),
-        });
-      console.log("supply result");
-
-      this.setBalance();
-      // this.setInterestRate();
-    } catch (e) {
-      console.log(e);
-    }
-    this.setState({ depositLoading: false });
-  };
-
-  withdraw = async (e) => {};
-
-  setBalance = async (e) => {
-    //
-  };
 
   setDeposit = (event) => {
     event.preventDefault();

@@ -1,29 +1,5 @@
 import React, { Component } from "react";
-import {
-  CardBody,
-  CardSubtitle,
-  TabContent,
-  TabPane,
-  NavLink,
-  Container,
-  Row,
-  Col,
-  ButtonGroup,
-  Form,
-  FormGroup,
-  Label,
-  Input,
-  Table,
-  Card,
-  CardText,
-  CardTitle,
-  Button,
-  Navbar,
-  NavbarBrand,
-  Nav,
-  NavItem,
-} from "reactstrap";
-import Paper from "@material-ui/core/Paper";
+import { Form, FormGroup, Label, Input, Button } from "reactstrap";
 import SchoolOutlinedIcon from "@material-ui/icons/SchoolOutlined";
 import FolderOutlinedIcon from "@material-ui/icons/FolderOutlined";
 import Tabs from "@material-ui/core/Tabs";
@@ -32,48 +8,19 @@ import PropTypes from "prop-types";
 import AppBar from "@material-ui/core/AppBar";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
-import Web3 from "web3";
-import { erc20Abi, cTokenAbi, schoolJSON } from "../abi/abis";
-import "../App.css";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 import SettingsOutlinedIcon from "@material-ui/icons/SettingsOutlined";
-import axios from "axios";
-import { makeStyles } from "@material-ui/core/styles";
-import Panel from "../components/Panel";
 import ClipLoader from "react-spinners/ClipLoader";
+import { connect } from "react-redux";
 
-import { Redirect } from "react-router-dom";
-
-// note, contract address must match the address provided by Truffle after migrations
-const web3 = new Web3(Web3.givenProvider);
-
-const privateKey =
-  "0xb8c1b5c1d81f9475fdf2e334517d29f733bdfa40682207571b12fc1142cbf329";
-
-// Add your Ethereum wallet to the Web3 object
-web3.eth.accounts.wallet.add(privateKey);
-const myWalletAddress = web3.eth.accounts.wallet[0].address;
-
-// Mainnet address of the underlying token contract. Example: Dai.
-const underlyingMainnetAddress = process.env.REACT_APP_TOKEN_ADDRESS;
-const underlying = new web3.eth.Contract(erc20Abi, underlyingMainnetAddress);
-
-// Mainnet contract address and ABI for the cToken, which can be found in the
-// mainnet tab on this page: https://compound.finance/docs
-const cTokenAddress = process.env.REACT_APP_CTOKEN_ADDRESS;
-const cToken = new web3.eth.Contract(cTokenAbi, cTokenAddress);
-
-const fromMyWallet = {
-  from: myWalletAddress,
-  gasLimit: web3.utils.toHex(1000000),
-  gasPrice: web3.utils.toHex(20000000000), // use ethgasstation.info (mainnet only)
-};
-
-const underlyingDecimals = 18; // Number of decimals defined in this ERC20 token's contract
-
-var TruffleContract = require("truffle-contract");
-var School = TruffleContract(schoolJSON);
-School.setProvider(Web3.givenProvider);
+import "../App.css";
+import Panel from "../components/Panel";
+import {
+  getSchoolProjects,
+  handleSchoolLogout,
+  getSchoolBalance,
+  withdrawSchool,
+} from "../redux/actions/school_actions";
 
 const theme = createMuiTheme({
   palette: {
@@ -122,89 +69,21 @@ function a11yProps(index) {
 }
 
 class SchoolDashboard extends Component {
-  constructor(props) {
-    super(props);
-    var receivedProps = this.props.location.state;
-    this.state = {
-      Balance: "",
-      Withdraw: "",
-      Name: receivedProps.Name,
-      activeTab: receivedProps.activeTab,
-      projects: [],
-      schoolAddress: receivedProps.schoolAddress,
-      schoolInstance: "",
-      withdrawLoading: false,
-    };
-    this.setBalance = this.setBalance.bind(this);
-    this.setWithdraw = this.setWithdraw.bind(this);
-    this.toggle = this.toggle.bind(this);
-    this.setSchoolInstance();
-    this.setBalance();
-    this.getProjects();
-  }
+  state = {
+    Balance: "",
+    Withdraw: "",
+    activeTab: 0,
+    withdrawLoading: false,
+  };
 
   componentDidMount() {
-    this.getProjects();
+    if (!this.props.address) {
+      this.props.history.push({ pathname: "Login" });
+    } else {
+      this.props.getSchoolProjects(this.props.address);
+      this.props.getSchoolBalance(this.props.address);
+    }
   }
-
-  setSchoolInstance = async (e) => {
-    let schoolInstance = new web3.eth.Contract(
-      schoolJSON.abi,
-      this.state.schoolAddress
-    );
-    this.schoolInstance = schoolInstance;
-
-    // if (!this.state.Name){
-    //   let name = await schoolInstance.methods.getName().call();
-    //   console.log(name)
-    //   this.setState({ Name: name })
-    // }
-  };
-
-  withdraw = async (e) => {
-    const self = this;
-    e.preventDefault();
-    this.setState({ withdrawLoading: true });
-    const amount = web3.utils.toHex(
-      this.state.Withdraw * Math.pow(10, underlyingDecimals)
-    );
-    try {
-      const accounts = await web3.eth.getAccounts();
-      let schoolBalance = await self.schoolInstance.methods
-        .getBalance(underlyingMainnetAddress)
-        .call();
-      console.log("school balance: " + schoolBalance / 1e18);
-      console.log("withdrawing ... ");
-
-      await self.schoolInstance.methods
-        .withdrawBalance(schoolBalance, underlyingMainnetAddress)
-        .send({
-          from: accounts[0],
-          gasLimit: web3.utils.toHex(1000000),
-          gasPrice: web3.utils.toHex(20000000000),
-        });
-
-      self.setBalance();
-    } catch (err) {
-      console.log(err.message);
-    }
-    this.setState({ withdrawLoading: false });
-  };
-
-  setBalance = async (e) => {
-    const self = this;
-    try {
-      let schoolBalance = await self.schoolInstance.methods
-        .getBalance(underlyingMainnetAddress)
-        .call();
-      console.log(
-        "schoolBalance: " + Number((schoolBalance / 1e18).toFixed(2))
-      );
-      self.setState({ Balance: Number((schoolBalance / 1e18).toFixed(6)) });
-    } catch (err) {
-      console.log("setBalance " + err.message);
-    }
-  };
 
   setWithdraw = (event) => {
     event.preventDefault();
@@ -231,34 +110,19 @@ class SchoolDashboard extends Component {
     });
   };
 
-  getProjects = async () => {
-    await axios
-      .get(
-        "http://localhost:4000/api/project?schoolAddress=" +
-          this.state.schoolAddress
-      )
-      .then((res) => this.setState({ projects: res.data.projects }));
-  };
-
-  logout = (event) => {
-    const self = this;
-    event.preventDefault();
-    self.props.history.push({ pathname: "/Login", state: {} });
-  };
-
   render() {
-    console.log(this.state.projects);
-    const { classes } = this.props;
+    console.log(this.props.projects);
+
     return (
       <div className="App">
         <div className="screens">
           <TabPanel value={this.state.activeTab} index={0}>
             <div className="Welcome">
-              {"Welcome back, " + this.state.Name + "!"}
+              {"Welcome back, " + this.props.name + "!"}
             </div>
             <div className="Balance">
               <div className="BalanceTitle">CURRENT BALANCE</div>
-              <div className="BalanceAmount">{this.state.Balance + " DAI"}</div>
+              <div className="BalanceAmount">{this.props.balance + " DAI"}</div>
             </div>
 
             <div>
@@ -301,7 +165,13 @@ class SchoolDashboard extends Component {
                       justifyContent: "space-around",
                     }}
                     className="AmountButton"
-                    onClick={this.withdraw}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      this.props.withdrawSchool(
+                        this.props.schoolAddress,
+                        this.state.Withdraw
+                      );
+                    }}
                     type="submit"
                   >
                     Withdraw
@@ -332,8 +202,8 @@ class SchoolDashboard extends Component {
             >
               Create Project
             </Button>
-            {this.state.projects.length > 0
-              ? this.state.projects.map((project) => (
+            {this.props.projects.length > 0
+              ? this.props.projects.map((project) => (
                   <div className="PanelWidth">
                     <Panel project={project}></Panel>
                   </div>
@@ -350,7 +220,10 @@ class SchoolDashboard extends Component {
                 borderWidth: "3px",
                 borderColor: "#146EFF",
               }}
-              onClick={this.logout}
+              onClick={(e) => {
+                e.preventDefault();
+                this.props.handleSchoolLogout(this.props.history);
+              }}
               className="LogoutButton"
             >
               Logout
@@ -393,4 +266,14 @@ class SchoolDashboard extends Component {
   }
 }
 
-export default SchoolDashboard;
+const mapStateToProps = (state) => {
+  const { name, address, projects, balance } = state.school;
+  return { name, address, projects, balance };
+};
+
+export default connect(mapStateToProps, {
+  getSchoolProjects,
+  handleSchoolLogout,
+  getSchoolBalance,
+  withdrawSchool,
+})(SchoolDashboard);

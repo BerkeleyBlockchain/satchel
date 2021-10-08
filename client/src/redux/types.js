@@ -15,3 +15,10 @@ export const LOGOUT_USER = "logout_user";
 
 export const GET_SCHOOL_INFO = "get_school_info";
 export const GET_SCHOOL_PROJECTS = "get_school_projects";
+
+export const LOAD_LOGIN_SCHOOL = "load_login_school";
+export const LOAD_CREATE_SCHOOL = "load_create_school";
+export const SCHOOL_LOGIN_ERROR = "school_login_error";
+
+export const SET_SCHOOL_BALANCE = "set_school_balance";
+export const LOAD_SCHOOL_WITHDRAW = "load_school_withdraw";
