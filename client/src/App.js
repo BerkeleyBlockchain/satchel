@@ -6,6 +6,7 @@ import SchoolLogin from "./school/SchoolLogin";
 import SchoolDashboard from "./school/SchoolDashboard";
 import CreateProject from "./school/CreateProject";
 import SelectSchool from "./user/SelectSchool";
+import Assets from "./user/Assets";
 
 import {
   BrowserRouter as Router,
@@ -27,6 +28,8 @@ class App extends Component {
             <Route exact path="/SchoolDashboard" component={SchoolDashboard} />
             <Route exact path="/CreateProject" component={CreateProject} />
             <Route exact path="/SelectSchool" component={SelectSchool} />
+            <Route exact path="/Assets" component={Assets} />
+
             {/* <Redirect to="/CreateProject/" /> */}
             <Route
               exact

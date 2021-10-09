@@ -178,7 +178,10 @@ class Dashboard extends Component {
             <div className="Welcome">
               {"Welcome back, " + this.props.name + "!"}
             </div>
-            <div className="Balance">
+            <div
+              className="Balance"
+              onClick={() => this.props.history.push({ pathname: "/Assets" })}
+            >
               <div className="BalanceTitle">CURRENT BALANCE</div>
               <div className="BalanceAmount">{this.props.balance + " DAI"}</div>
             </div>
