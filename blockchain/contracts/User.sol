@@ -42,6 +42,7 @@ contract User is Exponential {
     address payable public schoolContract;
     address public owner;
     string public name;
+    bool public community;
     // Keep track of how much the user deposited in underlying token
     // underlyingToken => amount deposited
     mapping(address => uint256) underlyingAmountDeposited;
@@ -60,8 +61,9 @@ contract User is Exponential {
     }
         
 
-    constructor(address payable _schoolContract, string memory _name, address payable _owner) public {
+    constructor(address payable _schoolContract, string memory _name, bool _community, address payable _owner) public {
       name = _name;
+      community = _community;
       owner = _owner;
       schoolContract = _schoolContract;
     }
@@ -161,13 +163,17 @@ contract User is Exponential {
         }
 
         // Now calculate half of the amount generated from interest
-        (mErr, floatingPoint.halfWithdrawnInterest) = divScalar(floatingPoint.interestToWithdraw, 2);
-        if (mErr != MathError.NO_ERROR) {
-            revert("Exponential Failure when calculating halfWithdrawnInterest");
+        if (!community) {
+            (mErr, floatingPoint.halfWithdrawnInterest) = divScalar(floatingPoint.interestToWithdraw, 2);
+            if (mErr != MathError.NO_ERROR) {
+                revert("Exponential Failure when calculating halfWithdrawnInterest");
+            }
+            // Convert Exponential back into native units of the underlying token
+            interestToSendToSchool = floatingPoint.halfWithdrawnInterest.mantissa / expScale;
+        } else {
+            // Non-community member: the whole interest goes to school, and convert exp back into native units
+            interestToSendToSchool = floating.interestToWithdraw.mantissa / expScale;
         }
-
-        // Convert Exponential back into native units of the underlying token
-        interestToSendToSchool = floatingPoint.halfWithdrawnInterest.mantissa / expScale;
 
         // Now the user will get the amount to withdraw, minus the interest that went to the school
         (mErr, amountForUser) = subUInt(amount, interestToSendToSchool);
