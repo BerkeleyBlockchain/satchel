@@ -396,7 +396,7 @@ class Dashboard extends Component {
                 >
                   <Tab
                     icon={<AccountBalanceWalletOutlinedIcon />}
-                    label="School"
+                    label="Account"
                     {...a11yProps(0)}
                   />
                   <Tab

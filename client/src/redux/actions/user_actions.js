@@ -6,6 +6,7 @@ import { erc20Abi, cTokenAbi } from "../../abi/abis";
 import userAbi from "../../abi/User.json";
 import schoolAbi from "../../abi/School.json";
 import axios from "axios";
+import assets from "../../assets.json";
 
 const web3 = new Web3(Web3.givenProvider);
 
@@ -135,8 +136,20 @@ export const getContribution = (contractAddress) => async (dispatch) => {
 
 export const getInterestRate = (contractAddress) => async (dispatch) => {
   const { data } = await axios.get(
-    "https://api.compound.finance/api/v2/ctoken?addresses=0x5d3a536e4d6dbd6114cc1ead35777bab948e3643"
+    "https://api.compound.finance/api/v2/ctoken",
+    {
+      params: {
+        addresses: assets.map((asset) => asset.cTokenAddressMainnet),
+      },
+    }
   );
+
+  const interestRates = data.cToken.map(
+    (cToken) => cToken.supply_rate.value * 50
+  );
+  console.log("Interest rate...");
+  console.log(interestRates);
+
   dispatch({
     type: types.GET_INTEREST_RATE,
     payload: Number(((data.cToken[0].supply_rate.value / 2) * 100).toFixed(2)),

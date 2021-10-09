@@ -4,13 +4,15 @@
     "symbol": "BTC",
     "url": "https://dynamic-assets.coinbase.com/e785e0181f1a23a30d9476038d9be91e9f6c63959b538eabbc51a1abc8898940383291eede695c3b8dfaa1829a9b57f5a2d0a16b0523580346c6b8fab67af14b/asset_icons/b57ac673f06a4b0338a596817eb0a50ce16e2059f327dc117744449a47915cb2.png",
     "tokenAddress": "",
-    "cTokenAddress": ""
+    "cTokenAddress": "0x822397d9a55d0fefd20f5c4bcab33c5f65bd28eb",
+    "cTokenAddressMainnet": "0x5d3a536e4d6dbd6114cc1ead35777bab948e3643"
   },
   {
-    "name": "Ethereum",
-    "symbol": "ETH",
-    "url": "https://dynamic-assets.coinbase.com/dbb4b4983bde81309ddab83eb598358eb44375b930b94687ebe38bc22e52c3b2125258ffb8477a5ef22e33d6bd72e32a506c391caa13af64c00e46613c3e5806/asset_icons/4113b082d21cc5fab17fc8f2d19fb996165bcce635e6900f7fc2d57c4ef33ae9.png",
+    "name": "Dai Stablecoin",
+    "symbol": "DAI",
+    "url": "https://dynamic-assets.coinbase.com/90184cca292578d533bb00d9ee98529b889c15126bb120582309286b9129df9886781b30c85c21ee9cae9f2db6dc11e88633c7361fdd1ba5046ea444e101ae15/asset_icons/ebc24b163bf1f58a9732a9a1d2faa5b2141b041d754ddc2260c5e76edfed261e.png",
     "tokenAddress": "",
-    "cTokenAddress": ""
+    "cTokenAddress": "0x822397d9a55d0fefd20f5c4bcab33c5f65bd28eb",
+    "cTokenAddressMainnet": "0x5d3a536e4d6dbd6114cc1ead35777bab948e3643"
   }
 ]
