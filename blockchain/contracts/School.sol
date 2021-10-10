@@ -19,7 +19,8 @@ contract School {
 
     function createUserContract(string memory _name) public {
         // instantiate a new user contract
-        _users[msg.sender] = address(new User(address(this), _name, msg.sender));
+        // TODO: Default to having user be a community member (pass in true)
+        _users[msg.sender] = address(new User(address(this), _name, true, msg.sender));
     }
 
     function getUserContract() public view returns (address) {

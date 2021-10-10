@@ -163,7 +163,7 @@ contract User is Exponential {
         }
 
         // Now calculate half of the amount generated from interest
-        if (!community) {
+        if (community) {
             (mErr, floatingPoint.halfWithdrawnInterest) = divScalar(floatingPoint.interestToWithdraw, 2);
             if (mErr != MathError.NO_ERROR) {
                 revert("Exponential Failure when calculating halfWithdrawnInterest");
@@ -172,7 +172,7 @@ contract User is Exponential {
             interestToSendToSchool = floatingPoint.halfWithdrawnInterest.mantissa / expScale;
         } else {
             // Non-community member: the whole interest goes to school, and convert exp back into native units
-            interestToSendToSchool = floating.interestToWithdraw.mantissa / expScale;
+            interestToSendToSchool = floatingPoint.interestToWithdraw.mantissa / expScale;
         }
 
         // Now the user will get the amount to withdraw, minus the interest that went to the school
@@ -186,9 +186,13 @@ contract User is Exponential {
         require(underlying.transfer(msg.sender, amountForUser), "Error transferring funds to user");
 
         // Bookkeeping: Now we need to identify the amount withdrawn that came from the initial deposit (not from interest)
-        (mErr, totalInterestWithdrawn) = mulUInt(interestToSendToSchool, 2);
-        if (mErr != MathError.NO_ERROR) {
-            revert("Arithmetic Failure when calculating totalInterestWithdrawn");
+        if (community) {
+            (mErr, totalInterestWithdrawn) = mulUInt(interestToSendToSchool, 2);
+            if (mErr != MathError.NO_ERROR) {
+                revert("Arithmetic Failure when calculating totalInterestWithdrawn");
+            }
+        } else {
+            totalInterestWithdrawn = interestToSendToSchool;
         }
 
         (mErr, amountWithdrawnFromDeposit) = subUInt(amount, totalInterestWithdrawn);
