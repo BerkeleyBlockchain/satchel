@@ -113,7 +113,7 @@ describe("Unit tests", function () {
 
         const schoolAddress = await unicefSatchel.schoolArray(0);
 
-        await unicefSatchel.createUserContract(userName, schoolAddress, {
+        await unicefSatchel.createUserContract(userName, schoolAddress, true, {
           from: owner.address,
         });
 
@@ -136,7 +136,7 @@ describe("Unit tests", function () {
 
         const schoolAddress = await unicefSatchel.schoolArray(0);
 
-        await unicefSatchel.createUserContract(userName, schoolAddress, {
+        await unicefSatchel.createUserContract(userName, schoolAddress, true, {
           from: owner.address,
         });
 
