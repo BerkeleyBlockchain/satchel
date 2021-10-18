@@ -17,31 +17,14 @@ interface Erc20 {
     ) external returns (bool);
 }
 
-
-interface CErc20 is Erc20 {
-    function mint(uint256) external returns (uint256);
-
-    function balanceOfUnderlying(address) external view returns (uint256);
-
-    function redeemUnderlying(uint) external returns (uint);
-}
-
-contract testCDai is CErc20 {
+contract testDai is Erc20 {
     mapping(address => uint256) balances;
     mapping(address => mapping (address => uint256)) allowed;
-    address payable dai;
-
-    event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-    event Transfer(address indexed from, address indexed to, uint tokens);
-
-    // Number of cDai equal to 1 Dai (we leave it fixed)
-    uint256 exchangeRate = 5;
 
     using SafeMath for uint256;
-
-    constructor(address payable _dai) {
-        dai = _dai;
-    }
+    
+    event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
+    event Transfer(address indexed from, address indexed to, uint tokens);
 
     function balanceOf(address tokenOwner) public override view returns (uint256) {
         return balances[tokenOwner];
@@ -76,30 +59,7 @@ contract testCDai is CErc20 {
         return true;
     }
 
-    // Expect amt to be in base units (so typically 1e^18)
-    // Set balance of cDai
     function setBalance(address address_to_set, uint256 amt) external {
         balances[address_to_set] = amt;
-    }
-
-    // Will mint 5*underlying_amt of cDai
-    function mint(uint256 underlying_amt) external override returns (uint256) {
-        bool transferSuccess = Erc20(dai).transferFrom(msg.sender, address(this), underlying_amt);
-        require(transferSuccess, "Failure transferring Dai from sender to Dai contract.");
-        balances[msg.sender] = balances[msg.sender].add(underlying_amt.mul(exchangeRate));
-        return balances[msg.sender];
-    }
-
-    function balanceOfUnderlying(address user) external view override returns (uint256) {
-        return balances[user].div(exchangeRate);
-    }
-
-    // Amt is the amount in underlying (so Dai)
-    function redeemUnderlying(uint256 amt) external override returns (uint256) {
-        require(balances[msg.sender].div(exchangeRate) <= amt, "Trying to redeem more in underlying than owned");
-        balances[msg.sender] = balances[msg.sender].sub(amt.mul(exchangeRate));
-        bool transferSuccess = Erc20(dai).transfer(msg.sender, amt);
-        require(transferSuccess, "Failure transferring Dai From contract back to user.");
-        return amt;
     }
 }
