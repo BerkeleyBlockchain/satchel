@@ -12,6 +12,7 @@ import { User } from '../contract_types/User';
 import { getOverrideOptions } from "./utils";
 import chai, { expect } from "chai";
 import { solidity } from "ethereum-waffle";
+import { BigNumber } from "ethers";
 chai.use(solidity);
 const { deployContract } = hre.waffle;
 
@@ -181,7 +182,7 @@ describe("Unit tests", function () {
         let userInstance: User = <User> (await ethers.getContractAt("User", _userAddress));
 
         // let's give alice some Dai
-        // let aliceInitialDai = BigInt(5 * 100);
+        // let aliceInitialDai = BigInt(500 * multiplier);
         let aliceInitialDai = 500;
         await testDai.setBalance(alice.address, aliceInitialDai);
         await testDai.connect(alice).approve(userInstance.address, aliceInitialDai);
@@ -220,15 +221,20 @@ describe("Unit tests", function () {
         await testDai.setBalance(alice.address, aliceInitialDai);
         await testDai.connect(alice).approve(userInstance.address, aliceInitialDai);
         let aliceDaiBalance = await testDai.balanceOf(alice.address);
-        expect(aliceDaiBalance).to.be.eq(aliceInitialDai);
 
         // // Now let's deposit this 
-        userInstance.connect(alice).deposit(testDai.address, testCDai.address, aliceInitialDai);
-        let userContractDaiBalance = await testDai.balanceOf(userInstance.address);
-        expect(userContractDaiBalance).to.be.eq(0);
+        await userInstance.connect(alice).deposit(testDai.address, testCDai.address, aliceInitialDai);
+
+        // let's pretend time elapsed and the deposited cDai are now worth 20% more dai
+        await testDai.setBalance(testCDai.address, aliceInitialDai * 1.2);
+        await testCDai.setBalance(userInstance.address, aliceInitialDai * exchangeRate * 1.2);
+        let testCDaiContractDaiBalance = await testDai.balanceOf(testCDai.address);
+        // Should be 600 
+        expect(testCDaiContractDaiBalance).to.be.eq(aliceInitialDai * 1.2);
 
         let userContractCDaiBalance = await testCDai.balanceOf(userInstance.address);
-        expect(userContractCDaiBalance).to.be.eq(exchangeRate * aliceInitialDai);
+        // Should be 5 * 500 * 1.2 = 3000 
+        expect(userContractCDaiBalance).to.be.eq(aliceInitialDai * exchangeRate * 1.2);
 
       });
 
