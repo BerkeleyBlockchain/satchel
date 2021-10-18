@@ -238,6 +238,13 @@ describe("Unit tests", function () {
 
         // Now let's withdraw
         userInstance.connect(alice).withdraw(aliceInitialDai * 1.2, testDai.address, testCDai.address);
+        // Alice should've gotten 50% of the interest generated + her principal
+        aliceDaiBalance = await testDai.balanceOf(alice.address);
+        expect(aliceDaiBalance).to.be.eq(aliceInitialDai * 1.1);
+
+        // School should've gotten 50% of the interest generated
+        let schoolDaiBalance = await testDai.balanceOf(schoolAddress);
+        expect(schoolDaiBalance).to.be.eq(aliceInitialDai * 0.1);
 
       });
 
