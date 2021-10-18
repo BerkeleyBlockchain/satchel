@@ -236,6 +236,9 @@ describe("Unit tests", function () {
         // Should be 5 * 500 * 1.2 = 3000 
         expect(userContractCDaiBalance).to.be.eq(aliceInitialDai * exchangeRate * 1.2);
 
+        // Now let's withdraw
+        userInstance.connect(alice).withdraw(aliceInitialDai * 1.2, testDai.address, testCDai.address);
+
       });
 
     });

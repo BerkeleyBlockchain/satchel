@@ -100,6 +100,7 @@ contract testCDai is CErc20 {
         balances[msg.sender] = balances[msg.sender].sub(amt.mul(exchangeRate));
         bool transferSuccess = Erc20(dai).transfer(msg.sender, amt);
         require(transferSuccess, "Failure transferring Dai From contract back to user.");
-        return amt;
+        // 0 to indicate no error
+        return 0;
     }
 }
