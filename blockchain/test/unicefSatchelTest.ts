@@ -180,10 +180,8 @@ describe("Unit tests", function () {
         // let's give alice some Dai
         // let aliceInitialDai = BigInt(5 * 100);
         let aliceInitialDai = 500;
-        testDai.setBalance(alice.address, aliceInitialDai);
-        testDai.connect(alice).approve(userInstance.address, aliceInitialDai);
-        let aliceBalance = await testDai.balanceOf(alice.address);
-        console.log(`Alice has ${aliceBalance}`);
+        await testDai.setBalance(alice.address, aliceInitialDai);
+        await testDai.connect(alice).approve(userInstance.address, aliceInitialDai);
 
         // // Now let's deposit this 
         userInstance.connect(alice).deposit(testDai.address, testCDai.address, aliceInitialDai);

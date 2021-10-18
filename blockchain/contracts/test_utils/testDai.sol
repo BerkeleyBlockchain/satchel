@@ -2,6 +2,8 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+// For debugging only
+import "hardhat/console.sol";
 
 interface Erc20 {
     function approve(address, uint256) external returns (bool);
