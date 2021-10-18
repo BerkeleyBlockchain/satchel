@@ -10,8 +10,6 @@ interface Erc20 {
 
     function balanceOf(address) external view returns (uint256 balance);
 
-    function decimals() external view returns (uint8);
-
     function transferFrom(
         address,
         address,
@@ -24,12 +22,6 @@ interface CErc20 is Erc20 {
     function mint(uint256) external returns (uint256);
 
     function balanceOfUnderlying(address) external returns (uint256);
-
-    function exchangeRateCurrent() external returns (uint256);
-
-    function supplyRatePerBlock() external returns (uint256);
-
-    function redeem(uint) external returns (uint);
 
     function redeemUnderlying(uint) external returns (uint);
 }
@@ -99,12 +91,12 @@ contract User is Exponential {
         // Mint cTokens
         uint mintResult = cToken.mint(_numTokensToSupply);
 
+        require(mintResult == 0, "Failure when attempting to mint cTokens");
+
         // If mint is successful, then update the underlyingAmountDeposited for this token
-        if (mintResult == 0) {
-            (MathError err0, uint result) = addUInt(underlyingAmountDeposited[address(underlying)], _numTokensToSupply);
-            require(err0 == MathError.NO_ERROR, "error updating initial balance of user");
-            underlyingAmountDeposited[address(underlying)] = result;
-        }
+        (MathError err0, uint result) = addUInt(underlyingAmountDeposited[address(underlying)], _numTokensToSupply);
+        require(err0 == MathError.NO_ERROR, "error updating initial balance of user");
+        underlyingAmountDeposited[address(underlying)] = result;
 
         return mintResult;
     }

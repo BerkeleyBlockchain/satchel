@@ -6,20 +6,27 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-wit
 import { Signers } from "./types";
 import { School } from "../contract_types/School";
 import { UnicefSatchel } from '../contract_types/UnicefSatchel';
+import { TestDai } from '../contract_types/TestDai';
+import { TestCDai } from '../contract_types/TestCDai';
 import { User } from '../contract_types/User';
 import { getOverrideOptions } from "./utils";
 import chai, { expect } from "chai";
 import { solidity } from "ethereum-waffle";
+import { BigNumber } from "ethers";
 chai.use(solidity);
 const { deployContract } = hre.waffle;
 
 describe("Unit tests", function () {
     let unicefSatchel: UnicefSatchel;
+    let testDai: TestDai;
+    let testCDai: TestCDai;
     let admin: SignerWithAddress;
     let owner: SignerWithAddress;
     let deployer: SignerWithAddress;
     let alice: SignerWithAddress;
     let bob: SignerWithAddress;
+    let multiplier: number;
+    let exchangeRate: number;
     const schoolName = "School Name";
     const schoolName2 = "Second School Name";
     const erc20Address = "0x5d3a536e4d6dbd6114cc1ead35777bab948e3643";
@@ -38,14 +45,23 @@ describe("Unit tests", function () {
       unicefSatchel = <UnicefSatchel><any>(
         await deployContract(owner, UnicefSatchelArtifact, [], {gasPrice: 1_000_000_00})
       );
-  
-      // // Fund UnicefSatchel with 10 ETH
-      // await this.signers.admin.sendTransaction({
-      //     // @ts-ignore
-      //     to: this.unicefSatchel.address,
-      //     value: hre.ethers.utils.parseEther("10"),
-      //     ...getOverrideOptions()
-      // });
+
+      // deploy testDai contract
+      const TestDaiArtifact: Artifact = await hre.artifacts.readArtifact("testDai");
+      testDai = <TestDai><any> (
+        await deployContract(owner, TestDaiArtifact, [], {gasPrice: 1_000_000_00})
+      );
+
+      // deploy testCDai
+      const TestCDaiArtifact: Artifact = await hre.artifacts.readArtifact("testCDai");
+      testCDai = <TestCDai><any> (
+        await deployContract(owner, TestCDaiArtifact, [testDai.address], {gasPrice: 1_000_000_00})
+      );
+
+      multiplier = 10**18;
+      // 5 cDai = 1 DAI
+      exchangeRate = 5;
+
     });
 
     describe("Schools", () => {
@@ -145,7 +161,92 @@ describe("Unit tests", function () {
         });
         let userInstance = await ethers.getContractAt("User", userAddress);
         let balance = await userInstance.getBalance(erc20Address);
-        console.log(balance);
       });
+    });
+
+    describe("Interest functionality", () => {
+      it("User should be able to deposit into the User Contract and User Contract should get cDai", async () => {
+        await unicefSatchel.newSchool(schoolName, {
+          from: owner.address,
+        });
+
+        const schoolAddress = await unicefSatchel.schoolArray(0);
+
+        await unicefSatchel.connect(alice).createUserContract(userName, schoolAddress, true, {
+          from: alice.address,
+        });
+
+        const _userAddress = await unicefSatchel.connect(alice).getUserContract({
+          from: alice.address,
+        });
+        let userInstance: User = <User> (await ethers.getContractAt("User", _userAddress));
+
+        // let's give alice some Dai
+        // let aliceInitialDai = BigInt(500 * multiplier);
+        let aliceInitialDai = 500;
+        await testDai.setBalance(alice.address, aliceInitialDai);
+        await testDai.connect(alice).approve(userInstance.address, aliceInitialDai);
+        let aliceDaiBalance = await testDai.balanceOf(alice.address);
+        expect(aliceDaiBalance).to.be.eq(aliceInitialDai);
+
+        // // Now let's deposit this 
+        userInstance.connect(alice).deposit(testDai.address, testCDai.address, aliceInitialDai);
+        let userContractDaiBalance = await testDai.balanceOf(userInstance.address);
+        expect(userContractDaiBalance).to.be.eq(0);
+
+        let userContractCDaiBalance = await testCDai.balanceOf(userInstance.address);
+        expect(userContractCDaiBalance).to.be.eq(exchangeRate * aliceInitialDai);
+
+      });
+
+      it("User should be able to withdraw and interest should get split 50-50 with School", async () => {
+        await unicefSatchel.newSchool(schoolName, {
+          from: owner.address,
+        });
+
+        const schoolAddress = await unicefSatchel.schoolArray(0);
+
+        await unicefSatchel.connect(alice).createUserContract(userName, schoolAddress, true, {
+          from: alice.address,
+        });
+
+        const _userAddress = await unicefSatchel.connect(alice).getUserContract({
+          from: alice.address,
+        });
+        let userInstance: User = <User> (await ethers.getContractAt("User", _userAddress));
+
+        // let's give alice some Dai
+        // let aliceInitialDai = BigInt(5 * 100);
+        let aliceInitialDai = 500;
+        await testDai.setBalance(alice.address, aliceInitialDai);
+        await testDai.connect(alice).approve(userInstance.address, aliceInitialDai);
+        let aliceDaiBalance = await testDai.balanceOf(alice.address);
+
+        // // Now let's deposit this 
+        await userInstance.connect(alice).deposit(testDai.address, testCDai.address, aliceInitialDai);
+
+        // let's pretend time elapsed and the deposited cDai are now worth 20% more dai
+        await testDai.setBalance(testCDai.address, aliceInitialDai * 1.2);
+        await testCDai.setBalance(userInstance.address, aliceInitialDai * exchangeRate * 1.2);
+        let testCDaiContractDaiBalance = await testDai.balanceOf(testCDai.address);
+        // Should be 600 
+        expect(testCDaiContractDaiBalance).to.be.eq(aliceInitialDai * 1.2);
+
+        let userContractCDaiBalance = await testCDai.balanceOf(userInstance.address);
+        // Should be 5 * 500 * 1.2 = 3000 
+        expect(userContractCDaiBalance).to.be.eq(aliceInitialDai * exchangeRate * 1.2);
+
+        // Now let's withdraw
+        userInstance.connect(alice).withdraw(aliceInitialDai * 1.2, testDai.address, testCDai.address);
+        // Alice should've gotten 50% of the interest generated + her principal
+        aliceDaiBalance = await testDai.balanceOf(alice.address);
+        expect(aliceDaiBalance).to.be.eq(aliceInitialDai * 1.1);
+
+        // School should've gotten 50% of the interest generated
+        let schoolDaiBalance = await testDai.balanceOf(schoolAddress);
+        expect(schoolDaiBalance).to.be.eq(aliceInitialDai * 0.1);
+
+      });
+
     });
 });
