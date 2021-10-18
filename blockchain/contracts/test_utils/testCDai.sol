@@ -87,7 +87,7 @@ contract testCDai is CErc20 {
         bool transferSuccess = Erc20(dai).transferFrom(msg.sender, address(this), underlying_amt);
         require(transferSuccess, "Failure transferring Dai from sender to Dai contract.");
         balances[msg.sender] = balances[msg.sender].add(underlying_amt.mul(exchangeRate));
-        return balances[msg.sender];
+        return 0;
     }
 
     function balanceOfUnderlying(address user) external view override returns (uint256) {

@@ -91,12 +91,12 @@ contract User is Exponential {
         // Mint cTokens
         uint mintResult = cToken.mint(_numTokensToSupply);
 
+        require(mintResult == 0, "Failure when attempting to mint cTokens");
+
         // If mint is successful, then update the underlyingAmountDeposited for this token
-        if (mintResult == 0) {
-            (MathError err0, uint result) = addUInt(underlyingAmountDeposited[address(underlying)], _numTokensToSupply);
-            require(err0 == MathError.NO_ERROR, "error updating initial balance of user");
-            underlyingAmountDeposited[address(underlying)] = result;
-        }
+        (MathError err0, uint result) = addUInt(underlyingAmountDeposited[address(underlying)], _numTokensToSupply);
+        require(err0 == MathError.NO_ERROR, "error updating initial balance of user");
+        underlyingAmountDeposited[address(underlying)] = result;
 
         return mintResult;
     }
