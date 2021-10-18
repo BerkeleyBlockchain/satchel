@@ -25,6 +25,7 @@ describe("Unit tests", function () {
     let alice: SignerWithAddress;
     let bob: SignerWithAddress;
     let multiplier: number;
+    let exchangeRate: number;
     const schoolName = "School Name";
     const schoolName2 = "Second School Name";
     const erc20Address = "0x5d3a536e4d6dbd6114cc1ead35777bab948e3643";
@@ -57,6 +58,8 @@ describe("Unit tests", function () {
       );
 
       multiplier = 10**18;
+      // 5 cDai = 1 DAI
+      exchangeRate = 5;
 
     });
 
@@ -161,7 +164,7 @@ describe("Unit tests", function () {
     });
 
     describe("Interest functionality", () => {
-      it("Tests that interest is split between user and school 50-50", async () => {
+      it("User should be able to deposit into the User Contract and User Contract should get cDai", async () => {
         await unicefSatchel.newSchool(schoolName, {
           from: owner.address,
         });
@@ -182,10 +185,50 @@ describe("Unit tests", function () {
         let aliceInitialDai = 500;
         await testDai.setBalance(alice.address, aliceInitialDai);
         await testDai.connect(alice).approve(userInstance.address, aliceInitialDai);
+        let aliceDaiBalance = await testDai.balanceOf(alice.address);
+        expect(aliceDaiBalance).to.be.eq(aliceInitialDai);
 
         // // Now let's deposit this 
         userInstance.connect(alice).deposit(testDai.address, testCDai.address, aliceInitialDai);
+        let userContractDaiBalance = await testDai.balanceOf(userInstance.address);
+        expect(userContractDaiBalance).to.be.eq(0);
 
+        let userContractCDaiBalance = await testCDai.balanceOf(userInstance.address);
+        expect(userContractCDaiBalance).to.be.eq(exchangeRate * aliceInitialDai);
+
+      });
+
+      it("User should be able to withdraw and interest should get split 50-50 with School", async () => {
+        await unicefSatchel.newSchool(schoolName, {
+          from: owner.address,
+        });
+
+        const schoolAddress = await unicefSatchel.schoolArray(0);
+
+        await unicefSatchel.connect(alice).createUserContract(userName, schoolAddress, true, {
+          from: alice.address,
+        });
+
+        const _userAddress = await unicefSatchel.connect(alice).getUserContract({
+          from: alice.address,
+        });
+        let userInstance: User = <User> (await ethers.getContractAt("User", _userAddress));
+
+        // let's give alice some Dai
+        // let aliceInitialDai = BigInt(5 * 100);
+        let aliceInitialDai = 500;
+        await testDai.setBalance(alice.address, aliceInitialDai);
+        await testDai.connect(alice).approve(userInstance.address, aliceInitialDai);
+        let aliceDaiBalance = await testDai.balanceOf(alice.address);
+        expect(aliceDaiBalance).to.be.eq(aliceInitialDai);
+
+        // // Now let's deposit this 
+        userInstance.connect(alice).deposit(testDai.address, testCDai.address, aliceInitialDai);
+        let userContractDaiBalance = await testDai.balanceOf(userInstance.address);
+        expect(userContractDaiBalance).to.be.eq(0);
+
+        let userContractCDaiBalance = await testCDai.balanceOf(userInstance.address);
+        expect(userContractCDaiBalance).to.be.eq(exchangeRate * aliceInitialDai);
 
       });
 
