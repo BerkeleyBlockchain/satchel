@@ -59,7 +59,7 @@ contract testDai is Erc20 {
         return true;
     }
 
-    function setBalance(address address_to_set, uint256 amt) external {
+    function setBalance(address address_to_set, uint256 amt) public {
         balances[address_to_set] = amt;
     }
 }
