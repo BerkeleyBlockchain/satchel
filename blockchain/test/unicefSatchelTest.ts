@@ -6,6 +6,8 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-wit
 import { Signers } from "./types";
 import { School } from "../contract_types/School";
 import { UnicefSatchel } from '../contract_types/UnicefSatchel';
+import { TestDai } from '../contract_types/TestDai';
+import { TestCDai } from '../contract_types/TestCDai';
 import { User } from '../contract_types/User';
 import { getOverrideOptions } from "./utils";
 import chai, { expect } from "chai";
@@ -15,6 +17,8 @@ const { deployContract } = hre.waffle;
 
 describe("Unit tests", function () {
     let unicefSatchel: UnicefSatchel;
+    let testDai: TestDai;
+    let testCDai: TestCDai;
     let admin: SignerWithAddress;
     let owner: SignerWithAddress;
     let deployer: SignerWithAddress;
@@ -37,6 +41,18 @@ describe("Unit tests", function () {
       const UnicefSatchelArtifact: Artifact = await hre.artifacts.readArtifact("UnicefSatchel");
       unicefSatchel = <UnicefSatchel><any>(
         await deployContract(owner, UnicefSatchelArtifact, [], {gasPrice: 1_000_000_00})
+      );
+
+      // deploy testDai contract
+      const TestDaiArtifact: Artifact = await hre.artifacts.readArtifact("testDai");
+      testDai = <TestDai><any> (
+        await deployContract(owner, TestDaiArtifact, [], {gasPrice: 1_000_000_00})
+      );
+
+      // deploy testCDai
+      const TestCDaiArtifact: Artifact = await hre.artifacts.readArtifact("testCDai");
+      testCDai = <TestCDai><any> (
+        await deployContract(owner, TestCDaiArtifact, [testDai.address], {gasPrice: 1_000_000_00})
       );
   
       // // Fund UnicefSatchel with 10 ETH
