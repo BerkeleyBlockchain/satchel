@@ -175,11 +175,17 @@ describe("Unit tests", function () {
         const _userAddress = await unicefSatchel.connect(alice).getUserContract({
           from: alice.address,
         });
-        let userInstance = await ethers.getContractAt("User", _userAddress);
+        let userInstance: User = <User> (await ethers.getContractAt("User", _userAddress));
 
         // let's give alice some Dai
-        // testDai.setBalance(alice.address, 5 * multiplier);
-        // testDai.connect(alice).approve(userInstance.address, 5 * multiplier);
+        // let aliceInitialDai = BigInt(5 * 100);
+        let aliceInitialDai = 500;
+        testDai.setBalance(alice.address, aliceInitialDai);
+        testDai.connect(alice).approve(userInstance.address, aliceInitialDai);
+
+        // // Now let's deposit this 
+        userInstance.connect(alice).deposit(testDai.address, testCDai.address, aliceInitialDai);
+
 
       });
 

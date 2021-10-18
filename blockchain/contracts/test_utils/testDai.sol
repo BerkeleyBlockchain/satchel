@@ -49,8 +49,8 @@ contract testDai is Erc20 {
     }
 
     function transferFrom(address owner, address buyer, uint256 numTokens) public override returns (bool) {
-        require(numTokens <= balances[owner]);
-        require(numTokens <= allowed[owner][msg.sender]);
+        require(numTokens <= balances[owner], "transferFrom Failure: owner does not have enough tokens");
+        require(numTokens <= allowed[owner][msg.sender], "transferFrom Failure: buyer does not have enough allowed");
 
         balances[owner] = balances[owner].sub(numTokens);
         allowed[owner][msg.sender] = allowed[owner][msg.sender].sub(numTokens);
