@@ -24,6 +24,7 @@ describe("Unit tests", function () {
     let deployer: SignerWithAddress;
     let alice: SignerWithAddress;
     let bob: SignerWithAddress;
+    let multiplier: number;
     const schoolName = "School Name";
     const schoolName2 = "Second School Name";
     const erc20Address = "0x5d3a536e4d6dbd6114cc1ead35777bab948e3643";
@@ -54,14 +55,9 @@ describe("Unit tests", function () {
       testCDai = <TestCDai><any> (
         await deployContract(owner, TestCDaiArtifact, [testDai.address], {gasPrice: 1_000_000_00})
       );
-  
-      // // Fund UnicefSatchel with 10 ETH
-      // await this.signers.admin.sendTransaction({
-      //     // @ts-ignore
-      //     to: this.unicefSatchel.address,
-      //     value: hre.ethers.utils.parseEther("10"),
-      //     ...getOverrideOptions()
-      // });
+
+      multiplier = 10**18;
+
     });
 
     describe("Schools", () => {
@@ -161,7 +157,31 @@ describe("Unit tests", function () {
         });
         let userInstance = await ethers.getContractAt("User", userAddress);
         let balance = await userInstance.getBalance(erc20Address);
-        console.log(balance);
       });
+    });
+
+    describe("Interest functionality", () => {
+      it("Tests that interest is split between user and school 50-50", async () => {
+        await unicefSatchel.newSchool(schoolName, {
+          from: owner.address,
+        });
+
+        const schoolAddress = await unicefSatchel.schoolArray(0);
+
+        await unicefSatchel.connect(alice).createUserContract(userName, schoolAddress, true, {
+          from: alice.address,
+        });
+
+        const _userAddress = await unicefSatchel.connect(alice).getUserContract({
+          from: alice.address,
+        });
+        let userInstance = await ethers.getContractAt("User", _userAddress);
+
+        // let's give alice some Dai
+        // testDai.setBalance(alice.address, 5 * multiplier);
+        // testDai.connect(alice).approve(userInstance.address, 5 * multiplier);
+
+      });
+
     });
 });
