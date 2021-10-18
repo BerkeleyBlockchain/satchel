@@ -99,8 +99,10 @@ GOERLI_PRIVATE_KEY=
 
 ### 6. Deploy the smart contracts
 
+
 ```
-truffle deploy --network goerli
+cd blockchain
+yarn deploy
 ```
 
 ### 7. Fill out the server side .env
