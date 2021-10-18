@@ -5,10 +5,10 @@ async function main() {
   
     console.log("Account balance:", (await deployer.getBalance()).toString());
   
-    const UserFactory = await ethers.getContractFactory("UserFactory");
-    const userFactory = await UserFactory.deploy();
+    const UnicefSatchel = await ethers.getContractFactory("UnicefSatchel");
+    const unicefSatchel = await UnicefSatchel.deploy();
   
-    console.log("userFactory address:", userFactory.address);
+    console.log("unicefSatchel address:", unicefSatchel.address);
   }
   
   main()
