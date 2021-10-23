@@ -115,7 +115,7 @@ class Dashboard extends Component {
       this.props.getName(this.props.contractAddress);
       this.props.getBalance(this.props.contractAddress);
       this.props.getInterestRate(this.props.contractAddress);
-      this.props.getContribution(this.props.contractAddress);
+      // this.props.getContribution(this.props.contractAddress);
       this.props.getSchoolByUser(this.props.contractAddress);
     }
   }

@@ -1,10 +1,11 @@
 import Web3 from "web3";
 
 import * as types from "../types";
-import contractAbi from "../../abi/UnicefSatchel.json";
-import { erc20Abi, cTokenAbi } from "../../abi/abis";
-import userAbi from "../../abi/User.json";
-import schoolAbi from "../../abi/School.json";
+import contractAbi from "../../contracts/UnicefSatchel.sol/UnicefSatchel.json";
+import erc20Abi from "../../contracts/User.sol/Erc20.json";
+import cTokenAbi from "../../contracts/User.sol/CErc20.json";
+import userAbi from "../../contracts/User.sol/User.json";
+import schoolAbi from "../../contracts/School.sol/School.json";
 import axios from "axios";
 import assets from "../../assets.json";
 
@@ -80,7 +81,7 @@ export const handleUserSignup = (school, name, history) => async (dispatch) => {
 
     if (userContractAddress == "0x0000000000000000000000000000000000000000") {
       await contractInstance.methods
-        .createUserContract(name, school.address)
+        .createUserContract(name, school.address, true)
         .send({ from: accounts[0] });
 
       userContractAddress = await contractInstance.methods
@@ -109,14 +110,14 @@ export const handleUserSignup = (school, name, history) => async (dispatch) => {
 
 export const getName = (contractAddress) => async (dispatch) => {
   let userContract = new web3.eth.Contract(userAbi.abi, contractAddress);
-  let name = await userContract.methods.getName().call();
+  let name = await userContract.methods.name().call();
   console.log("Name is ", name);
   dispatch({ type: types.GET_NAME, payload: name });
 };
 
 export const getBalance = (contractAddress) => async (dispatch) => {
   const cTokenAddress = process.env.REACT_APP_CTOKEN_ADDRESS;
-  const cToken = new web3.eth.Contract(cTokenAbi, cTokenAddress);
+  const cToken = new web3.eth.Contract(cTokenAbi.abi, cTokenAddress);
   const userContract = new web3.eth.Contract(userAbi.abi, contractAddress);
 
   let cTokenBalance = await cToken.methods.balanceOf(contractAddress).call();
@@ -159,10 +160,13 @@ export const getInterestRate = (contractAddress) => async (dispatch) => {
 // I think this needs to be initialized for each asset we want to do...
 const underlyingDecimals = 18;
 const underlyingMainnetAddress = process.env.REACT_APP_TOKEN_ADDRESS;
-const underlying = new web3.eth.Contract(erc20Abi, underlyingMainnetAddress);
+const underlying = new web3.eth.Contract(
+  erc20Abi.abi,
+  underlyingMainnetAddress
+);
 
 const cTokenAddress = process.env.REACT_APP_CTOKEN_ADDRESS;
-const cToken = new web3.eth.Contract(cTokenAbi, cTokenAddress);
+const cToken = new web3.eth.Contract(cTokenAbi.abi, cTokenAddress);
 
 export const deposit = (contractAddress, amount) => async (dispatch) => {
   console.log(process.env.REACT_APP_CTOKEN_ADDRESS);

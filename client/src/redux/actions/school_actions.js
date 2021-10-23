@@ -1,10 +1,11 @@
 import Web3 from "web3";
 
 import * as types from "../types";
-import contractAbi from "../../abi/UnicefSatchel.json";
-import { erc20Abi, cTokenAbi, schoolJSON } from "../../abi/abis";
-import userAbi from "../../abi/User.json";
-import schoolAbi from "../../abi/School.json";
+import contractAbi from "../../contracts/UnicefSatchel.sol/UnicefSatchel.json";
+import erc20Abi from "../../contracts/User.sol/Erc20.json";
+import cTokenAbi from "../../contracts/User.sol/CErc20.json";
+import userAbi from "../../contracts/User.sol/User.json";
+import schoolAbi from "../../contracts/School.sol/School.json";
 import axios from "axios";
 
 const web3 = new Web3(Web3.givenProvider);
@@ -119,14 +120,16 @@ export const deploySchool = (schoolName, history) => async (dispatch) => {
     const accounts = await web3.eth.getAccounts();
     const gasPrice = await web3.eth.getGasPrice();
     const gasEstimate = await contractInstance.methods
-      .newSchool(this.state.Name)
+      .newSchool(schoolName)
       .estimateGas({ from: accounts[0] });
 
     const { events } = await contractInstance.methods
-      .newSchool(this.state.Name)
+      .newSchool(schoolName)
       .send({ from: accounts[0], gasPrice: gasPrice, gas: gasEstimate });
+    console.log(events);
     const id = events.newSchoolEvent.returnValues.schoolId;
-    console.log(this.state.Name + " created");
+
+    console.log(schoolName + " created");
     console.log(id);
     const schoolAddress = await contractInstance.methods.schoolArray(id).call();
     console.log(schoolAddress); // Gives address of school contract
@@ -167,16 +170,19 @@ export const handleSchoolLogout = (history) => {
 // All this needs to be changed
 // Mainnet address of the underlying token contract. Example: Dai.
 const underlyingMainnetAddress = process.env.REACT_APP_TOKEN_ADDRESS;
-const underlying = new web3.eth.Contract(erc20Abi, underlyingMainnetAddress);
+const underlying = new web3.eth.Contract(
+  erc20Abi.abi,
+  underlyingMainnetAddress
+);
 
 // Mainnet contract address and ABI for the cToken, which can be found in the
 // mainnet tab on this page: https://compound.finance/docs
 const cTokenAddress = process.env.REACT_APP_CTOKEN_ADDRESS;
-const cToken = new web3.eth.Contract(cTokenAbi, cTokenAddress);
+const cToken = new web3.eth.Contract(cTokenAbi.abi, cTokenAddress);
 
 export const getSchoolBalance = (schoolAddress) => async (dispatch) => {
   try {
-    const schoolInstance = new web3.eth.Contract(schoolJSON.abi, schoolAddress);
+    const schoolInstance = new web3.eth.Contract(schoolAbi.abi, schoolAddress);
 
     let schoolBalance = await schoolInstance.methods
       .getBalance(underlyingMainnetAddress)
@@ -198,7 +204,7 @@ export const withdrawSchool = (schoolAddress, withdraw) => async (dispatch) => {
   dispatch({ type: types.LOAD_SCHOOL_WITHDRAW });
   try {
     const accounts = await web3.eth.getAccounts();
-    const schoolInstance = new web3.eth.Contract(schoolJSON.abi, schoolAddress);
+    const schoolInstance = new web3.eth.Contract(schoolAbi.abi, schoolAddress);
 
     let schoolBalance = await schoolInstance.methods
       .getBalance(underlyingMainnetAddress)

@@ -23,12 +23,14 @@ if (!mnemonic) {
   throw new Error("Please set your MNEMONIC in a .env file");
 }
 // Ensure that we have archive mainnet node URL set as an environment variable
-const archiveMainnetNodeURL: string | undefined = process.env.ARCHIVE_MAINNET_NODE_URL;
+const archiveMainnetNodeURL: string | undefined =
+  process.env.ARCHIVE_MAINNET_NODE_URL;
 if (!archiveMainnetNodeURL) {
   throw new Error("Please set your ARCHIVE_MAINNET_NODE_URL in a .env file");
 }
 
-const goerliMainnetNodeURL: string | undefined = process.env.ARCHIVE_GOERLI_NODE_URL;
+const goerliMainnetNodeURL: string | undefined =
+  process.env.ARCHIVE_GOERLI_NODE_URL;
 if (!goerliMainnetNodeURL) {
   throw new Error("Please set your ARCHIVE_GOERLI_NODE_URL in a .env file");
 }
@@ -60,8 +62,8 @@ const config: HardhatUserConfig = {
     },
     goerli: {
       url: goerliMainnetNodeURL,
-      accounts: [`0x${GOERLI_PRIVATE_KEY}`]
-    }
+      accounts: [`0x${GOERLI_PRIVATE_KEY}`],
+    },
   },
   paths: {
     artifacts: "./artifacts",
@@ -71,7 +73,8 @@ const config: HardhatUserConfig = {
   },
   solidity: {
     compilers: [
-      { version: "0.6.12",
+      {
+        version: "0.6.12",
         settings: {
           metadata: {
             // Not including the metadata hash
@@ -85,12 +88,12 @@ const config: HardhatUserConfig = {
             runs: 800,
           },
         },
-      }, 
+      },
       {
-        version: "0.8.0", 
-        settings: {}
-      }
-    ]
+        version: "0.8.0",
+        settings: {},
+      },
+    ],
   },
   typechain: {
     outDir: "./contract_types",

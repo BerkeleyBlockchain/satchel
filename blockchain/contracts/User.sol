@@ -37,8 +37,8 @@ contract User is Exponential {
     bool public community;
     // Keep track of how much the user deposited in underlying token
     // underlyingToken => amount deposited
-    mapping(address => uint256) underlyingAmountDeposited;
-    mapping(address => uint256) schoolContributions;
+    mapping(address => uint256) public underlyingAmountDeposited;
+    mapping(address => uint256) public schoolContributions;
 
     modifier onlyOwner {
         require(msg.sender == owner);
