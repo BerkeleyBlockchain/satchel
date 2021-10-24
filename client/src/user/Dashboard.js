@@ -9,6 +9,10 @@ import {
   Label,
   Input,
   Button,
+  Dropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem
 } from "reactstrap";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
@@ -106,6 +110,8 @@ class Dashboard extends Component {
     projects: [],
     withdrawLoading: false,
     depositLoading: false,
+    dropdownOpen: false,
+    dropDownValue: "Select Asset"
   };
 
   async componentDidMount() {
@@ -137,6 +143,12 @@ class Dashboard extends Component {
     if (this.state.activeTab !== tab) {
       this.setState({ activeTab: tab });
     }
+  };
+
+  toggleAsset = () => {
+    this.setState({
+      dropdownOpen: !this.state.dropdownOpen
+    });
   };
 
   render() {
@@ -210,6 +222,16 @@ class Dashboard extends Component {
                               fontSize: "12px",
                             }}
                           />
+                          <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggleAsset}>
+                            <DropdownToggle className="my-dropdown" my-dropdowncaret>
+                              {this.state.dropDownValue}
+                            </DropdownToggle>
+                            <DropdownMenu>
+                              <DropdownItem>DAI</DropdownItem>
+                              <DropdownItem>Asset 2</DropdownItem>
+                              <DropdownItem>Asset 3</DropdownItem>
+                            </DropdownMenu>
+                          </Dropdown>
                         </FormGroup>
                       </Row>
                       <Row>
