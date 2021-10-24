@@ -216,14 +216,14 @@ export const getInterestRate = (contractAddress) => async (dispatch) => {
 
 // think this needs to be initialized for each asset we want to do...
 const underlyingDecimals = 18;
-const underlyingMainnetAddress = process.env.REACT_APP_TOKEN_ADDRESS;
-const underlying = new web3.eth.Contract(
-  erc20Abi.abi,
-  underlyingMainnetAddress
-);
+// const underlyingMainnetAddress = process.env.REACT_APP_TOKEN_ADDRESS;
+// const underlying = new web3.eth.Contract(
+//   erc20Abi.abi,
+//   underlyingMainnetAddress
+// );
 
-const cTokenAddress = process.env.REACT_APP_CTOKEN_ADDRESS;
-const cToken = new web3.eth.Contract(cTokenAbi.abi, cTokenAddress);
+// const cTokenAddress = process.env.REACT_APP_CTOKEN_ADDRESS;
+// const cToken = new web3.eth.Contract(cTokenAbi.abi, cTokenAddress);
 
 export const deposit = (contractAddress, amount, asset) => async (dispatch) => {
   console.log("handleGet\n\n\n");
@@ -261,7 +261,7 @@ export const deposit = (contractAddress, amount, asset) => async (dispatch) => {
 };
 
 export const withdraw =
-  (contractAddress, withdrawAmount) => async (dispatch) => {
+  (contractAddress, withdrawAmount, asset) => async (dispatch) => {
     try {
       dispatch({ type: types.LOAD_WITHDRAW });
       const amount = web3.utils.toHex(
@@ -272,8 +272,11 @@ export const withdraw =
       const userContract = new web3.eth.Contract(userAbi.abi, contractAddress);
 
       console.log(`Redeeming ...`);
+      console.log(asset.tokenAddress);
+      console.log(asset.cTokenAddress);
+
       let redeemResult = await userContract.methods
-        .withdraw(amount, underlyingMainnetAddress, cTokenAddress)
+        .withdraw(amount, asset.tokenAddress, asset.cTokenAddress)
         .send({
           from: accounts[0],
           gasLimit: web3.utils.toHex(1000000),

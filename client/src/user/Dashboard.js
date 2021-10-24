@@ -319,7 +319,8 @@ class Dashboard extends Component {
                             e.preventDefault();
                             this.props.withdraw(
                               this.props.contractAddress,
-                              this.state.Withdraw
+                              this.state.Withdraw,
+                              this.state.activeAsset
                             );
                           }}
                           type="submit"
