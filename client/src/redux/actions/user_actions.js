@@ -116,17 +116,47 @@ export const getName = (contractAddress) => async (dispatch) => {
 };
 
 export const getBalance = (contractAddress) => async (dispatch) => {
-  const cTokenAddress = process.env.REACT_APP_CTOKEN_ADDRESS;
-  const cToken = new web3.eth.Contract(cTokenAbi.abi, cTokenAddress);
-  const userContract = new web3.eth.Contract(userAbi.abi, contractAddress);
+  let userContract = new web3.eth.Contract(userAbi.abi, contractAddress);
+  try {
+    const promises = assets.map(async (asset) => {
+      console.log(asset);
+      return userContract.methods
+        .underlyingAmountDeposited(asset.tokenAddress)
+        .call();
+    });
+    console.log(promises);
 
-  let cTokenBalance = await cToken.methods.balanceOf(contractAddress).call();
-  cTokenBalance = cTokenBalance / 1e8;
-  console.log(`MyContract's Token Balance:`, cTokenBalance);
-  let balance =
-    (await userContract.methods.getBalance(cTokenAddress).call()) / 1e18 / 1e18;
-  console.log(balance);
-  dispatch({ payload: Number(balance.toFixed(2)), type: types.GET_BALANCE });
+    let data = await Promise.all(promises);
+    console.log(data);
+    const balance = {};
+
+    for (let i = 0; i < assets.length; i++) {
+      balance[assets[i].symbol] = Number((data[i] / 1e18).toFixed(2));
+    }
+
+    console.log("balancess");
+    console.log(balance);
+    dispatch({ type: types.GET_BALANCE, payload: balance });
+
+    const prices = await axios.get(
+      "http://localhost:4000/api/user/getTokenPrices",
+      { params: { tokens: assets.map((asset) => asset.symbol).join() } }
+    );
+
+    console.log("price");
+    console.log(prices.data.data);
+
+    let tb = 0;
+    assets.forEach((asset) => {
+      let { symbol } = asset;
+      tb += prices.data.data[symbol].quote.USD.price * balance[symbol];
+    });
+
+    dispatch({ type: types.GET_TOTAL_BALANCE, payload: Number(tb.toFixed(2)) });
+  } catch (e) {
+    console.log(e);
+    console.log(e.message);
+  }
 };
 
 export const getContribution = (contractAddress) => async (dispatch) => {
@@ -177,23 +207,24 @@ export const deposit = (contractAddress, amount) => async (dispatch) => {
     const accounts = await web3.eth.getAccounts();
     const userContract = new web3.eth.Contract(userAbi.abi, contractAddress);
 
-    let transferResult = await underlying.methods
-      .transfer(
-        contractAddress,
-        web3.utils.toHex(amount * Math.pow(10, underlyingDecimals)) // 10 tokens to send to MyContract
-      )
-      .send({
-        from: accounts[0],
-        gasLimit: web3.utils.toHex(1000000),
-        gasPrice: web3.utils.toHex(20000000000),
-      });
-    console.log("transfer result");
-    let supplyResult = await userContract.methods
-      .deposit(
-        underlyingMainnetAddress,
-        cTokenAddress,
-        web3.utils.toHex(amount * Math.pow(10, underlyingDecimals)) // 10 tokens to supply
-      )
+    const underlyingMainnetAddress = process.env.REACT_APP_TOKEN_ADDRESS;
+    const cTokenAddress = process.env.REACT_APP_CTOKEN_ADDRESS;
+    const underlying = new web3.eth.Contract(
+      erc20Abi.abi,
+      underlyingMainnetAddress
+    );
+    const underlyingDecimals = 18;
+
+    console.log("Approve funds");
+    let supply = web3.utils.toHex(amount * Math.pow(10, underlyingDecimals));
+    await underlying.methods.approve(contractAddress, supply).send({
+      from: accounts[0],
+      gasLimit: web3.utils.toHex(1000000),
+      gasPrice: web3.utils.toHex(20000000000),
+    });
+
+    await userContract.methods
+      .deposit(underlyingMainnetAddress, cTokenAddress, supply)
       .send({
         from: accounts[0],
         gasLimit: web3.utils.toHex(1000000),

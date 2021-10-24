@@ -23,7 +23,7 @@ import SettingsOutlinedIcon from "@material-ui/icons/SettingsOutlined";
 import SupervisedUserCircleOutlinedIcon from "@material-ui/icons/SupervisedUserCircleOutlined";
 import { css } from "@emotion/core";
 import ClipLoader from "react-spinners/ClipLoader";
-
+import axios from "axios";
 import "../App.css";
 import Panel from "../components/Panel";
 import {
@@ -108,7 +108,7 @@ class Dashboard extends Component {
     depositLoading: false,
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     if (!this.props.contractAddress) {
       this.props.history.push({ pathname: "Login" });
     } else {
@@ -183,7 +183,9 @@ class Dashboard extends Component {
               onClick={() => this.props.history.push({ pathname: "/Assets" })}
             >
               <div className="BalanceTitle">CURRENT BALANCE</div>
-              <div className="BalanceAmount">{this.props.balance + " DAI"}</div>
+              <div className="BalanceAmount">
+                {this.props.totalBalance + " USD"}
+              </div>
             </div>
 
             <div className="ColAlign">
@@ -429,6 +431,7 @@ const mapStateToProps = (state) => {
     interestRate,
     depositLoading,
     withdrawLoading,
+    totalBalance,
   } = state.user;
   const { projects } = state.school;
   return {
@@ -441,6 +444,7 @@ const mapStateToProps = (state) => {
     interestRate,
     depositLoading,
     withdrawLoading,
+    totalBalance,
     schoolName: state.school.name,
     schoolAddress: state.school.address,
   };

@@ -4,11 +4,12 @@ const INITIAL_STATE = {
   address: "",
   name: "",
   contractAddress: "",
-  balance: 0,
+  balance: {},
   contribution: 0,
   interestRate: 0,
   depositLoading: false,
   withdrawLoading: false,
+  totalBalance: 0,
 };
 
 export default function (state = INITIAL_STATE, action) {
@@ -36,7 +37,8 @@ export default function (state = INITIAL_STATE, action) {
       return { ...state, depositLoading: true };
     case types.LOAD_WITHDRAW:
       return { ...state, withdrawLoading: true };
-
+    case types.GET_TOTAL_BALANCE:
+      return { ...state, totalBalance: action.payload };
     default:
       return state;
   }

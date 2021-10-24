@@ -1,5 +1,6 @@
 const express = require('express');
 const User = require('../models/User');
+const axios = require('axios');
 require('dotenv').config();
 
 const router = express.Router();
@@ -50,6 +51,29 @@ router.post('/createUser', async (req, res) => {
     }
 
     return res.status(200).json({ success: true });
+});
+
+router.get('/getTokenPrices', async (req, res) => {
+    const { tokens } = req.query;
+    if (!tokens) {
+        return res.status(400).json({
+            tokens: 'Tokens not found',
+        });
+    }
+
+    const prices = await axios.get(
+        'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest',
+        {
+            params: {
+                symbol: tokens,
+            },
+            headers: {
+                'X-CMC_PRO_API_KEY': process.env.PRICES_API,
+            },
+        }
+    );
+
+    return res.status(200).json({ ...prices.data });
 });
 
 module.exports = router;

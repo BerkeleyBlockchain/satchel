@@ -4,6 +4,7 @@ export const LOGIN_NEW_USER_SUCCESS = "login_user_success";
 export const LOGIN_USER_FAILURE = "login_user_failure";
 
 export const GET_BALANCE = "get-balance";
+export const GET_TOTAL_BALANCE = "get_total_balance";
 export const GET_NAME = "get_name";
 export const GET_CONTRIBUTION = "get_contribution";
 export const GET_INTEREST_RATE = "get_interest_rate";

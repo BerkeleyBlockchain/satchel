@@ -38,7 +38,7 @@ class Assets extends Component {
           }}
         >
           <div>User Balance</div>
-          <div>{asset.symbol}</div>
+          <div>{this.props.balance[asset.symbol]}</div>
         </div>
       </div>
     );
@@ -85,8 +85,8 @@ class Assets extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const { address } = state.user;
-  return { address };
+  const { address, balance } = state.user;
+  return { address, balance };
 };
 
 export default connect(mapStateToProps, {})(Assets);
