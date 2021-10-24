@@ -134,25 +134,52 @@ export const getBalance = (contractAddress) => async (dispatch) => {
       balance[assets[i].symbol] = Number((data[i] / 1e18).toFixed(2));
     }
 
-    console.log("balancess");
-    console.log(balance);
     dispatch({ type: types.GET_BALANCE, payload: balance });
 
+    // Get prices
     const prices = await axios.get(
       "http://localhost:4000/api/user/getTokenPrices",
       { params: { tokens: assets.map((asset) => asset.symbol).join() } }
     );
 
-    console.log("price");
-    console.log(prices.data.data);
-
+    // Convert price to USD and sum
     let tb = 0;
+    const balance_usd = {};
     assets.forEach((asset) => {
       let { symbol } = asset;
-      tb += prices.data.data[symbol].quote.USD.price * balance[symbol];
+      balance_usd[symbol] =
+        prices.data.data[symbol].quote.USD.price * balance[symbol];
+      tb += balance_usd[symbol];
     });
 
     dispatch({ type: types.GET_TOTAL_BALANCE, payload: Number(tb.toFixed(2)) });
+
+    // Get ctoken interest rates
+    const cTokenInterest = await axios.get(
+      "https://api.compound.finance/api/v2/ctoken",
+      {
+        params: {
+          addresses: assets.map((asset) => asset.cTokenAddressMainnet),
+        },
+      }
+    );
+
+    console.log(cTokenInterest.data);
+
+    // Get avg interest
+    let interest = 0;
+    for (let i = 0; i < assets.length; i++) {
+      interest +=
+        (balance[assets[i].symbol] *
+          cTokenInterest.data.cToken[i].supply_rate.value *
+          50) /
+        tb;
+    }
+
+    dispatch({
+      type: types.GET_INTEREST_RATE,
+      payload: Number(interest.toFixed(2)),
+    });
   } catch (e) {
     console.log(e);
     console.log(e.message);
@@ -187,7 +214,7 @@ export const getInterestRate = (contractAddress) => async (dispatch) => {
   });
 };
 
-// I think this needs to be initialized for each asset we want to do...
+// think this needs to be initialized for each asset we want to do...
 const underlyingDecimals = 18;
 const underlyingMainnetAddress = process.env.REACT_APP_TOKEN_ADDRESS;
 const underlying = new web3.eth.Contract(
@@ -198,21 +225,16 @@ const underlying = new web3.eth.Contract(
 const cTokenAddress = process.env.REACT_APP_CTOKEN_ADDRESS;
 const cToken = new web3.eth.Contract(cTokenAbi.abi, cTokenAddress);
 
-export const deposit = (contractAddress, amount) => async (dispatch) => {
-  console.log(process.env.REACT_APP_CTOKEN_ADDRESS);
-  console.log("handleGet\n");
+export const deposit = (contractAddress, amount, asset) => async (dispatch) => {
+  console.log("handleGet\n\n\n");
   dispatch({ type: types.LOAD_DEPOSIT });
 
+  console.log(asset);
   try {
     const accounts = await web3.eth.getAccounts();
     const userContract = new web3.eth.Contract(userAbi.abi, contractAddress);
 
-    const underlyingMainnetAddress = process.env.REACT_APP_TOKEN_ADDRESS;
-    const cTokenAddress = process.env.REACT_APP_CTOKEN_ADDRESS;
-    const underlying = new web3.eth.Contract(
-      erc20Abi.abi,
-      underlyingMainnetAddress
-    );
+    const underlying = new web3.eth.Contract(erc20Abi.abi, asset.tokenAddress);
     const underlyingDecimals = 18;
 
     console.log("Approve funds");
@@ -224,7 +246,7 @@ export const deposit = (contractAddress, amount) => async (dispatch) => {
     });
 
     await userContract.methods
-      .deposit(underlyingMainnetAddress, cTokenAddress, supply)
+      .deposit(asset.tokenAddress, asset.cTokenAddress, supply)
       .send({
         from: accounts[0],
         gasLimit: web3.utils.toHex(1000000),

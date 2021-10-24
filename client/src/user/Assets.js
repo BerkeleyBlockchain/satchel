@@ -22,6 +22,7 @@ class Assets extends Component {
           alignItems: "center",
           padding: "2vw",
           borderRadius: "2vw",
+          marginBottom: "3vh",
         }}
       >
         <img

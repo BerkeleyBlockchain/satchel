@@ -12,7 +12,7 @@ import {
   Dropdown,
   DropdownToggle,
   DropdownMenu,
-  DropdownItem
+  DropdownItem,
 } from "reactstrap";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
@@ -27,9 +27,10 @@ import SettingsOutlinedIcon from "@material-ui/icons/SettingsOutlined";
 import SupervisedUserCircleOutlinedIcon from "@material-ui/icons/SupervisedUserCircleOutlined";
 import { css } from "@emotion/core";
 import ClipLoader from "react-spinners/ClipLoader";
-import axios from "axios";
 import "../App.css";
 import Panel from "../components/Panel";
+import assets from "../assets.json";
+
 import {
   getName,
   getBalance,
@@ -111,7 +112,8 @@ class Dashboard extends Component {
     withdrawLoading: false,
     depositLoading: false,
     dropdownOpen: false,
-    dropDownValue: "Select Asset"
+    dropDownValue: "Select Asset",
+    activeAsset: {},
   };
 
   async componentDidMount() {
@@ -120,7 +122,7 @@ class Dashboard extends Component {
     } else {
       this.props.getName(this.props.contractAddress);
       this.props.getBalance(this.props.contractAddress);
-      this.props.getInterestRate(this.props.contractAddress);
+      // this.props.getInterestRate(this.props.contractAddress);
       // this.props.getContribution(this.props.contractAddress);
       this.props.getSchoolByUser(this.props.contractAddress);
     }
@@ -147,7 +149,7 @@ class Dashboard extends Component {
 
   toggleAsset = () => {
     this.setState({
-      dropdownOpen: !this.state.dropdownOpen
+      dropdownOpen: !this.state.dropdownOpen,
     });
   };
 
@@ -202,6 +204,26 @@ class Dashboard extends Component {
 
             <div className="ColAlign">
               <Container>
+                <Dropdown
+                  isOpen={this.state.dropdownOpen}
+                  toggle={this.toggleAsset}
+                >
+                  <DropdownToggle className="my-dropdown" my-dropdown caret>
+                    {!this.state.activeAsset.name
+                      ? "Select Asset"
+                      : "Asset: " + this.state.activeAsset.name}
+                  </DropdownToggle>
+                  <DropdownMenu>
+                    {assets.map((asset) => (
+                      <DropdownItem
+                        onClick={() => this.setState({ activeAsset: asset })}
+                      >
+                        {asset.name}
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </Dropdown>
+
                 <Row>
                   <Col xs="6">
                     <Form>
@@ -222,16 +244,6 @@ class Dashboard extends Component {
                               fontSize: "12px",
                             }}
                           />
-                          <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggleAsset}>
-                            <DropdownToggle className="my-dropdown" my-dropdowncaret>
-                              {this.state.dropDownValue}
-                            </DropdownToggle>
-                            <DropdownMenu>
-                              <DropdownItem>DAI</DropdownItem>
-                              <DropdownItem>Asset 2</DropdownItem>
-                              <DropdownItem>Asset 3</DropdownItem>
-                            </DropdownMenu>
-                          </Dropdown>
                         </FormGroup>
                       </Row>
                       <Row>
@@ -252,7 +264,8 @@ class Dashboard extends Component {
                             e.preventDefault();
                             this.props.deposit(
                               this.props.contractAddress,
-                              this.state.Deposit
+                              this.state.Deposit,
+                              this.state.activeAsset
                             );
                           }}
                           type="submit"

@@ -4,7 +4,7 @@
     "symbol": "USDC",
     "url": "https://dynamic-assets.coinbase.com/3c15df5e2ac7d4abbe9499ed9335041f00c620f28e8de2f93474a9f432058742cdf4674bd43f309e69778a26969372310135be97eb183d91c492154176d455b8/asset_icons/9d67b728b6c8f457717154b3a35f9ddc702eae7e76c4684ee39302c4d7fd0bb8.png",
     "tokenAddress": "0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C",
-    "cTokenAddress": "0xcec4a43ebb02f9b80916f1c718338169d6d5c1f0",
+    "cTokenAddress": "0xCEC4a43eBB02f9B80916F1c718338169d6d5C1F0",
     "cTokenAddressMainnet": "0x39aa39c021dfbae8fac545936693ac917d5e7563"
   },
   {
@@ -14,5 +14,13 @@
     "tokenAddress": "0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60",
     "cTokenAddress": "0x822397d9a55d0fefd20f5c4bcab33c5f65bd28eb",
     "cTokenAddressMainnet": "0x5d3a536e4d6dbd6114cc1ead35777bab948e3643"
+  },
+  {
+    "name": "ZeroX Token",
+    "symbol": "ZRX",
+    "url": "https://dynamic-assets.coinbase.com/3d0b1dc2a70acb73379c2d35a1e641f4438702ce8e4a4855b5514ad2758e3f520797d3ae7a9aa675d683188302e4d09c801a5195d89382d4296933dd72217717/asset_icons/1597d628dd19b7885433a2ac2d7de6ad196c519aeab4bfe679706aacbf1df78a.png",
+    "tokenAddress": "0xe4e81fa6b16327d4b78cfeb83aade04ba7075165",
+    "cTokenAddress": "0xa253295ec2157b8b69c44b2cb35360016daa25b1",
+    "cTokenAddressMainnet": "0xb3319f5d18bc0d84dd1b4825dcde5d5f7266d407"
   }
 ]
