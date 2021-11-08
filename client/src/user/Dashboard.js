@@ -41,6 +41,7 @@ import {
   withdraw,
 } from "../redux/actions/user_actions";
 import { getSchoolByUser } from "../redux/actions/school_actions";
+import LoanCard from "../components/LoanCard";
 
 const theme = createMuiTheme({
   palette: {
@@ -355,6 +356,37 @@ class Dashboard extends Component {
             </div>
           </TabPanel>
           <TabPanel value={this.state.activeTab} index={1}>
+            <div className="Welcome">Borrow</div>
+            <div
+              className="Balance"
+              onClick={() => this.props.history.push({ pathname: "/Assets" })}
+            >
+              <div className="BalanceTitle">Credit Score</div>
+              <div className="BalanceAmount">500/800</div>
+            </div>
+            <Button
+              style={{
+                backgroundColor: "#146EFF",
+                color: "white",
+                fontWeight: "bold",
+                borderRadius: "10px",
+                borderWidth: "0px",
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-around",
+                width: "70vw",
+                margin: "4vh 10% 0 10%",
+              }}
+              type="submit"
+            >
+              Take out a New Loan{" "}
+            </Button>
+            <div className="Welcome">Active Loans</div>
+            <LoanCard date="10/01/2020" name="New House" amount="45.00 DAI" />
+            <div className="Welcome">Past Loans</div>
+          </TabPanel>
+          <TabPanel value={this.state.activeTab} index={2}>
             <div className="Community">{"Community"}</div>
             <div className="Contributions">
               <Container>
@@ -403,7 +435,7 @@ class Dashboard extends Component {
                 ))
               : null}
           </TabPanel>
-          <TabPanel value={this.state.activeTab} index={2}>
+          <TabPanel value={this.state.activeTab} index={3}>
             <Button
               style={{
                 backgroundColor: "white",
@@ -438,14 +470,19 @@ class Dashboard extends Component {
                     {...a11yProps(0)}
                   />
                   <Tab
+                    icon={<SettingsOutlinedIcon />}
+                    label="Borrow"
+                    {...a11yProps(1)}
+                  />
+                  <Tab
                     icon={<DomainOutlinedIcon />}
                     label="Projects"
-                    {...a11yProps(1)}
+                    {...a11yProps(2)}
                   />
                   <Tab
                     icon={<SettingsOutlinedIcon />}
                     label="Settings"
-                    {...a11yProps(2)}
+                    {...a11yProps(3)}
                   />
                 </Tabs>
               </AppBar>
