@@ -3,7 +3,7 @@ import { Form, Button } from "reactstrap";
 import { connect } from "react-redux";
 
 import "../App.css";
-import logo from "../logo.png";
+import NavBar from "../components/Navbar";
 import tokens from "../assets.json";
 
 class Assets extends Component {
@@ -76,10 +76,11 @@ class Assets extends Component {
             width: "80vw",
             margin: "4vh 10vw 0 10vw",
           }}
-          onClick={() => this.props.history.push({ pathname: "/Dashboard" })}
+          onClick={() => this.props.history.push({ pathname: "/Account" })}
         >
           Back{" "}
         </Button>
+        <NavBar active={0} history={this.props.history} />
       </div>
     );
   }

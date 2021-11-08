@@ -47,7 +47,7 @@ export const handleUserLogin = (history) => async (dispatch) => {
       console.log("New user detected");
       history.push({ pathname: "/SelectSchool" });
     } else {
-      history.push({ pathname: "/Dashboard" });
+      history.push({ pathname: "/Account" });
     }
   } catch (err) {
     console.log(err);
@@ -96,7 +96,7 @@ export const handleUserSignup = (school, name, history) => async (dispatch) => {
           name,
         },
       });
-      history.push({ pathname: "/Dashboard" });
+      history.push({ pathname: "/Account" });
     } else {
       console.log("Not a new user!");
       history.push({ pathname: "/Login" });

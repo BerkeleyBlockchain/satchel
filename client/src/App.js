@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import "./App.css";
-import Dashboard from "./user/Dashboard";
+import Account from "./user/Account";
 import Login from "./user/Login";
 import SchoolLogin from "./school/SchoolLogin";
 import SchoolDashboard from "./school/SchoolDashboard";
 import CreateProject from "./school/CreateProject";
 import SelectSchool from "./user/SelectSchool";
 import Assets from "./user/Assets";
+import Settings from "./user/Settings";
 
 import {
   BrowserRouter as Router,
@@ -14,6 +15,8 @@ import {
   Switch,
   Redirect,
 } from "react-router-dom";
+import Loans from "./user/Loans";
+import Community from "./user/Community";
 class App extends Component {
   render() {
     return (
@@ -33,9 +36,12 @@ class App extends Component {
             {/* <Redirect to="/CreateProject/" /> */}
             <Route
               exact
-              path="/Dashboard"
-              render={(props) => <Dashboard {...props} />}
+              path="/Account"
+              render={(props) => <Account {...props} />}
             />
+            <Route exact path="/Settings" component={Settings} />
+            <Route exact path="/Loans" component={Loans} />
+            <Route exact path="/Community" component={Community} />
           </Switch>
         </div>
       </Router>
