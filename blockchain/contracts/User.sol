@@ -24,6 +24,8 @@ interface CErc20 is Erc20 {
     function balanceOfUnderlying(address) external returns (uint256);
 
     function redeemUnderlying(uint) external returns (uint);
+
+    function borrow(uint borrowAmount) external returns (uint);
 }
 
 interface Comptroller {
@@ -233,6 +235,24 @@ contract User is Exponential {
      */
     function exitMarket(address comptroller, address cToken) public returns (uint) {
         return Comptroller(comptroller).exitMarket(cToken);
+    }
+
+    /** Allows the user to borrow cTokens through the Compound protocol
+     * @param - _cTokenAddress is the cToken we wish to borrow
+     * @param - borrowAmount is the number of cTokens the user wishes to borrow
+     * @return - 0 on success else error
+     */
+    function borrow(address _cTokenAddress, uint borrowAmount) public returns (uint) {
+        // First borrow tokens from Compound
+        CErc20 cToken = CErc20(_cTokenAddress);
+        uint err = cToken.borrow(borrowAmount);
+        require(err == 0, "Error when borrowing cTokens from Compound");
+        
+        // Now let's send these tokens to the user
+        bool transferSuccess = cToken.transfer(msg.sender, borrowAmount);
+        require(transferSuccess, "Transferring borrowed tokens to user failed");
+
+        return 0;
     }
 
     // This is needed to receive ETH when calling `redeemCEth`
