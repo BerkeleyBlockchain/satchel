@@ -26,6 +26,12 @@ interface CErc20 is Erc20 {
     function redeemUnderlying(uint) external returns (uint);
 }
 
+interface Comptroller {
+    function enterMarkets(address[] calldata cTokens) external returns (uint[] memory);
+
+    function exitMarket(address cToken) external returns (uint);
+}
+
 contract User is Exponential {
     // School addr, token addr, amount
     event SendToSchool(address, address, uint256);
@@ -207,6 +213,16 @@ contract User is Exponential {
     function getBalance(address _erc20Contract) public view returns(uint256) {
         Erc20 underlying = Erc20(_erc20Contract);
         return underlying.balanceOf(msg.sender);
+    }
+
+    /** Allows the user to enter the market
+     * This is necessary in order to begin borrowing from any market on Compound
+     * @param - comptroller is the address of the compound comptroller 
+     * @param - cTokens is an array of addresses of cTokens whose market we wish to enter
+     * @return - array of integers, one element for each cToken market. 0 if success, else error
+     */
+    function enterMarkets(address comptroller, address[] calldata cTokens) public returns (uint[] memory) {
+        return Comptroller(comptroller).enterMarkets(cTokens);
     }
 
     // This is needed to receive ETH when calling `redeemCEth`
