@@ -26,6 +26,8 @@ interface CErc20 is Erc20 {
     function redeemUnderlying(uint) external returns (uint);
 
     function borrow(uint borrowAmount) external returns (uint);
+
+    function repayBorrow(uint repayAmount) external returns (uint);
 }
 
 interface Comptroller {
@@ -251,6 +253,26 @@ contract User is Exponential {
         // Now let's send these tokens to the user
         bool transferSuccess = cToken.transfer(msg.sender, borrowAmount);
         require(transferSuccess, "Transferring borrowed tokens to user failed");
+
+        return 0;
+    }
+
+    /** Allows the user to repayed borrowed cTokens 
+     * @dev - note that the user must have called cToken.approve(repayAmount) before calling this function
+     * @param - _cTokenAddress is the cToken we wish to borrow
+     * @param - repayAmount is the number of cTokens the user wishes to repay
+     * @return - 0 on success else error
+     */
+    function repayBorrow(address _cTokenAddress, uint repayAmount) public returns (uint) {
+        CErc20 cToken = CErc20(_cTokenAddress);
+
+        // Transfer funds from the user to this contract
+        // Note: The user must have called cToken.approve() before calling this current function
+        require(cToken.transferFrom(msg.sender, address(this), repayAmount), "Transfer of cToken from msg.sender to this contract failed");
+
+        // Now let's go ahead and repay the borrow amount
+        uint success = cToken.repayBorrow(repayAmount);
+        require(success == 0, "Repaying borrow failed");
 
         return 0;
     }
