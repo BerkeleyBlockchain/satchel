@@ -1,7 +1,6 @@
 {
   "scripts": {
     "clean": "hardhat clean",
-    "commit": "git-cz",
     "compile": "env SKIP_LOAD=true hardhat compile && cp -r ./contract_types ../client/contract_types",
     "deploy": "npx hardhat run scripts/deploy.js",
     "lint": "yarn run lint:sol && yarn run lint:ts && yarn run prettier:check",
