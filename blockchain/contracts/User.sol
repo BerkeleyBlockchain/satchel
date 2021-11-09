@@ -225,6 +225,16 @@ contract User is Exponential {
         return Comptroller(comptroller).enterMarkets(cTokens);
     }
 
+    /** Allows the user to exit the market
+     * This changes the assets that compound uses to calculate account liquidity
+     * @param - comptroller is the address of the compound comptroller 
+     * @param - cToken is the address of the cToken whose market we wish to exit
+     * @return - 0 on success else error
+     */
+    function exitMarket(address comptroller, address cToken) public returns (uint) {
+        return Comptroller(comptroller).exitMarket(cToken);
+    }
+
     // This is needed to receive ETH when calling `redeemCEth`
     receive() external payable {}
     fallback() external payable {}
