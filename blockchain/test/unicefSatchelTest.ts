@@ -297,9 +297,22 @@ describe("Unit tests", function () {
         let aliceDaiBalance = await daiContract.connect(daiWhaleUser).balanceOf(alice.address);
         expect(aliceDaiBalance).to.be.eq(daiAmtForAlice);
 
+        await hre.network.provider.request({
+          method: "hardhat_stopImpersonatingAccount",
+          params: [addrOfDaiWhale],
+        });
+
         // 2. Let's mint some cDai
+        // Approve cDai contract to spend Alice's dai
+        await daiContract.connect(alice).approve(cDaiContract.address, aliceDaiBalance);
+        let retval = await cDaiContract.connect(alice).mint(daiAmtForAlice);
+        // expect(retval).to.be.eq(0);
+
+        let aliceCDaiBalance = await cDaiContract.balanceOf(alice.address);
+        console.log(aliceCDaiBalance);
 
         // 3. Let's enter the market for cDai (we can use it as collateral)
+
 
         // 4. Let's try to borrow some cUsdc
 
