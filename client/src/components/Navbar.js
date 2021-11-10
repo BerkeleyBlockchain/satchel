@@ -9,6 +9,7 @@ import Box from "@material-ui/core/Box";
 import SettingsOutlinedIcon from "@material-ui/icons/SettingsOutlined";
 import AccountBalanceWalletOutlinedIcon from "@material-ui/icons/AccountBalanceWalletOutlined";
 import DomainOutlinedIcon from "@material-ui/icons/DomainOutlined";
+import SyncOutlinedIcon from "@material-ui/icons/SyncOutlined";
 
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 import { useHistory } from "react-router-dom";
@@ -57,11 +58,7 @@ export default function NavBar(props) {
               label="Account"
               {...a11yProps(0)}
             />
-            <Tab
-              icon={<SettingsOutlinedIcon />}
-              label="Borrow"
-              {...a11yProps(1)}
-            />
+            <Tab icon={<SyncOutlinedIcon />} label="Borrow" {...a11yProps(1)} />
             <Tab
               icon={<DomainOutlinedIcon />}
               label="Projects"

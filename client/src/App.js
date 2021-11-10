@@ -17,6 +17,7 @@ import {
 } from "react-router-dom";
 import Loans from "./user/Loans";
 import Community from "./user/Community";
+import LoanDetail from "./user/LoanDetail";
 class App extends Component {
   render() {
     return (
@@ -41,6 +42,7 @@ class App extends Component {
             />
             <Route exact path="/Settings" component={Settings} />
             <Route exact path="/Loans" component={Loans} />
+            <Route exact path="/LoanDetail" component={LoanDetail} />
             <Route exact path="/Community" component={Community} />
           </Switch>
         </div>

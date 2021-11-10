@@ -16,7 +16,7 @@ import { getSchoolByUser } from "../redux/actions/school_actions";
 import LoanCard from "../components/LoanCard";
 import NavBar from "../components/Navbar";
 
-class Dashboard extends Component {
+class Loans extends Component {
   state = {
     activeTab: 0,
     Balance: "",
@@ -50,31 +50,6 @@ class Dashboard extends Component {
     }
   }
 
-  setDeposit = (event) => {
-    event.preventDefault();
-    const x = event.target.value;
-    this.setState({ Deposit: x });
-  };
-
-  setWithdraw = (event) => {
-    event.preventDefault();
-    const x = event.target.value;
-    this.setState({ Withdraw: x });
-  };
-
-  toggle = (event, tab) => {
-    event.preventDefault();
-    if (this.state.activeTab !== tab) {
-      this.setState({ activeTab: tab });
-    }
-  };
-
-  toggleAsset = () => {
-    this.setState({
-      dropdownOpen: !this.state.dropdownOpen,
-    });
-  };
-
   render() {
     console.log("User Address: ", this.props.contractAddress);
     return (
@@ -99,7 +74,7 @@ class Dashboard extends Component {
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-around",
-              width: "70vw",
+              width: "80vw",
               margin: "4vh 10% 0 10%",
             }}
             type="submit"
@@ -107,7 +82,12 @@ class Dashboard extends Component {
             Take out a New Loan{" "}
           </Button>
           <div className="Welcome">Active Loans</div>
-          <LoanCard date="10/01/2020" name="New House" amount="45.00 DAI" />
+          <LoanCard
+            date="10/01/2020"
+            name="New House"
+            amount="45.00 DAI"
+            onClick={() => this.props.history.push({ pathname: "/LoanDetail" })}
+          />
           <div className="Welcome">Past Loans</div>
           <NavBar active={1} history={this.props.history} />
         </div>
@@ -154,4 +134,4 @@ export default connect(mapStateToProps, {
   getInterestRate,
   deposit,
   withdraw,
-})(Dashboard);
+})(Loans);
