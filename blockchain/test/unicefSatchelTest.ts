@@ -277,6 +277,8 @@ describe("Unit tests", function () {
         const daiContract: Erc20 = <Erc20> await ethers.getContractAt("contracts/User.sol:Erc20", daiAddr);
         const cDaiAddr = "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643";
         const cDaiContract: CErc20 = <CErc20> await ethers.getContractAt("contracts/User.sol:CErc20", cDaiAddr);
+        const cUsdcAddr = "0x39aa39c021dfbae8fac545936693ac917d5e7563";
+        const cUsdcContract: CErc20 = <CErc20> await ethers.getContractAt("contracts/User.sol:CErc20", cUsdcAddr);
         const comptrollerAddr = "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B";
         const comptrollerContract: Comptroller = <Comptroller> await ethers.getContractAt("Comptroller", comptrollerAddr);
 
@@ -312,9 +314,17 @@ describe("Unit tests", function () {
         console.log(aliceCDaiBalance);
 
         // 3. Let's enter the market for cDai (we can use it as collateral)
-
+        await comptrollerContract.connect(alice).enterMarkets([cDaiContract.address, cUsdcContract.address]);
 
         // 4. Let's try to borrow some cUsdc
+        const usdcAmtToBorrow = 250 * 10 ** 8;
+        retval = await cUsdcContract.connect(alice).borrow(usdcAmtToBorrow);
+        // console.log(retval);
+        
+        let aliceCUsdcBalanceinUsdc = await cUsdcContract.balanceOfUnderlying(alice.address);
+        console.log(aliceCUsdcBalanceinUsdc);
+
+        // expect(retval).to.be.eq(0);
 
         // 5. Let's pay off our cUsdc loan 
 

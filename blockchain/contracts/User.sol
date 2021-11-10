@@ -21,19 +21,19 @@ interface Erc20 {
 interface CErc20 is Erc20 {
     function mint(uint256) external returns (uint256);
 
-    function balanceOfUnderlying(address) external returns (uint256);
+    function balanceOfUnderlying(address) external view returns (uint256);
 
     function redeemUnderlying(uint) external returns (uint);
 
-    function borrow(uint borrowAmount) external returns (uint);
+    function borrow(uint) external returns (uint);
 
-    function repayBorrow(uint repayAmount) external returns (uint);
+    function repayBorrow(uint) external returns (uint);
 }
 
 interface Comptroller {
-    function enterMarkets(address[] calldata cTokens) external returns (uint[] memory);
+    function enterMarkets(address[] calldata) external returns (uint[] memory);
 
-    function exitMarket(address cToken) external returns (uint);
+    function exitMarket(address) external returns (uint);
 }
 
 contract User is Exponential {
