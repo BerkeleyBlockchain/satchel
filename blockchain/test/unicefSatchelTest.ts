@@ -284,6 +284,19 @@ describe("Unit tests", function () {
         const addrOfDaiWhale = "0x64f65e10f1c3cd7e920a6b34b83daf2f100f15e6";
         const daiWhaleUser = await ethers.getSigner(addrOfDaiWhale);
 
+        // Impersonate the account
+        await hre.network.provider.request({
+          method: "hardhat_impersonateAccount",
+          params: [addrOfDaiWhale],
+        });
+
+        const daiAmtForAlice = 500 * 10 ** 8;
+
+        await daiContract.connect(daiWhaleUser).transfer(alice.address, daiAmtForAlice);
+
+        let aliceDaiBalance = await daiContract.connect(daiWhaleUser).balanceOf(alice.address);
+        expect(aliceDaiBalance).to.be.eq(daiAmtForAlice);
+
         // 2. Let's mint some cDai
 
         // 3. Let's enter the market for cDai (we can use it as collateral)
