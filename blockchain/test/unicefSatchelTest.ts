@@ -8,6 +8,9 @@ import { School } from "../contract_types/School";
 import { UnicefSatchel } from '../contract_types/UnicefSatchel';
 import { TestDai } from '../contract_types/TestDai';
 import { TestCDai } from '../contract_types/TestCDai';
+import {Erc20} from '../contract_types/Erc20';
+import {CErc20} from '../contract_types/cErc20';
+import {Comptroller} from '../contract_types/Comptroller';
 import { User } from '../contract_types/User';
 import { getOverrideOptions } from "./utils";
 import chai, { expect } from "chai";
@@ -245,6 +248,51 @@ describe("Unit tests", function () {
         // School should've gotten 50% of the interest generated
         let schoolDaiBalance = await testDai.balanceOf(schoolAddress);
         expect(schoolDaiBalance).to.be.eq(aliceInitialDai * 0.1);
+
+      });
+
+    });
+
+    describe("Borrowing functionality", () => {
+      it("Should allow users to borrow using deposited collateral", async () => {
+        await unicefSatchel.newSchool(schoolName, {
+          from: owner.address,
+        });
+
+        const schoolAddress = await unicefSatchel.schoolArray(0);
+
+        await unicefSatchel.connect(alice).createUserContract(userName, schoolAddress, true, {
+          from: alice.address,
+        });
+
+        const _userAddress = await unicefSatchel.connect(alice).getUserContract({
+          from: alice.address,
+        });
+        let userInstance: User = <User> (await ethers.getContractAt("User", _userAddress));
+
+        // Ok, now let's simulate an actual interaction. 
+
+        // 0. Some setup
+        const daiAddr = "0x6b175474e89094c44da98b954eedeac495271d0f";
+        const daiContract: Erc20 = <Erc20> await ethers.getContractAt("contracts/User.sol:Erc20", daiAddr);
+        const cDaiAddr = "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643";
+        const cDaiContract: CErc20 = <CErc20> await ethers.getContractAt("contracts/User.sol:CErc20", cDaiAddr);
+        const comptrollerAddr = "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B";
+        const comptrollerContract: Comptroller = <Comptroller> await ethers.getContractAt("Comptroller", comptrollerAddr);
+
+        //1. Let's transfer Dai from a whale to Alice
+        const addrOfDaiWhale = "0x64f65e10f1c3cd7e920a6b34b83daf2f100f15e6";
+        const daiWhaleUser = await ethers.getSigner(addrOfDaiWhale);
+
+        // 2. Let's mint some cDai
+
+        // 3. Let's enter the market for cDai (we can use it as collateral)
+
+        // 4. Let's try to borrow some cUsdc
+
+        // 5. Let's pay off our cUsdc loan 
+
+        // 6. Let's try to redeem our cDai back for Dai? 
 
       });
 
