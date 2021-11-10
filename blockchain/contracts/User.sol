@@ -28,6 +28,8 @@ interface CErc20 is Erc20 {
     function borrow(uint) external returns (uint);
 
     function repayBorrow(uint) external returns (uint);
+    
+    event Failure(uint, uint, uint);
 }
 
 interface Comptroller {

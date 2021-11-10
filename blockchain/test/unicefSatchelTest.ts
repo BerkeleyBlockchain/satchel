@@ -311,18 +311,22 @@ describe("Unit tests", function () {
         // expect(retval).to.be.eq(0);
 
         let aliceCDaiBalance = await cDaiContract.balanceOf(alice.address);
-        console.log(aliceCDaiBalance);
+        // console.log(aliceCDaiBalance);
 
         // 3. Let's enter the market for cDai (we can use it as collateral)
         await comptrollerContract.connect(alice).enterMarkets([cDaiContract.address, cUsdcContract.address]);
 
         // 4. Let's try to borrow some cUsdc
         const usdcAmtToBorrow = 250 * 10 ** 8;
-        retval = await cUsdcContract.connect(alice).borrow(usdcAmtToBorrow);
+        let borrowTx = await cUsdcContract.connect(alice).borrow(usdcAmtToBorrow);
+        let failureFilter = cUsdcContract.filters.Failure();
+        let failureEvents = await cUsdcContract.queryFilter(failureFilter, "latest");
+        // console.log(failureEvents[0].args);
         // console.log(retval);
         
         let aliceCUsdcBalanceinUsdc = await cUsdcContract.balanceOfUnderlying(alice.address);
-        console.log(aliceCUsdcBalanceinUsdc);
+        // console.log(aliceCUsdcBalanceinUsdc);
+        // expect(aliceCUsdcBalanceinUsdc).to.be.equal(usdcAmtToBorrow);
 
         // expect(retval).to.be.eq(0);
 
