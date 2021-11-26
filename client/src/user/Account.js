@@ -101,7 +101,7 @@ class Account extends Component {
             className="Balance"
             onClick={() => this.props.history.push({ pathname: "/Assets" })}
           >
-            <div className="BalanceTitle">CURRENT BALANCE</div>
+            <div className="BalanceTitle">CURRENT BALANCE</div>{" "}
             <div className="BalanceAmount">
               {this.props.totalBalance + " USD"}
             </div>

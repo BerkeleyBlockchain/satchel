@@ -87,8 +87,8 @@ class Loans extends Component {
                 marginLeft: "5vw",
               }}
             >
-              <div style={{ color: "#146EFF" }}>Remaining Due</div>
-              <div style={{ fontSize: "200%" }}> 45.00 DAI</div>
+              <div style={{ color: "#146EFF" }}>Current Interest Rate</div>
+              <div style={{ fontSize: "200%" }}> 4.0%</div>
             </div>
           </div>
 
@@ -110,8 +110,8 @@ class Loans extends Component {
                 marginLeft: "5vw",
               }}
             >
-              <div style={{ color: "#146EFF" }}>Remaining Due</div>
-              <div style={{ fontSize: "200%" }}> 45.00 DAI</div>
+              <div style={{ color: "#146EFF" }}>Final Due Date</div>
+              <div style={{ fontSize: "200%" }}>12/8/22</div>
             </div>
           </div>
 
@@ -130,6 +130,7 @@ class Loans extends Component {
               margin: "4vh 10% 0 10%",
             }}
             type="submit"
+            onClick={() => this.props.history.push({ pathname: "/RepayLoan" })}
           >
             Repay
           </Button>
