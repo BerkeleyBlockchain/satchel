@@ -6,6 +6,7 @@ import "../App.css";
 import { getName, getBalance } from "../redux/actions/user_actions";
 import NavBar from "../components/Navbar";
 import BackButton from "../components/BackButton";
+import EventIcon from "@material-ui/icons/Event";
 
 class ConfirmRepay extends Component {
   state = {
@@ -45,46 +46,66 @@ class ConfirmRepay extends Component {
             style={{
               display: "flex",
               flexDirection: "column",
-              alignItems: "center",
-              border: "2px solid #D4E4FF",
+              alignItems: "flex-start",
+              backgroundColor: "#ECF3FF",
               borderRadius: "4vw",
               margin: "4vh 10% 0 10%",
-              padding: "1.5vw",
-              color: "#727A89",
+              padding: "3vw 3vw 3vw 10vw",
+              textAlign: "left",
             }}
           >
-            {data.map((element) => (
+            <div style={{ fontWeight: "bold" }}> You are paying</div>
+            <h3>15.00 DAI </h3>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                width: "100%",
+                alignItems: "center",
+                margin: "2vw 0 2vw 0",
+              }}
+            >
+              <EventIcon fontSize="large" />
               <div
                 style={{
                   display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  padding: "1.5vw 3vw 1.5vw 3vw",
-                  width: "100%",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "flex-start",
+                  textAlign: "left",
+                  marginLeft: "3vw",
                 }}
               >
-                <div style={{ fontWeight: "bold" }}>{element.title}</div>
-                <div>{element.data}</div>
+                <div style={{ fontWeight: "bold" }}> Loan Being Repaid</div>
+                New House
               </div>
-            ))}
-          </div>
+            </div>
 
-          <div style={{ textAlign: "left", margin: "4vh 10% 2vh 10%" }}>
-            How much would you like to repay?
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                width: "100%",
+                alignItems: "center",
+                margin: "2vw 0 2vw 0",
+              }}
+            >
+              <EventIcon fontSize="large" />
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "flex-start",
+                  textAlign: "left",
+                  marginLeft: "3vw",
+                }}
+              >
+                <div style={{ fontWeight: "bold" }}> Amount Remaining</div>
+                30.00 DAI
+              </div>
+            </div>
           </div>
-          <Input
-            type="number"
-            style={{
-              backgroundColor: "#ECF3FF",
-              color: "black",
-              borderRadius: "10px",
-              border: "white",
-              fontSize: "12px",
-              width: "80vw",
-              margin: "2vh 10% 0 10%",
-            }}
-            onChange={(event) => this.setState({ amount: event.target.value })}
-          />
 
           <div
             style={{
@@ -121,6 +142,9 @@ class ConfirmRepay extends Component {
                 width: "35vw",
               }}
               type="submit"
+              onClick={() =>
+                this.props.history.push({ pathname: "RepayComplete" })
+              }
             >
               Repay
             </Button>

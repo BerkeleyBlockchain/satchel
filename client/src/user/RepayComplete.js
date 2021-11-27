@@ -7,11 +7,7 @@ import { getName, getBalance } from "../redux/actions/user_actions";
 import NavBar from "../components/Navbar";
 import BackButton from "../components/BackButton";
 
-class RepayLoan extends Component {
-  state = {
-    amount: "",
-  };
-
+class RepayComplete extends Component {
   async componentDidMount() {
     if (!this.props.contractAddress) {
       this.props.history.push({ pathname: "Login" });
@@ -21,112 +17,34 @@ class RepayLoan extends Component {
   }
 
   render() {
-    console.log(this.state.amount);
-    const data = [
-      { title: "Loan", data: "New House" },
-      { title: "Due Date", data: "12/18/2022" },
-      { title: "Amount Owed", data: "45.00 DAI" },
-    ];
-
     return (
       <div className="App">
         <div className="screens">
-          <BackButton
-            onClick={() => this.props.history.push({ pathname: "Loans" })}
-            text="BORROW"
-          />
-          <div className="Welcome">Repay Loan</div>
-          <div style={{ textAlign: "left", marginLeft: "10%" }}>
-            You are repaying for
-          </div>
+          <div className="Welcome">Repayment</div>
 
-          <div
+          <h2 style={{ textAlign: "left", margin: "20vh 10% 2vh 10%" }}>
+            Congratulations!
+          </h2>
+          <div>You've repaid back 15.00 DAI of your loan!</div>
+          <Button
             style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              border: "2px solid #D4E4FF",
-              borderRadius: "4vw",
-              margin: "4vh 10% 0 10%",
-              padding: "1.5vw",
-              color: "#727A89",
-            }}
-          >
-            {data.map((element) => (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  padding: "1.5vw 3vw 1.5vw 3vw",
-                  width: "100%",
-                }}
-              >
-                <div style={{ fontWeight: "bold" }}>{element.title}</div>
-                <div>{element.data}</div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ textAlign: "left", margin: "4vh 10% 2vh 10%" }}>
-            How much would you like to repay?
-          </div>
-          <Input
-            type="number"
-            style={{
-              backgroundColor: "#ECF3FF",
-              color: "black",
+              backgroundColor: "#146EFF",
+              color: "white",
+              fontWeight: "bold",
               borderRadius: "10px",
-              border: "white",
-              fontSize: "12px",
-              width: "80vw",
-              margin: "2vh 10% 0 10%",
-            }}
-            onChange={(event) => this.setState({ amount: event.target.value })}
-          />
-
-          <div
-            style={{
+              borderWidth: "0px",
               display: "flex",
               flexDirection: "row",
-              justifyContent: "space-between",
+              alignItems: "center",
+              justifyContent: "space-around",
+              width: "80vw",
               margin: "4vh 10% 0 10%",
             }}
+            type="submit"
+            onClick={() => this.props.history.push({ pathname: "/LoanDetail" })}
           >
-            <Button
-              style={{
-                backgroundColor: "white",
-                fontWeight: "bold",
-                color: "#146EFF",
-                borderRadius: "10px",
-                borderWidth: "3px",
-                borderColor: "#146EFF",
-                width: "35vw",
-              }}
-              onClick={() =>
-                this.props.history.push({
-                  pathname: "LoanDetail",
-                  state: { amount: this.state.amount },
-                })
-              }
-              className="LogoutButton"
-            >
-              Cancel
-            </Button>
-
-            <Button
-              style={{
-                backgroundColor: "#146EFF",
-                color: "white",
-                fontWeight: "bold",
-                borderRadius: "10px",
-                width: "35vw",
-              }}
-              type="submit"
-            >
-              Continue
-            </Button>
-          </div>
+            Back to Borrow
+          </Button>
 
           <NavBar active={1} history={this.props.history} />
         </div>
@@ -147,4 +65,4 @@ const mapStateToProps = (state) => {
 export default connect(mapStateToProps, {
   getName,
   getBalance,
-})(RepayLoan);
+})(RepayComplete);
