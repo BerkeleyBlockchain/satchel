@@ -10,12 +10,12 @@
 
 ## Description
 
-Satchel is a mobile-optimized web application that leverages a crowdfunding framework to bank underbanked communities that may lack access to stable financial climates, but have access to the internet. Satchel combats hyperinflation and economic distrust by giving users banking functionality with the use of DAI, a cryptocurrency soft-pegged to the U.S. dollar. Satchel allows users to invest in both themselves and their local school, which operates as an economic hub for each community. By arming communities with the tools they need to adopt socioeconomic mobility at the individual and communal level, Satchel can redefine financial autonomy on the global scale.
+Satchel is a mobile-optimized web application that leverages a crowdfunding framework to bank underbanked communities that may lack access to stable financial climates, but have access to the internet. Satchel combats hyperinflation and economic distrust by giving users banking functionality with the use of DAI, a cryptocurrency soft-pegged to the U.S. dollar. Satchel allows users to invest in both themselves and their local school, which operates as an economic hub for each community. By arming communities with the tools they need to adopt socioeconomic mobility at the individual and communal level, Satchel can redefine financial autonomy on a global scale.
 
 ### Technical Architecture
 
 - React.js and web3 for the frontend
-- Compound as the the Ethereum-lending protocol to garner interest for users
+- Compound as the Ethereum-lending protocol to garner interest for users
 - Solidity for smart contracts
 - MetaMask for authentication
 
@@ -105,14 +105,14 @@ cd blockchain
 yarn deploy
 ```
 
-### 7. Fill out the server side .env
+### 7. Fill out the server-side .env
 
 ```
 PORT=4000
 MONGOOSE=[YOUR MONGO DB URL]
 ```
 
-### 8. Fill out the client side .env
+### 8. Fill out the client-side .env
 
 ```
 REACT_APP_CONTRACT_ADDRESS=[THE ADDRESS OF THE CONTRACT DEPLOYED IN STEP 6]
