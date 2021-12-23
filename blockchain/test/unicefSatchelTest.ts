@@ -309,36 +309,22 @@ describe("Unit tests", function () {
         });
 
         // 2. Let's mint some cDai
-        // Approve cDai contract to spend Alice's dai
-        await daiContract.connect(alice).approve(cDaiContract.address, aliceDaiBalance);
-        let retval = await cDaiContract.connect(alice).mint(daiAmtForAlice);
-        // expect(retval).to.be.eq(0);
-
-        let aliceCDaiBalance = await cDaiContract.balanceOf(alice.address);
-        console.log(aliceCDaiBalance);
+        await daiContract.connect(alice).approve(userInstance.address, aliceDaiBalance);
+        await userInstance.connect(alice).deposit(daiContract.address, cDaiContract.address, aliceDaiBalance);
 
         // 3. Let's enter the market for cDai (we can use it as collateral)
-        let enterMarketsRetVal = await (await comptrollerContract.connect(alice).enterMarkets([cDaiContract.address, cUsdcContract.address])).wait();
-        // expect(enterMarketsRetVal[0]).to.be.eq(0);
-        // expect(enterMarketsRetVal[1]).to.be.eq(0);
+        await userInstance.connect(alice).enterMarkets(comptrollerAddr, [cDaiContract.address, cUsdcContract.address]);
 
         // 4. Let's try to borrow some cUsdc
         const usdcAmtToBorrow = 250 * 10 ** usdcDecimals;
-        let borrowTx = await cUsdcContract.connect(alice).borrow(usdcAmtToBorrow);
-        let failureFilter = cUsdcContract.filters.Failure();
-        let failureEvents = await cUsdcContract.queryFilter(failureFilter, "latest");
-        console.log(failureEvents[0]);
-        // console.log(retval);
+        await userInstance.connect(alice).borrow(usdcAddr, cUsdcAddr, usdcAmtToBorrow);
         
         let aliceUsdcBalance = await usdcContract.balanceOf(alice.address);
-        console.log(aliceUsdcBalance);
         expect(aliceUsdcBalance).to.be.equal(usdcAmtToBorrow);
 
-        // expect(retval).to.be.eq(0);
-
         // 5. Let's pay off our cUsdc loan 
-
-        // 6. Let's try to redeem our cDai back for Dai? 
+        await usdcContract.connect(alice).approve(userInstance.address, aliceUsdcBalance);
+        await userInstance.connect(alice).repayBorrow(usdcAddr, cUsdcAddr, usdcAmtToBorrow);
 
       });
 
