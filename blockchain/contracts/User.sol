@@ -227,7 +227,7 @@ contract User is Exponential {
      * @param - cTokens is an array of addresses of cTokens whose market we wish to enter
      * @return - array of integers, one element for each cToken market. 0 if success, else error
      */
-    function enterMarkets(address comptroller, address[] calldata cTokens) public returns (uint[] memory) {
+    function enterMarkets(address comptroller, address[] calldata cTokens) public onlyOwner returns (uint[] memory) {
         return Comptroller(comptroller).enterMarkets(cTokens);
     }
 
@@ -237,42 +237,48 @@ contract User is Exponential {
      * @param - cToken is the address of the cToken whose market we wish to exit
      * @return - 0 on success else error
      */
-    function exitMarket(address comptroller, address cToken) public returns (uint) {
+    function exitMarket(address comptroller, address cToken) public onlyOwner returns (uint) {
         return Comptroller(comptroller).exitMarket(cToken);
     }
 
     /** Allows the user to borrow cTokens through the Compound protocol
-     * @param - _cTokenAddress is the cToken we wish to borrow
-     * @param - borrowAmount is the number of cTokens the user wishes to borrow
+     * @param - _tokenAddress is the token we wish to borrow
+     * @param - _cTokenAddress is the cToken address
+     * @param - borrowAmount is the number of tokens the user wishes to borrow
      * @return - 0 on success else error
      */
-    function borrow(address _cTokenAddress, uint borrowAmount) public returns (uint) {
+    function borrow(address _tokenAddress, address _cTokenAddress, uint borrowAmount) public onlyOwner returns (uint) {
         // First borrow tokens from Compound
         CErc20 cToken = CErc20(_cTokenAddress);
         uint err = cToken.borrow(borrowAmount);
         require(err == 0, "Error when borrowing cTokens from Compound");
         
         // Now let's send these tokens to the user
-        bool transferSuccess = cToken.transfer(msg.sender, borrowAmount);
+
+        bool transferSuccess = Erc20(_tokenAddress).transfer(msg.sender, borrowAmount);
         require(transferSuccess, "Transferring borrowed tokens to user failed");
 
         return 0;
     }
 
-    /** Allows the user to repayed borrowed cTokens 
-     * @dev - note that the user must have called cToken.approve(repayAmount) before calling this function
-     * @param - _cTokenAddress is the cToken we wish to borrow
-     * @param - repayAmount is the number of cTokens the user wishes to repay
+    /** Allows the user to repayed borrowed tokens 
+     * @dev - note that the user must have called token.approve(repayAmount) before calling this function
+     * @param - _tokenAddress is the token we wish to repay
+     * @param - _cTokenAddress is the cToken
+     * @param - repayAmount is the number of tokens the user wishes to repay
      * @return - 0 on success else error
      */
-    function repayBorrow(address _cTokenAddress, uint repayAmount) public returns (uint) {
+    function repayBorrow(address _tokenAddress, address _cTokenAddress, uint repayAmount) public onlyOwner returns (uint) {
         CErc20 cToken = CErc20(_cTokenAddress);
+        Erc20 token = CErc20(_tokenAddress);
 
         // Transfer funds from the user to this contract
         // Note: The user must have called cToken.approve() before calling this current function
-        require(cToken.transferFrom(msg.sender, address(this), repayAmount), "Transfer of cToken from msg.sender to this contract failed");
+        require(token.transferFrom(msg.sender, address(this), repayAmount), "Transfer of token from msg.sender to this contract failed");
 
         // Now let's go ahead and repay the borrow amount
+        // Approve the cToken to access our token balance
+        token.approve(_cTokenAddress, repayAmount);
         uint success = cToken.repayBorrow(repayAmount);
         require(success == 0, "Repaying borrow failed");
 
