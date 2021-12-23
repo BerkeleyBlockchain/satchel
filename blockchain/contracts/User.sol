@@ -227,7 +227,7 @@ contract User is Exponential {
      * @param - cTokens is an array of addresses of cTokens whose market we wish to enter
      * @return - array of integers, one element for each cToken market. 0 if success, else error
      */
-    function enterMarkets(address comptroller, address[] calldata cTokens) public returns (uint[] memory) {
+    function enterMarkets(address comptroller, address[] calldata cTokens) public onlyOwner returns (uint[] memory) {
         return Comptroller(comptroller).enterMarkets(cTokens);
     }
 
@@ -237,7 +237,7 @@ contract User is Exponential {
      * @param - cToken is the address of the cToken whose market we wish to exit
      * @return - 0 on success else error
      */
-    function exitMarket(address comptroller, address cToken) public returns (uint) {
+    function exitMarket(address comptroller, address cToken) public onlyOwner returns (uint) {
         return Comptroller(comptroller).exitMarket(cToken);
     }
 
@@ -246,7 +246,7 @@ contract User is Exponential {
      * @param - borrowAmount is the number of cTokens the user wishes to borrow
      * @return - 0 on success else error
      */
-    function borrow(address _cTokenAddress, uint borrowAmount) public returns (uint) {
+    function borrow(address _cTokenAddress, uint borrowAmount) public onlyOwner returns (uint) {
         // First borrow tokens from Compound
         CErc20 cToken = CErc20(_cTokenAddress);
         uint err = cToken.borrow(borrowAmount);
@@ -265,7 +265,7 @@ contract User is Exponential {
      * @param - repayAmount is the number of cTokens the user wishes to repay
      * @return - 0 on success else error
      */
-    function repayBorrow(address _cTokenAddress, uint repayAmount) public returns (uint) {
+    function repayBorrow(address _cTokenAddress, uint repayAmount) public onlyOwner returns (uint) {
         CErc20 cToken = CErc20(_cTokenAddress);
 
         // Transfer funds from the user to this contract
