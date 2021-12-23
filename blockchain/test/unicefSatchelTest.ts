@@ -34,6 +34,8 @@ describe("Unit tests", function () {
     const schoolName2 = "Second School Name";
     const erc20Address = "0x5d3a536e4d6dbd6114cc1ead35777bab948e3643";
     const userName = "User Name";
+    const daiDecimals = 18;
+    const usdcDecimals = 6;
     beforeEach(async function () {
       this.signers = {} as Signers;
       const signers: SignerWithAddress[] = await hre.ethers.getSigners();
@@ -275,12 +277,14 @@ describe("Unit tests", function () {
         // 0. Some setup
         const daiAddr = "0x6b175474e89094c44da98b954eedeac495271d0f";
         const daiContract: Erc20 = <Erc20> await ethers.getContractAt("contracts/User.sol:Erc20", daiAddr);
+        const usdcAddr = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
+        const usdcContract: Erc20 = <Erc20> await ethers.getContractAt("contracts/User.sol:Erc20", usdcAddr);
         const cDaiAddr = "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643";
         const cDaiContract: CErc20 = <CErc20> await ethers.getContractAt("contracts/User.sol:CErc20", cDaiAddr);
         const cUsdcAddr = "0x39aa39c021dfbae8fac545936693ac917d5e7563";
         const cUsdcContract: CErc20 = <CErc20> await ethers.getContractAt("contracts/User.sol:CErc20", cUsdcAddr);
         const comptrollerAddr = "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B";
-        const comptrollerContract: Comptroller = <Comptroller> await ethers.getContractAt("Comptroller", comptrollerAddr);
+        const comptrollerContract: Comptroller = <Comptroller> await ethers.getContractAt("contracts/User.sol:Comptroller", comptrollerAddr);
 
         //1. Let's transfer Dai from a whale to Alice
         const addrOfDaiWhale = "0x64f65e10f1c3cd7e920a6b34b83daf2f100f15e6";
@@ -292,7 +296,7 @@ describe("Unit tests", function () {
           params: [addrOfDaiWhale],
         });
 
-        const daiAmtForAlice = 500 * 10 ** 8;
+        const daiAmtForAlice = BigInt(500 * 10 ** 18);
 
         await daiContract.connect(daiWhaleUser).transfer(alice.address, daiAmtForAlice);
 
@@ -311,22 +315,24 @@ describe("Unit tests", function () {
         // expect(retval).to.be.eq(0);
 
         let aliceCDaiBalance = await cDaiContract.balanceOf(alice.address);
-        // console.log(aliceCDaiBalance);
+        console.log(aliceCDaiBalance);
 
         // 3. Let's enter the market for cDai (we can use it as collateral)
-        await comptrollerContract.connect(alice).enterMarkets([cDaiContract.address, cUsdcContract.address]);
+        let enterMarketsRetVal = await (await comptrollerContract.connect(alice).enterMarkets([cDaiContract.address, cUsdcContract.address])).wait();
+        // expect(enterMarketsRetVal[0]).to.be.eq(0);
+        // expect(enterMarketsRetVal[1]).to.be.eq(0);
 
         // 4. Let's try to borrow some cUsdc
-        const usdcAmtToBorrow = 250 * 10 ** 8;
+        const usdcAmtToBorrow = 250 * 10 ** usdcDecimals;
         let borrowTx = await cUsdcContract.connect(alice).borrow(usdcAmtToBorrow);
         let failureFilter = cUsdcContract.filters.Failure();
         let failureEvents = await cUsdcContract.queryFilter(failureFilter, "latest");
-        // console.log(failureEvents[0].args);
+        console.log(failureEvents[0]);
         // console.log(retval);
         
-        let aliceCUsdcBalanceinUsdc = await cUsdcContract.balanceOfUnderlying(alice.address);
-        // console.log(aliceCUsdcBalanceinUsdc);
-        // expect(aliceCUsdcBalanceinUsdc).to.be.equal(usdcAmtToBorrow);
+        let aliceUsdcBalance = await usdcContract.balanceOf(alice.address);
+        console.log(aliceUsdcBalance);
+        expect(aliceUsdcBalance).to.be.equal(usdcAmtToBorrow);
 
         // expect(retval).to.be.eq(0);
 

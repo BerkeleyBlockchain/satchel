@@ -8,6 +8,8 @@ import { config as dotenvConfig } from "dotenv";
 import { HardhatUserConfig } from "hardhat/config";
 
 dotenvConfig({ path: resolve(__dirname, "./.env") });
+import "@tenderly/hardhat-tenderly";
+
 
 const chainIds = {
   hardhat: 31337,
@@ -64,12 +66,19 @@ const config: HardhatUserConfig = {
       url: goerliMainnetNodeURL,
       accounts: [`0x${GOERLI_PRIVATE_KEY}`],
     },
+    // local: {
+		// 	url: 'http://127.0.0.1:8545'
+	  // }
   },
   paths: {
     artifacts: "./artifacts",
     cache: "./cache",
     sources: "./contracts",
     tests: "./test",
+  },
+  tenderly: {
+    username: process.env.username!,
+    project: process.env.project!
   },
   solidity: {
     compilers: [
