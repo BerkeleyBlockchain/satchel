@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import "../App.css";
 import logo from "../logo.png";
 import { handleUserLogin } from "../redux/actions/user_actions";
+import { AppDiv } from "../styles";
 
 // note, contract address must match the address provided by Truffle after migrations
 const web3 = new Web3(Web3.givenProvider);
@@ -34,14 +35,12 @@ class Login extends Component {
 
   login = async (e) => {
     e.preventDefault();
-    // var UserFactory = TruffleContract(userFactoryABI.abi);
-    // UserFactory.setProvider(Web3.givenProvider);
     this.props.handleUserLogin(this.props.history);
   };
 
   render() {
     return (
-      <div className="App">
+      <AppDiv>
         <div className="LoginItems">
           <div>
             {" "}
@@ -54,24 +53,6 @@ class Login extends Component {
             Invest in both yourself and your community.
           </div>
           <Form>
-            {/* <FormGroup className="NameField">
-              <Label for="amount"></Label>
-              <Input
-                onChange={this.setName}
-                type="text"
-                name="text"
-                id="amount"
-                placeholder="Enter your name"
-                style={{
-                  backgroundColor: "#ECF3FF",
-                  color: "black",
-                  borderRadius: "10px",
-                  border: "white",
-                  fontSize: "15px",
-                }}
-              />
-            </FormGroup> */}
-
             <div style={{ marginTop: "10px" }}>
               <Button
                 className="Button"
@@ -104,7 +85,7 @@ class Login extends Component {
             </Button>
           </div>
         </div>
-      </div>
+      </AppDiv>
     );
   }
 }

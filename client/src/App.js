@@ -8,6 +8,8 @@ import CreateProject from "./school/CreateProject";
 import SelectSchool from "./user/SelectSchool";
 import Assets from "./user/Assets";
 import Settings from "./user/Settings";
+import theme from './theme'
+import { ThemeProvider } from '@mui/material/styles';
 
 import {
   BrowserRouter as Router,
@@ -25,7 +27,7 @@ class App extends Component {
   render() {
     return (
       <Router>
-        <div>
+        <ThemeProvider theme={theme}>
           <Switch>
             <Route exact path="/">
               <Redirect to="/Login" />
@@ -51,7 +53,7 @@ class App extends Component {
             <Route exact path="/RepayComplete" component={RepayComplete} />
             <Route exact path="/Community" component={Community} />
           </Switch>
-        </div>
+        </ThemeProvider>
       </Router>
     );
   }
